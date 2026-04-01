@@ -1,15 +1,17 @@
-# BreakWave
-# Created in collaboration with Cube23 Holdings LLC.
-
 name: CI
 
 on:
   push:
-    branches: [main]
-  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+concurrency:
+  group: breakwave-main
+  cancel-in-progress: true
 
 jobs:
-  flutter:
+  verify-analyze-test-build:
+    name: Verify, Analyze, Test, Build APK
     runs-on: ubuntu-latest
 
     steps:
@@ -17,26 +19,56 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Set up Java
-        uses: actions/setup-java@v5
+        uses: actions/setup-java@v4
         with:
           distribution: temurin
-          java-version: '21'
+          java-version: '17'
 
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
           channel: stable
           cache: true
-          pub-cache: true
 
-      - name: Install dependencies
+      - name: Show tool versions
+        run: |
+          flutter --version
+          dart --version
+          python3 --version
+
+      - name: Get dependencies
         run: flutter pub get
 
-      - name: Analyze
+      - name: Run BreakWave verification scripts
+        run: |
+          set -e
+          if [ -d tools ]; then
+            found=0
+            while IFS= read -r script; do
+              found=1
+              echo "Running $script"
+              python3 "$script"
+            done < <(find tools -maxdepth 1 -type f -name 'verify_bw*.py' | sort)
+
+            if [ "$found" -eq 0 ]; then
+              echo "No verify_bw*.py scripts found in tools/"
+            fi
+          else
+            echo "No tools/ directory found"
+          fi
+
+      - name: Flutter analyze
         run: flutter analyze
 
-      - name: Run tests
+      - name: Flutter test
         run: flutter test
 
-      - name: Build Android debug APK
-        run: flutter build apk --debug
+      - name: Build release APK
+        run: flutter build apk --release
+
+      - name: Upload APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: breakwave-release-apk
+          path: build/app/outputs/flutter-apk/app-release.apk
+          if-no-files-found: error
