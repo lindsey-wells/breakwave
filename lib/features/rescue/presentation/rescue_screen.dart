@@ -1,10 +1,10 @@
-/// ------------------------------------------------------------
-/// Cube23 Collaboration Header
-/// Project: BreakWave
-/// File: rescue_screen.dart
-/// Purpose: First-pass rescue screen placeholder for BreakWave.
-/// Notes: Shell-first deterministic scaffold for BW-01.
-/// ------------------------------------------------------------
+// ------------------------------------------------------------
+// Cube23 Collaboration Header
+// Project: BreakWave
+// File: rescue_screen.dart
+// Purpose: First-pass rescue screen placeholder for BreakWave.
+// Notes: Shell-first deterministic scaffold for BW-02.
+// ------------------------------------------------------------
 
 import 'package:flutter/material.dart';
 

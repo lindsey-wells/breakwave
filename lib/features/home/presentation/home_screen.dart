@@ -1,10 +1,10 @@
-/// ------------------------------------------------------------
-/// Cube23 Collaboration Header
-/// Project: BreakWave
-/// File: home_screen.dart
-/// Purpose: BW-02 home dashboard structure for BreakWave.
-/// Notes: Shell-first deterministic scaffold for BW-02.
-/// ------------------------------------------------------------
+// ------------------------------------------------------------
+// Cube23 Collaboration Header
+// Project: BreakWave
+// File: home_screen.dart
+// Purpose: BW-02 home dashboard structure for BreakWave.
+// Notes: Shell-first deterministic scaffold for BW-02.
+// ------------------------------------------------------------
 
 import 'package:flutter/material.dart';
 

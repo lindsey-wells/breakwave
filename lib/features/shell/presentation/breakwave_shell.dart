@@ -1,10 +1,10 @@
-/// ------------------------------------------------------------
-/// Cube23 Collaboration Header
-/// Project: BreakWave
-/// File: breakwave_shell.dart
-/// Purpose: Bottom-tab shell for the first BreakWave navigation pass.
-/// Notes: Shell-first deterministic scaffold for BW-02.
-/// ------------------------------------------------------------
+// ------------------------------------------------------------
+// Cube23 Collaboration Header
+// Project: BreakWave
+// File: breakwave_shell.dart
+// Purpose: Bottom-tab shell for the first BreakWave navigation pass.
+// Notes: Shell-first deterministic scaffold for BW-02.
+// ------------------------------------------------------------
 
 import 'package:flutter/material.dart';
 

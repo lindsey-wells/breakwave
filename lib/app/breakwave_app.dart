@@ -1,10 +1,10 @@
-/// ------------------------------------------------------------
-/// Cube23 Collaboration Header
-/// Project: BreakWave
-/// File: breakwave_app.dart
-/// Purpose: Root MaterialApp wrapper for BreakWave.
-/// Notes: Shell-first deterministic scaffold for BW-01.
-/// ------------------------------------------------------------
+// ------------------------------------------------------------
+// Cube23 Collaboration Header
+// Project: BreakWave
+// File: breakwave_app.dart
+// Purpose: Root MaterialApp wrapper for BreakWave.
+// Notes: Shell-first deterministic scaffold for BW-02.
+// ------------------------------------------------------------
 
 import 'package:flutter/material.dart';
 
@@ -20,7 +20,13 @@ class BreakWaveApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         useMaterial3: true,
+        brightness: Brightness.light,
       ),
+      darkTheme: ThemeData(
+        useMaterial3: true,
+        brightness: Brightness.dark,
+      ),
+      themeMode: ThemeMode.dark,
       home: const BreakWaveShell(),
     );
   }
