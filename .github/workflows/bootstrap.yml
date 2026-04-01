@@ -50,7 +50,7 @@ jobs:
           ## Initial bootstrap scope
           - Clean Flutter shell
           - Home screen scaffold
-          - GitHub Actions CI
+          - Bootstrap workflow
           - Cube23 collaboration notice
           EOT
 
@@ -58,7 +58,7 @@ jobs:
           BreakWave
           Created in collaboration with Cube23 Holdings LLC.
 
-          This repository contains the initial BreakWave bootstrap scaffold, first-screen shell, and CI setup.
+          This repository contains the initial BreakWave bootstrap scaffold and first-screen shell.
           EOT
 
           cat > lib/main.dart <<'EOT'
@@ -150,7 +150,7 @@ jobs:
                               ),
                             ),
                             const SizedBox(height: 12),
-                            Text(
+                            const Text(
                               'A private recovery companion for pause, rescue, reflection, and progress.',
                               textAlign: TextAlign.center,
                               style: TextStyle(
@@ -174,7 +174,7 @@ jobs:
                                       ),
                                     ),
                                     const SizedBox(height: 10),
-                                    Text(
+                                    const Text(
                                       'This is the clean bootstrap shell. Next up: Rescue, Log, Insights, and Support.',
                                       style: TextStyle(
                                         fontSize: 14,
@@ -217,52 +217,6 @@ jobs:
               expect(find.text('Open Rescue'), findsOneWidget);
             });
           }
-          EOT
-
-          mkdir -p .github/workflows
-          cat > .github/workflows/ci.yml <<'EOT'
-          # BreakWave
-          # Created in collaboration with Cube23 Holdings LLC.
-
-          name: CI
-
-          on:
-            push:
-              branches: [main]
-            pull_request:
-
-          jobs:
-            flutter:
-              runs-on: ubuntu-latest
-
-              steps:
-                - name: Checkout
-                  uses: actions/checkout@v4
-
-                - name: Set up Java
-                  uses: actions/setup-java@v5
-                  with:
-                    distribution: temurin
-                    java-version: '21'
-
-                - name: Set up Flutter
-                  uses: subosito/flutter-action@v2
-                  with:
-                    channel: stable
-                    cache: true
-                    pub-cache: true
-
-                - name: Install dependencies
-                  run: flutter pub get
-
-                - name: Analyze
-                  run: flutter analyze
-
-                - name: Run tests
-                  run: flutter test
-
-                - name: Build Android debug APK
-                  run: flutter build apk --debug
           EOT
 
       - name: Verify app
