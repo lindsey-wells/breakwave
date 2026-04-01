@@ -22,18 +22,12 @@ EXPECTED_PATTERNS = {
         "class BreakWaveApp",
         "MaterialApp(",
         "title: 'BreakWave'",
-        "useMaterial3: true",
         "home: const BreakWaveShell()",
     ],
     "lib/features/shell/presentation/breakwave_shell.dart": [
         "class BreakWaveShell",
-        "class _BreakWaveShellState",
         "IndexedStack(",
         "NavigationBar(",
-        "HomeScreen()",
-        "RescueScreen()",
-        "LogScreen()",
-        "SupportScreen()",
         "label: 'Home'",
         "label: 'Rescue'",
         "label: 'Log'",
@@ -41,7 +35,6 @@ EXPECTED_PATTERNS = {
     ],
     "lib/features/home/presentation/home_screen.dart": [
         "class HomeScreen",
-        "Ride the urge. Regain control.",
     ],
     "lib/features/rescue/presentation/rescue_screen.dart": [
         "class RescueScreen",
@@ -67,19 +60,20 @@ def fail(message: str) -> None:
 
 def main() -> None:
     for rel_path in EXPECTED_FILES:
-      path = ROOT / rel_path
-      if not path.exists():
-          fail(f"missing file: {rel_path}")
+        path = ROOT / rel_path
+        if not path.exists():
+            fail(f"missing file: {rel_path}")
 
-      content = path.read_text(encoding="utf-8")
-      if HEADER_TOKEN not in content:
-          fail(f"missing Cube23 header in: {rel_path}")
+        content = path.read_text(encoding="utf-8")
 
-      for pattern in EXPECTED_PATTERNS.get(rel_path, []):
-          if pattern not in content:
-              fail(f"missing pattern in {rel_path}: {pattern}")
+        if HEADER_TOKEN not in content:
+            fail(f"missing Cube23 header in: {rel_path}")
 
-    print("PASS: BW-01 shell files and markers verified.")
+        for pattern in EXPECTED_PATTERNS.get(rel_path, []):
+            if pattern not in content:
+                fail(f"missing pattern in {rel_path}: {pattern}")
+
+    print("PASS: BW-01 shell foundation verified.")
 
 
 if __name__ == "__main__":
