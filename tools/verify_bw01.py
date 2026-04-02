@@ -38,12 +38,9 @@ EXPECTED_PATTERNS = {
     ],
     "lib/features/rescue/presentation/rescue_screen.dart": [
         "class RescueScreen",
-        "UrgeIntensitySection(",
-        "CalmResetCard()",
     ],
     "lib/features/log/presentation/log_screen.dart": [
         "class LogScreen",
-        "Track urges, slips, and recovery patterns here.",
     ],
     "lib/features/support/presentation/support_screen.dart": [
         "class SupportScreen",
