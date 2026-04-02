@@ -44,7 +44,8 @@ EXPECTED_PATTERNS = {
     ],
     "lib/features/support/presentation/support_screen.dart": [
         "class SupportScreen",
-        "Tools, guidance, and help resources will live here.",
+        "SupportCategoriesCard()",
+        "EmergencyHelpCard()",
     ],
 }
 
