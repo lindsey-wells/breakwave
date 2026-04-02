@@ -3,11 +3,12 @@
 // Project: BreakWave
 // File: log_screen.dart
 // Purpose: BW-04 log foundation screen for BreakWave.
-// Notes: Neutral logging scaffold for BW-04.
+// Notes: Neutral logging scaffold for BW-06.
 // ------------------------------------------------------------
 
 import 'package:flutter/material.dart';
 
+import '../../../core/ui/wave_surface.dart';
 import 'widgets/log_entry_type_section.dart';
 import 'widgets/log_intensity_section.dart';
 import 'widgets/log_notes_card.dart';
@@ -100,14 +101,31 @@ class _LogScreenState extends State<LogScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: <Widget>[
-                  Text(
-                    'Log the moment honestly.',
-                    style: Theme.of(context).textTheme.headlineSmall,
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    'A short, honest log helps BreakWave turn a blurry pattern into something visible and interruptible.',
-                    style: Theme.of(context).textTheme.bodyLarge,
+                  const WaveSurface(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: <Widget>[
+                        Text(
+                          'Pattern Log',
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                        SizedBox(height: 8),
+                        Text(
+                          'Turn blur into something visible.',
+                          style: TextStyle(
+                            fontSize: 24,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                        SizedBox(height: 8),
+                        Text(
+                          'Blue clarity, honest pattern-tracking, and simple reflection belong here.',
+                        ),
+                      ],
+                    ),
                   ),
                   const SizedBox(height: 16),
                   LogEntryTypeSection(

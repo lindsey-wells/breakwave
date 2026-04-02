@@ -3,10 +3,12 @@
 // Project: BreakWave
 // File: urge_intensity_section.dart
 // Purpose: Urge intensity selector for the BW-03 rescue flow.
-// Notes: Neutral rescue flow scaffold for BW-03.
+// Notes: Neutral rescue flow scaffold for BW-06A.
 // ------------------------------------------------------------
 
 import 'package:flutter/material.dart';
+
+import '../../../../core/theme/breakwave_colors.dart';
 
 class UrgeIntensitySection extends StatelessWidget {
   final int selectedIntensity;
@@ -90,6 +92,22 @@ class _IntensityChip extends StatelessWidget {
     return ChoiceChip(
       label: Text(label),
       selected: isSelected,
+      showCheckmark: true,
+      checkmarkColor: Colors.white,
+      backgroundColor: BreakWaveColors.chipIdle,
+      selectedColor: BreakWaveColors.chipSelected,
+      side: BorderSide(
+        color: isSelected
+            ? BreakWaveColors.chipSelectedBorder
+            : const Color(0x33FFFFFF),
+        width: isSelected ? 1.6 : 1.0,
+      ),
+      elevation: isSelected ? 3 : 0,
+      shadowColor: BreakWaveColors.chipSelectedGlow,
+      labelStyle: TextStyle(
+        color: Colors.white,
+        fontWeight: isSelected ? FontWeight.w800 : FontWeight.w500,
+      ),
       onSelected: (_) => onTap(),
     );
   }

@@ -3,11 +3,12 @@
 // Project: BreakWave
 // File: support_screen.dart
 // Purpose: BW-05 support foundation screen for BreakWave.
-// Notes: Neutral support scaffold for BW-05.
+// Notes: Neutral support scaffold for BW-06.
 // ------------------------------------------------------------
 
 import 'package:flutter/material.dart';
 
+import '../../../core/ui/wave_surface.dart';
 import 'widgets/education_resources_card.dart';
 import 'widgets/emergency_help_card.dart';
 import 'widgets/support_categories_card.dart';
@@ -31,14 +32,31 @@ class SupportScreen extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: <Widget>[
-                  Text(
-                    'Support makes the wave smaller.',
-                    style: Theme.of(context).textTheme.headlineSmall,
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    'Use this space to reach for practical help, reduce isolation, and strengthen your next good decision.',
-                    style: Theme.of(context).textTheme.bodyLarge,
+                  const WaveSurface(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: <Widget>[
+                        Text(
+                          'Support Harbor',
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                        SizedBox(height: 8),
+                        Text(
+                          'Support makes the wave smaller.',
+                          style: TextStyle(
+                            fontSize: 24,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                        SizedBox(height: 8),
+                        Text(
+                          'This space should feel like safe water: practical, calm, and easy to reach when the tide gets rough.',
+                        ),
+                      ],
+                    ),
                   ),
                   const SizedBox(height: 16),
                   const SupportCategoriesCard(),

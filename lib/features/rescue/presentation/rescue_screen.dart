@@ -3,11 +3,12 @@
 // Project: BreakWave
 // File: rescue_screen.dart
 // Purpose: BW-03 rescue foundation screen for BreakWave.
-// Notes: Neutral rescue flow scaffold for BW-03.
+// Notes: Neutral rescue flow scaffold for BW-06.
 // ------------------------------------------------------------
 
 import 'package:flutter/material.dart';
 
+import '../../../core/ui/wave_surface.dart';
 import 'widgets/calm_reset_card.dart';
 import 'widgets/redirect_actions_card.dart';
 import 'widgets/support_escalation_card.dart';
@@ -62,19 +63,35 @@ class _RescueScreenState extends State<RescueScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: <Widget>[
-                  Text(
-                    'Take the next steady step.',
-                    style: Theme.of(context).textTheme.headlineSmall,
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    'You are in Rescue mode. Slow this moment down, lower the pressure, and interrupt the pattern.',
-                    style: Theme.of(context).textTheme.bodyLarge,
-                  ),
-                  const SizedBox(height: 10),
-                  Text(
-                    'Current intensity: $_intensityLabel',
-                    style: Theme.of(context).textTheme.titleMedium,
+                  WaveSurface(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: <Widget>[
+                        const Text(
+                          'Rescue Tide',
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        const Text(
+                          'Slow the surge. Ride the wave.',
+                          style: TextStyle(
+                            fontSize: 24,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          'Current intensity: $_intensityLabel',
+                          style: const TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                   const SizedBox(height: 16),
                   UrgeIntensitySection(

@@ -3,10 +3,12 @@
 // Project: BreakWave
 // File: log_intensity_section.dart
 // Purpose: Intensity selector for the BW-04 log flow.
-// Notes: Neutral logging scaffold for BW-04.
+// Notes: Neutral logging scaffold for BW-06A.
 // ------------------------------------------------------------
 
 import 'package:flutter/material.dart';
+
+import '../../../../core/theme/breakwave_colors.dart';
 
 class LogIntensitySection extends StatelessWidget {
   final int selectedIntensity;
@@ -49,9 +51,26 @@ class LogIntensitySection extends StatelessWidget {
               runSpacing: 8,
               children: List<Widget>.generate(labels.length, (int index) {
                 final int value = index + 1;
+                final bool isSelected = selectedIntensity == value;
                 return ChoiceChip(
                   label: Text(labels[index]),
-                  selected: selectedIntensity == value,
+                  selected: isSelected,
+                  showCheckmark: true,
+                  checkmarkColor: Colors.white,
+                  backgroundColor: BreakWaveColors.chipIdle,
+                  selectedColor: BreakWaveColors.chipSelected,
+                  side: BorderSide(
+                    color: isSelected
+                        ? BreakWaveColors.chipSelectedBorder
+                        : const Color(0x33FFFFFF),
+                    width: isSelected ? 1.6 : 1.0,
+                  ),
+                  elevation: isSelected ? 3 : 0,
+                  shadowColor: BreakWaveColors.chipSelectedGlow,
+                  labelStyle: TextStyle(
+                    color: Colors.white,
+                    fontWeight: isSelected ? FontWeight.w800 : FontWeight.w500,
+                  ),
                   onSelected: (_) => onSelected(value),
                 );
               }),

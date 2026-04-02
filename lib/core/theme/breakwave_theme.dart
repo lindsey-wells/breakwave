@@ -3,7 +3,7 @@
 // Project: BreakWave
 // File: breakwave_theme.dart
 // Purpose: App-wide visual theme for BreakWave.
-// Notes: BW-06 theme and wave motif pass.
+// Notes: BW-06A selected-state contrast polish.
 // ------------------------------------------------------------
 
 import 'package:flutter/material.dart';
@@ -71,9 +71,34 @@ class BreakWaveTheme {
       ),
       navigationBarTheme: NavigationBarThemeData(
         backgroundColor: BreakWaveColors.oceanDeep,
-        indicatorColor: const Color(0x332C8ED6),
-        labelTextStyle: WidgetStateProperty.all(
-          const TextStyle(fontWeight: FontWeight.w600),
+        indicatorColor: BreakWaveColors.navIndicator,
+        iconTheme: WidgetStateProperty.resolveWith<IconThemeData?>(
+          (Set<WidgetState> states) {
+            if (states.contains(WidgetState.selected)) {
+              return const IconThemeData(
+                color: Colors.white,
+                size: 28,
+              );
+            }
+            return const IconThemeData(
+              color: BreakWaveColors.mistBlue,
+              size: 26,
+            );
+          },
+        ),
+        labelTextStyle: WidgetStateProperty.resolveWith<TextStyle?>(
+          (Set<WidgetState> states) {
+            if (states.contains(WidgetState.selected)) {
+              return const TextStyle(
+                fontWeight: FontWeight.w800,
+                color: Colors.white,
+              );
+            }
+            return const TextStyle(
+              fontWeight: FontWeight.w600,
+              color: BreakWaveColors.mistBlue,
+            );
+          },
         ),
       ),
       filledButtonTheme: FilledButtonThemeData(
@@ -97,12 +122,19 @@ class BreakWaveTheme {
         ),
       ),
       chipTheme: ChipThemeData(
-        backgroundColor: BreakWaveColors.cardMid,
-        selectedColor: const Color(0x332C8ED6),
-        secondarySelectedColor: const Color(0x332C8ED6),
-        side: const BorderSide(color: Color(0x22FFFFFF)),
-        labelStyle: const TextStyle(color: Colors.white),
-        secondaryLabelStyle: const TextStyle(color: Colors.white),
+        backgroundColor: BreakWaveColors.chipIdle,
+        selectedColor: BreakWaveColors.chipSelected,
+        secondarySelectedColor: BreakWaveColors.chipSelected,
+        side: const BorderSide(color: Color(0x2FFFFFFF)),
+        checkmarkColor: Colors.white,
+        labelStyle: const TextStyle(
+          color: Colors.white,
+          fontWeight: FontWeight.w500,
+        ),
+        secondaryLabelStyle: const TextStyle(
+          color: Colors.white,
+          fontWeight: FontWeight.w800,
+        ),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(18),
         ),

@@ -3,10 +3,12 @@
 // Project: BreakWave
 // File: log_trigger_chips_section.dart
 // Purpose: Trigger chip selector for the BW-04 log flow.
-// Notes: Neutral logging scaffold for BW-04.
+// Notes: Neutral logging scaffold for BW-06A.
 // ------------------------------------------------------------
 
 import 'package:flutter/material.dart';
+
+import '../../../../core/theme/breakwave_colors.dart';
 
 class LogTriggerChipsSection extends StatelessWidget {
   final List<String> availableTriggers;
@@ -42,9 +44,26 @@ class LogTriggerChipsSection extends StatelessWidget {
               spacing: 8,
               runSpacing: 8,
               children: availableTriggers.map((String trigger) {
+                final bool isSelected = selectedTriggers.contains(trigger);
                 return FilterChip(
                   label: Text(trigger),
-                  selected: selectedTriggers.contains(trigger),
+                  selected: isSelected,
+                  showCheckmark: true,
+                  checkmarkColor: Colors.white,
+                  backgroundColor: BreakWaveColors.chipIdle,
+                  selectedColor: BreakWaveColors.chipSelected,
+                  side: BorderSide(
+                    color: isSelected
+                        ? BreakWaveColors.chipSelectedBorder
+                        : const Color(0x33FFFFFF),
+                    width: isSelected ? 1.6 : 1.0,
+                  ),
+                  elevation: isSelected ? 3 : 0,
+                  shadowColor: BreakWaveColors.chipSelectedGlow,
+                  labelStyle: TextStyle(
+                    color: Colors.white,
+                    fontWeight: isSelected ? FontWeight.w800 : FontWeight.w500,
+                  ),
                   onSelected: (_) => onToggle(trigger),
                 );
               }).toList(),
