@@ -3,7 +3,7 @@
 // Project: BreakWave
 // File: log_screen.dart
 // Purpose: BW-04 log foundation screen for BreakWave.
-// Notes: BW-07 persistence foundation.
+// Notes: BW-08 recent log history surface.
 // ------------------------------------------------------------
 
 import 'package:flutter/material.dart';
@@ -16,6 +16,7 @@ import 'widgets/log_intensity_section.dart';
 import 'widgets/log_notes_card.dart';
 import 'widgets/log_save_card.dart';
 import 'widgets/log_trigger_chips_section.dart';
+import 'widgets/recent_log_entries_card.dart';
 
 class LogScreen extends StatefulWidget {
   const LogScreen({super.key});
@@ -34,6 +35,7 @@ class _LogScreenState extends State<LogScreen> {
 
   int _savedEntryCount = 0;
   bool _isSaving = false;
+  List<LogEntry> _recentEntries = const <LogEntry>[];
 
   static const List<String> _availableTriggers = <String>[
     'Stress',
@@ -49,6 +51,7 @@ class _LogScreenState extends State<LogScreen> {
     super.initState();
     _notesController = TextEditingController();
     _loadSavedEntryCount();
+    _loadRecentEntries();
   }
 
   @override
@@ -63,6 +66,16 @@ class _LogScreenState extends State<LogScreen> {
       if (!mounted) return;
       setState(() {
         _savedEntryCount = count;
+      });
+    } catch (_) {}
+  }
+
+  Future<void> _loadRecentEntries() async {
+    try {
+      final List<LogEntry> entries = await _repository.loadEntries();
+      if (!mounted) return;
+      setState(() {
+        _recentEntries = entries.take(5).toList();
       });
     } catch (_) {}
   }
@@ -95,9 +108,11 @@ class _LogScreenState extends State<LogScreen> {
     });
 
     try {
+      final String savedType = _entryType;
+
       final LogEntry entry = LogEntry(
         id: DateTime.now().microsecondsSinceEpoch.toString(),
-        entryType: _entryType,
+        entryType: savedType,
         intensity: _intensity,
         triggers: _selectedTriggers.toList(),
         notes: _notesController.text.trim(),
@@ -105,12 +120,13 @@ class _LogScreenState extends State<LogScreen> {
       );
 
       await _repository.saveEntry(entry);
-      final int count = await _repository.entryCount();
+      final List<LogEntry> entries = await _repository.loadEntries();
 
       if (!mounted) return;
 
       setState(() {
-        _savedEntryCount = count;
+        _savedEntryCount = entries.length;
+        _recentEntries = entries.take(5).toList();
         _entryType = 'Urge';
         _intensity = 3;
         _selectedTriggers.clear();
@@ -121,7 +137,7 @@ class _LogScreenState extends State<LogScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-            'Saved $_entryType entry locally • $count total on this device',
+            'Saved $savedType entry locally • ${entries.length} total on this device',
           ),
         ),
       );
@@ -185,6 +201,10 @@ class _LogScreenState extends State<LogScreen> {
                   Text(
                     'Saved locally on this device: $_savedEntryCount',
                     style: Theme.of(context).textTheme.titleMedium,
+                  ),
+                  const SizedBox(height: 16),
+                  RecentLogEntriesCard(
+                    entries: _recentEntries,
                   ),
                   const SizedBox(height: 16),
                   LogEntryTypeSection(
