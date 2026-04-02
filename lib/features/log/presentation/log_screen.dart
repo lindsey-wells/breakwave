@@ -3,12 +3,14 @@
 // Project: BreakWave
 // File: log_screen.dart
 // Purpose: BW-04 log foundation screen for BreakWave.
-// Notes: Neutral logging scaffold for BW-06.
+// Notes: BW-07 persistence foundation.
 // ------------------------------------------------------------
 
 import 'package:flutter/material.dart';
 
 import '../../../core/ui/wave_surface.dart';
+import '../data/log_repository.dart';
+import '../domain/log_entry.dart';
 import 'widgets/log_entry_type_section.dart';
 import 'widgets/log_intensity_section.dart';
 import 'widgets/log_notes_card.dart';
@@ -23,10 +25,15 @@ class LogScreen extends StatefulWidget {
 }
 
 class _LogScreenState extends State<LogScreen> {
+  final LogRepository _repository = const LogRepository();
+
   String _entryType = 'Urge';
   int _intensity = 3;
   final Set<String> _selectedTriggers = <String>{};
   late final TextEditingController _notesController;
+
+  int _savedEntryCount = 0;
+  bool _isSaving = false;
 
   static const List<String> _availableTriggers = <String>[
     'Stress',
@@ -41,12 +48,23 @@ class _LogScreenState extends State<LogScreen> {
   void initState() {
     super.initState();
     _notesController = TextEditingController();
+    _loadSavedEntryCount();
   }
 
   @override
   void dispose() {
     _notesController.dispose();
     super.dispose();
+  }
+
+  Future<void> _loadSavedEntryCount() async {
+    try {
+      final int count = await _repository.entryCount();
+      if (!mounted) return;
+      setState(() {
+        _savedEntryCount = count;
+      });
+    } catch (_) {}
   }
 
   void _setEntryType(String value) {
@@ -71,19 +89,55 @@ class _LogScreenState extends State<LogScreen> {
     });
   }
 
-  void _saveEntry() {
-    final String notes = _notesController.text.trim();
-    final String triggerSummary = _selectedTriggers.isEmpty
-        ? 'No triggers selected'
-        : _selectedTriggers.join(', ');
+  Future<void> _saveEntry() async {
+    setState(() {
+      _isSaving = true;
+    });
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(
-          'Saved $_entryType entry • intensity $_intensity • $triggerSummary${notes.isEmpty ? '' : ' • notes added'}',
+    try {
+      final LogEntry entry = LogEntry(
+        id: DateTime.now().microsecondsSinceEpoch.toString(),
+        entryType: _entryType,
+        intensity: _intensity,
+        triggers: _selectedTriggers.toList(),
+        notes: _notesController.text.trim(),
+        createdAtIso: DateTime.now().toIso8601String(),
+      );
+
+      await _repository.saveEntry(entry);
+      final int count = await _repository.entryCount();
+
+      if (!mounted) return;
+
+      setState(() {
+        _savedEntryCount = count;
+        _entryType = 'Urge';
+        _intensity = 3;
+        _selectedTriggers.clear();
+        _notesController.clear();
+        _isSaving = false;
+      });
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            'Saved $_entryType entry locally • $count total on this device',
+          ),
         ),
-      ),
-    );
+      );
+    } catch (_) {
+      if (!mounted) return;
+
+      setState(() {
+        _isSaving = false;
+      });
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Unable to save the entry right now.'),
+        ),
+      );
+    }
   }
 
   @override
@@ -127,6 +181,11 @@ class _LogScreenState extends State<LogScreen> {
                       ],
                     ),
                   ),
+                  const SizedBox(height: 12),
+                  Text(
+                    'Saved locally on this device: $_savedEntryCount',
+                    style: Theme.of(context).textTheme.titleMedium,
+                  ),
                   const SizedBox(height: 16),
                   LogEntryTypeSection(
                     selectedType: _entryType,
@@ -152,6 +211,8 @@ class _LogScreenState extends State<LogScreen> {
                     entryType: _entryType,
                     intensity: _intensity,
                     triggerCount: _selectedTriggers.length,
+                    savedEntryCount: _savedEntryCount,
+                    isSaving: _isSaving,
                     onSave: _saveEntry,
                   ),
                 ],
