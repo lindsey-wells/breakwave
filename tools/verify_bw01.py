@@ -38,7 +38,8 @@ EXPECTED_PATTERNS = {
     ],
     "lib/features/rescue/presentation/rescue_screen.dart": [
         "class RescueScreen",
-        "This is where immediate urge support will live.",
+        "UrgeIntensitySection(",
+        "CalmResetCard()",
     ],
     "lib/features/log/presentation/log_screen.dart": [
         "class LogScreen",
