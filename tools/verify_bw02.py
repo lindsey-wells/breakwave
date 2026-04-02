@@ -18,7 +18,7 @@ HEADER_TOKEN = "Cube23 Collaboration Header"
 STRING_PATTERNS = {
     "lib/app/breakwave_app.dart": [
         "class BreakWaveApp",
-        "darkTheme: ThemeData(",
+        "BreakWaveTheme.dark()",
         "themeMode: ThemeMode.dark",
     ],
     "lib/features/home/presentation/home_screen.dart": [
