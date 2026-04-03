@@ -3,7 +3,7 @@
 // Project: BreakWave
 // File: recent_log_entries_card.dart
 // Purpose: Recent log history surface for the BW-08 log flow.
-// Notes: BW-08 recent log history surface.
+// Notes: BW-10 edit/delete actions.
 // ------------------------------------------------------------
 
 import 'package:flutter/material.dart';
@@ -12,10 +12,14 @@ import '../../domain/log_entry.dart';
 
 class RecentLogEntriesCard extends StatelessWidget {
   final List<LogEntry> entries;
+  final ValueChanged<LogEntry> onEdit;
+  final ValueChanged<LogEntry> onDelete;
 
   const RecentLogEntriesCard({
     super.key,
     required this.entries,
+    required this.onEdit,
+    required this.onDelete,
   });
 
   @override
@@ -43,7 +47,11 @@ class RecentLogEntriesCard extends StatelessWidget {
                 children: entries.map((LogEntry entry) {
                   return Padding(
                     padding: const EdgeInsets.only(bottom: 12),
-                    child: _RecentEntryRow(entry: entry),
+                    child: _RecentEntryRow(
+                      entry: entry,
+                      onEdit: () => onEdit(entry),
+                      onDelete: () => onDelete(entry),
+                    ),
                   );
                 }).toList(),
               ),
@@ -75,9 +83,13 @@ class _EmptyHistoryState extends StatelessWidget {
 
 class _RecentEntryRow extends StatelessWidget {
   final LogEntry entry;
+  final VoidCallback onEdit;
+  final VoidCallback onDelete;
 
   const _RecentEntryRow({
     required this.entry,
+    required this.onEdit,
+    required this.onDelete,
   });
 
   String _formatTimestamp(String iso) {
@@ -153,6 +165,23 @@ class _RecentEntryRow extends StatelessWidget {
               style: Theme.of(context).textTheme.bodyMedium,
             ),
           ],
+          const SizedBox(height: 12),
+          Wrap(
+            spacing: 10,
+            runSpacing: 10,
+            children: <Widget>[
+              OutlinedButton.icon(
+                onPressed: onEdit,
+                icon: const Icon(Icons.edit_outlined),
+                label: const Text('Edit'),
+              ),
+              OutlinedButton.icon(
+                onPressed: onDelete,
+                icon: const Icon(Icons.delete_outline),
+                label: const Text('Delete'),
+              ),
+            ],
+          ),
         ],
       ),
     );

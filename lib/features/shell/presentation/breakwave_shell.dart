@@ -3,7 +3,7 @@
 // Project: BreakWave
 // File: breakwave_shell.dart
 // Purpose: Bottom-tab shell for the first BreakWave navigation pass.
-// Notes: Shell-first deterministic scaffold for BW-02.
+// Notes: Shell-first deterministic scaffold for BW-10.
 // ------------------------------------------------------------
 
 import 'package:flutter/material.dart';
@@ -30,6 +30,10 @@ class _BreakWaveShellState extends State<BreakWaveShell> {
     });
   }
 
+  void _returnHome() {
+    _onDestinationSelected(0);
+  }
+
   @override
   Widget build(BuildContext context) {
     final List<Widget> screens = <Widget>[
@@ -37,8 +41,12 @@ class _BreakWaveShellState extends State<BreakWaveShell> {
         onOpenRescue: () => _onDestinationSelected(1),
         onOpenLog: () => _onDestinationSelected(2),
       ),
-      const RescueScreen(),
-      const LogScreen(),
+      RescueScreen(
+        onReturnHome: _returnHome,
+      ),
+      LogScreen(
+        onReturnHome: _returnHome,
+      ),
       const SupportScreen(),
     ];
 
