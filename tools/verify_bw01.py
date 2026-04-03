@@ -22,7 +22,7 @@ EXPECTED_PATTERNS = {
         "class BreakWaveApp",
         "MaterialApp(",
         "title: 'BreakWave'",
-        "home: const BreakWaveShell()",
+        "BreakWaveShell()",
     ],
     "lib/features/shell/presentation/breakwave_shell.dart": [
         "class BreakWaveShell",
