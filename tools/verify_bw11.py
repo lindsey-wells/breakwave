@@ -7,6 +7,8 @@ checks = [
         "secular",
         "christian",
         "fromStorage",
+        "Secular recovery path",
+        "Christian recovery path",
     ]),
     ("lib/core/recovery/recovery_mode_store.dart", [
         "class RecoveryModeStore",
@@ -23,9 +25,10 @@ checks = [
     ("lib/features/recovery_mode/recovery_mode_screen.dart", [
         "class RecoveryModeScreen",
         "Choose your recovery mode",
-        "Secular recovery path",
-        "Christian recovery path",
         "Continue",
+        "_ModeCard",
+        "RecoveryMode.secular",
+        "RecoveryMode.christian",
     ]),
     ("lib/app/breakwave_app.dart", [
         "RecoveryModeGate",
@@ -51,4 +54,4 @@ for rel_path, needles in checks:
 if failed:
     sys.exit(1)
 
-print("BW-11 verify passed.")
+print("PASS: BW-11 recovery mode selection verified.")
