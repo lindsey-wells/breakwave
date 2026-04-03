@@ -11,7 +11,7 @@ EXPECTED_FILES = [
 EXPECTED_PATTERNS = {
     "lib/features/log/presentation/log_screen.dart": [
         "List<LogEntry> _recentEntries = const <LogEntry>[];",
-        "Future<void> _loadRecentEntries() async",
+        "Future<void> _refreshFromStorage() async",
         "_recentEntries = entries.take(5).toList();",
         "RecentLogEntriesCard(",
         "entries: _recentEntries",
