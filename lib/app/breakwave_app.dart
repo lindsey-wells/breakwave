@@ -8,6 +8,7 @@
 
 import 'package:flutter/material.dart';
 
+import '../core/recovery/recovery_mode_gate.dart';
 import '../core/theme/breakwave_theme.dart';
 import '../features/shell/presentation/breakwave_shell.dart';
 
@@ -22,7 +23,9 @@ class BreakWaveApp extends StatelessWidget {
       theme: BreakWaveTheme.dark(),
       darkTheme: BreakWaveTheme.dark(),
       themeMode: ThemeMode.dark,
-      home: const BreakWaveShell(),
+      home: const RecoveryModeGate(
+        child: BreakWaveShell(),
+      ),
     );
   }
 }
