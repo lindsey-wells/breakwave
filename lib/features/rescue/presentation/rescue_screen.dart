@@ -3,12 +3,14 @@
 // Project: BreakWave
 // File: rescue_screen.dart
 // Purpose: BW-03 rescue foundation screen for BreakWave.
-// Notes: Neutral rescue flow scaffold for BW-06.
+// Notes: BW-10 completion saves and returns home.
 // ------------------------------------------------------------
 
 import 'package:flutter/material.dart';
 
 import '../../../core/ui/wave_surface.dart';
+import '../../log/data/log_repository.dart';
+import '../../log/domain/log_entry.dart';
 import 'widgets/calm_reset_card.dart';
 import 'widgets/redirect_actions_card.dart';
 import 'widgets/support_escalation_card.dart';
@@ -16,13 +18,20 @@ import 'widgets/urge_intensity_section.dart';
 import 'widgets/wave_completion_card.dart';
 
 class RescueScreen extends StatefulWidget {
-  const RescueScreen({super.key});
+  final VoidCallback onReturnHome;
+
+  const RescueScreen({
+    super.key,
+    required this.onReturnHome,
+  });
 
   @override
   State<RescueScreen> createState() => _RescueScreenState();
 }
 
 class _RescueScreenState extends State<RescueScreen> {
+  final LogRepository _repository = const LogRepository();
+
   int _selectedIntensity = 3;
 
   void _setIntensity(int value) {
@@ -45,6 +54,39 @@ class _RescueScreenState extends State<RescueScreen> {
         return 'Critical';
       default:
         return 'Strong';
+    }
+  }
+
+  Future<void> _completeWave() async {
+    final LogEntry entry = LogEntry(
+      id: DateTime.now().microsecondsSinceEpoch.toString(),
+      entryType: 'Victory',
+      intensity: _selectedIntensity,
+      triggers: const <String>['Rescue Completion'],
+      notes: 'Made it through this wave from Rescue.',
+      createdAtIso: DateTime.now().toIso8601String(),
+    );
+
+    try {
+      await _repository.saveEntry(entry);
+
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Nice work. Wave saved and returning home.'),
+        ),
+      );
+
+      widget.onReturnHome();
+    } catch (_) {
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Unable to save the wave completion right now.'),
+        ),
+      );
     }
   }
 
@@ -103,7 +145,9 @@ class _RescueScreenState extends State<RescueScreen> {
                   const SizedBox(height: 16),
                   const RedirectActionsCard(),
                   const SizedBox(height: 16),
-                  const WaveCompletionCard(),
+                  WaveCompletionCard(
+                    onComplete: _completeWave,
+                  ),
                   const SizedBox(height: 16),
                   const SupportEscalationCard(),
                 ],

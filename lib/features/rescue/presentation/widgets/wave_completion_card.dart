@@ -3,13 +3,18 @@
 // Project: BreakWave
 // File: wave_completion_card.dart
 // Purpose: Wave completion card for the BW-03 rescue flow.
-// Notes: Neutral rescue flow scaffold for BW-03.
+// Notes: BW-10 completion callback support.
 // ------------------------------------------------------------
 
 import 'package:flutter/material.dart';
 
 class WaveCompletionCard extends StatelessWidget {
-  const WaveCompletionCard({super.key});
+  final Future<void> Function() onComplete;
+
+  const WaveCompletionCard({
+    super.key,
+    required this.onComplete,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -30,13 +35,7 @@ class WaveCompletionCard extends StatelessWidget {
             ),
             const SizedBox(height: 16),
             FilledButton.icon(
-              onPressed: () {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('Nice work. You made it through this wave.'),
-                  ),
-                );
-              },
+              onPressed: () => onComplete(),
               icon: const Icon(Icons.check_circle_outline),
               label: const Text('I made it through this wave'),
             ),

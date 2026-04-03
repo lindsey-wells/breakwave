@@ -19,7 +19,7 @@ EXPECTED_PATTERNS = {
         "UrgeIntensitySection(",
         "CalmResetCard()",
         "RedirectActionsCard()",
-        "WaveCompletionCard()",
+        "WaveCompletionCard(",
         "SupportEscalationCard()",
         "Current intensity:",
     ],
