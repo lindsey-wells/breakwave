@@ -36,7 +36,7 @@ EXPECTED_PATTERNS = {
     ],
     "lib/features/log/presentation/log_screen.dart": [
         "final LogRepository _repository = const LogRepository();",
-        "Future<void> _loadSavedEntryCount() async",
+        "Future<void> _refreshFromStorage() async",
         "Future<void> _saveEntry() async",
         "LogEntry(",
         "await _repository.saveEntry(entry);",
