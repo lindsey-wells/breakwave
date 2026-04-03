@@ -3,7 +3,7 @@
 // Project: BreakWave
 // File: log_screen.dart
 // Purpose: BW-04 log foundation screen for BreakWave.
-// Notes: BW-08 recent log history surface.
+// Notes: BW-10 edit/delete recent log entries.
 // ------------------------------------------------------------
 
 import 'package:flutter/material.dart';
@@ -19,7 +19,12 @@ import 'widgets/log_trigger_chips_section.dart';
 import 'widgets/recent_log_entries_card.dart';
 
 class LogScreen extends StatefulWidget {
-  const LogScreen({super.key});
+  final VoidCallback onReturnHome;
+
+  const LogScreen({
+    super.key,
+    required this.onReturnHome,
+  });
 
   @override
   State<LogScreen> createState() => _LogScreenState();
@@ -36,6 +41,7 @@ class _LogScreenState extends State<LogScreen> {
   int _savedEntryCount = 0;
   bool _isSaving = false;
   List<LogEntry> _recentEntries = const <LogEntry>[];
+  String? _editingEntryId;
 
   static const List<String> _availableTriggers = <String>[
     'Stress',
@@ -50,8 +56,7 @@ class _LogScreenState extends State<LogScreen> {
   void initState() {
     super.initState();
     _notesController = TextEditingController();
-    _loadSavedEntryCount();
-    _loadRecentEntries();
+    _refreshFromStorage();
   }
 
   @override
@@ -60,21 +65,12 @@ class _LogScreenState extends State<LogScreen> {
     super.dispose();
   }
 
-  Future<void> _loadSavedEntryCount() async {
-    try {
-      final int count = await _repository.entryCount();
-      if (!mounted) return;
-      setState(() {
-        _savedEntryCount = count;
-      });
-    } catch (_) {}
-  }
-
-  Future<void> _loadRecentEntries() async {
+  Future<void> _refreshFromStorage() async {
     try {
       final List<LogEntry> entries = await _repository.loadEntries();
       if (!mounted) return;
       setState(() {
+        _savedEntryCount = entries.length;
         _recentEntries = entries.take(5).toList();
       });
     } catch (_) {}
@@ -102,6 +98,42 @@ class _LogScreenState extends State<LogScreen> {
     });
   }
 
+  void _populateDraftFromEntry(LogEntry entry) {
+    setState(() {
+      _editingEntryId = entry.id;
+      _entryType = entry.entryType;
+      _intensity = entry.intensity;
+      _selectedTriggers
+        ..clear()
+        ..addAll(entry.triggers);
+      _notesController.text = entry.notes;
+    });
+  }
+
+  Future<void> _deleteEntry(LogEntry entry) async {
+    await _repository.deleteEntry(entry.id);
+
+    if (_editingEntryId == entry.id) {
+      setState(() {
+        _editingEntryId = null;
+        _entryType = 'Urge';
+        _intensity = 3;
+        _selectedTriggers.clear();
+        _notesController.clear();
+      });
+    }
+
+    await _refreshFromStorage();
+
+    if (!mounted) return;
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Deleted log entry.'),
+      ),
+    );
+  }
+
   Future<void> _saveEntry() async {
     setState(() {
       _isSaving = true;
@@ -109,9 +141,10 @@ class _LogScreenState extends State<LogScreen> {
 
     try {
       final String savedType = _entryType;
+      final String? editingId = _editingEntryId;
 
       final LogEntry entry = LogEntry(
-        id: DateTime.now().microsecondsSinceEpoch.toString(),
+        id: editingId ?? DateTime.now().microsecondsSinceEpoch.toString(),
         entryType: savedType,
         intensity: _intensity,
         triggers: _selectedTriggers.toList(),
@@ -119,7 +152,12 @@ class _LogScreenState extends State<LogScreen> {
         createdAtIso: DateTime.now().toIso8601String(),
       );
 
-      await _repository.saveEntry(entry);
+      if (editingId == null) {
+        await _repository.saveEntry(entry);
+      } else {
+        await _repository.updateEntry(entry);
+      }
+
       final List<LogEntry> entries = await _repository.loadEntries();
 
       if (!mounted) return;
@@ -127,6 +165,7 @@ class _LogScreenState extends State<LogScreen> {
       setState(() {
         _savedEntryCount = entries.length;
         _recentEntries = entries.take(5).toList();
+        _editingEntryId = null;
         _entryType = 'Urge';
         _intensity = 3;
         _selectedTriggers.clear();
@@ -137,10 +176,14 @@ class _LogScreenState extends State<LogScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-            'Saved $savedType entry locally • ${entries.length} total on this device',
+            editingId == null
+                ? 'Saved $savedType entry locally • ${entries.length} total on this device'
+                : 'Updated $savedType entry locally • ${entries.length} total on this device',
           ),
         ),
       );
+
+      widget.onReturnHome();
     } catch (_) {
       if (!mounted) return;
 
@@ -158,6 +201,8 @@ class _LogScreenState extends State<LogScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final bool isEditing = _editingEntryId != null;
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Log'),
@@ -202,9 +247,18 @@ class _LogScreenState extends State<LogScreen> {
                     'Saved locally on this device: $_savedEntryCount',
                     style: Theme.of(context).textTheme.titleMedium,
                   ),
+                  if (isEditing) ...<Widget>[
+                    const SizedBox(height: 8),
+                    Text(
+                      'Editing a saved entry',
+                      style: Theme.of(context).textTheme.titleMedium,
+                    ),
+                  ],
                   const SizedBox(height: 16),
                   RecentLogEntriesCard(
                     entries: _recentEntries,
+                    onEdit: _populateDraftFromEntry,
+                    onDelete: _deleteEntry,
                   ),
                   const SizedBox(height: 16),
                   LogEntryTypeSection(
