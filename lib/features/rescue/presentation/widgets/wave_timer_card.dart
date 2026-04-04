@@ -79,6 +79,12 @@ class _WaveTimerCardState extends State<WaveTimerCard> {
     });
   }
 
+  void _resetTimerState() {
+    _timer?.cancel();
+    _remainingSeconds = _totalSeconds;
+    _isRunning = false;
+  }
+
   Future<void> _saveOutcome({
     required String entryType,
     required int intensity,
@@ -107,6 +113,10 @@ class _WaveTimerCardState extends State<WaveTimerCard> {
       );
 
       if (!mounted) return;
+
+      setState(() {
+        _resetTimerState();
+      });
 
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
