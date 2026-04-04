@@ -12,6 +12,7 @@ import '../../log/data/log_repository.dart';
 import '../../log/domain/log_entry.dart';
 import '../../../core/ui/wave_surface.dart';
 import '../../reasons/presentation/reasons_focus_card.dart';
+import '../../triggers/presentation/triggers_watch_card.dart';
 import 'widgets/daily_encouragement_card.dart';
 import 'widgets/home_hero_card.dart';
 import 'widgets/latest_logged_moment_card.dart';
@@ -108,6 +109,8 @@ class HomeScreen extends StatelessWidget {
                       ),
                       const SizedBox(height: 16),
                       const ReasonsFocusCard(),
+                      const SizedBox(height: 16),
+                      const TriggersWatchCard(),
                       const SizedBox(height: 16),
                       RecoverySnapshotCard(
                         totalEntries: summary.totalEntries,
