@@ -14,6 +14,7 @@ import '../../log/domain/log_entry.dart';
 import 'widgets/calm_reset_card.dart';
 import 'widgets/redirect_actions_card.dart';
 import 'widgets/support_escalation_card.dart';
+import 'widgets/wave_timer_card.dart';
 import 'widgets/urge_intensity_section.dart';
 import 'widgets/wave_completion_card.dart';
 
@@ -134,6 +135,10 @@ class _RescueScreenState extends State<RescueScreen> {
                         ),
                       ],
                     ),
+                  ),
+                  const SizedBox(height: 16),
+                  WaveTimerCard(
+                    onReturnHome: widget.onReturnHome,
                   ),
                   const SizedBox(height: 16),
                   UrgeIntensitySection(
