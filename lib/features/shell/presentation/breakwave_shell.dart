@@ -3,7 +3,7 @@
 // Project: BreakWave
 // File: breakwave_shell.dart
 // Purpose: Bottom-tab shell for the first BreakWave navigation pass.
-// Notes: Shell-first deterministic scaffold for BW-10.
+// Notes: BW-13B refreshes Log after Rescue saves.
 // ------------------------------------------------------------
 
 import 'package:flutter/material.dart';
@@ -22,10 +22,15 @@ class BreakWaveShell extends StatefulWidget {
 
 class _BreakWaveShellState extends State<BreakWaveShell> {
   int _selectedIndex = 0;
+  int _logRefreshTick = 0;
 
   void _onDestinationSelected(int index) {
-    if (_selectedIndex == index) return;
+    if (_selectedIndex == index && index != 2) return;
+
     setState(() {
+      if (index == 2) {
+        _logRefreshTick += 1;
+      }
       _selectedIndex = index;
     });
   }
@@ -45,6 +50,7 @@ class _BreakWaveShellState extends State<BreakWaveShell> {
         onReturnHome: _returnHome,
       ),
       LogScreen(
+        key: ValueKey<int>(_logRefreshTick),
         onReturnHome: _returnHome,
       ),
       const SupportScreen(),
