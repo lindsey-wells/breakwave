@@ -14,6 +14,7 @@ import '../../../core/ui/wave_surface.dart';
 import '../../reasons/presentation/reasons_focus_card.dart';
 import '../../triggers/presentation/triggers_watch_card.dart';
 import 'widgets/daily_encouragement_card.dart';
+import 'widgets/fast_urge_entry_card.dart';
 import 'widgets/home_hero_card.dart';
 import 'widgets/latest_logged_moment_card.dart';
 import 'widgets/recovery_cycle_preview_card.dart';
@@ -106,6 +107,10 @@ class HomeScreen extends StatelessWidget {
                             ),
                           ],
                         ),
+                      ),
+                      const SizedBox(height: 16),
+                      FastUrgeEntryCard(
+                        onOpenRescue: onOpenRescue,
                       ),
                       const SizedBox(height: 16),
                       const ReasonsFocusCard(),
