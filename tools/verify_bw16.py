@@ -18,13 +18,12 @@ checks = [
     ]),
     ("lib/features/rescue/presentation/widgets/rescue_card_engine.dart", [
         "class RescueCardEngine",
-        "Rescue Card",
         "Calm line",
         "Reframe",
         "Immediate action",
         "Next step",
-        "Show another rescue card",
         "_nextCard()",
+        "FilledButton.tonal(",
     ]),
 ]
 
