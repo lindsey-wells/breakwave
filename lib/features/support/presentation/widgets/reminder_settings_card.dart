@@ -3,7 +3,7 @@
 // Project: BreakWave
 // File: reminder_settings_card.dart
 // Purpose: BW-22 reminder settings card.
-// Notes: Configures local reminders and risky-time nudges from Support.
+// Notes: BW-34 hardens reminder save feedback and permission handling.
 // ------------------------------------------------------------
 
 import 'package:flutter/material.dart';
@@ -113,7 +113,14 @@ class _ReminderSettingsCardState extends State<ReminderSettingsCard> {
 
     try {
       await ReminderSettingsStore.save(_settings);
-      await BreakWaveNotifications.requestPermissions();
+
+      final bool wantsNotifications =
+          _settings.dailyReminderEnabled || _settings.riskyNudgeEnabled;
+
+      final bool permissionOk = wantsNotifications
+          ? await BreakWaveNotifications.safeRequestPermissions()
+          : true;
+
       final bool rescheduled = await BreakWaveNotifications.safeRescheduleAll(
         settings: _settings,
         triggersSelection: _triggers,
@@ -121,13 +128,23 @@ class _ReminderSettingsCardState extends State<ReminderSettingsCard> {
 
       if (!mounted) return;
 
+      final String message;
+      if (permissionOk && rescheduled) {
+        message = 'Reminder settings saved.';
+      } else if (!permissionOk && rescheduled) {
+        message =
+            'Reminder settings saved locally. Notification permission may still be needed.';
+      } else if (permissionOk && !rescheduled) {
+        message =
+            'Reminder settings saved locally. Notification refresh may need another try.';
+      } else {
+        message =
+            'Reminder settings saved locally. Notification permission or refresh may need another try.';
+      }
+
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(
-            rescheduled
-                ? 'Reminder settings saved.'
-                : 'Reminder settings saved locally. Notification refresh may need another try.',
-          ),
+          content: Text(message),
         ),
       );
     } catch (_) {

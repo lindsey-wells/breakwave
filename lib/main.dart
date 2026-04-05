@@ -3,7 +3,7 @@
 // Project: BreakWave
 // File: main.dart
 // Purpose: App entrypoint for BreakWave.
-// Notes: Initializes local notifications for BW-22.
+// Notes: Initializes local notifications for BW-22 and hardens launch for BW-34.
 // ------------------------------------------------------------
 
 import 'package:flutter/material.dart';
@@ -13,6 +13,12 @@ import 'core/reminders/breakwave_notifications.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await BreakWaveNotifications.initialize();
+
+  try {
+    await BreakWaveNotifications.initialize();
+  } catch (_) {
+    // Notification init is optional. Never let it block app launch.
+  }
+
   runApp(const BreakWaveApp());
 }

@@ -3,7 +3,7 @@
 // Project: BreakWave
 // File: breakwave_notifications.dart
 // Purpose: BW-22/BW-24 local reminders and risky-time nudges.
-// Notes: Schedules local notifications and supports discreet notification copy.
+// Notes: BW-34 adds safe wrappers so init/permission failures never break core flows.
 // ------------------------------------------------------------
 
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
@@ -50,10 +50,31 @@ class BreakWaveNotifications {
     _initialized = true;
   }
 
+  static Future<bool> safeInitialize() async {
+    try {
+      await initialize();
+      return true;
+    } catch (_) {
+      return false;
+    }
+  }
+
   static Future<void> requestPermissions() async {
     final android = _plugin.resolvePlatformSpecificImplementation<
         AndroidFlutterLocalNotificationsPlugin>();
     await android?.requestNotificationsPermission();
+  }
+
+  static Future<bool> safeRequestPermissions() async {
+    try {
+      final android = _plugin.resolvePlatformSpecificImplementation<
+          AndroidFlutterLocalNotificationsPlugin>();
+
+      final bool? granted = await android?.requestNotificationsPermission();
+      return granted ?? true;
+    } catch (_) {
+      return false;
+    }
   }
 
   static Future<bool> safeRescheduleAll({
