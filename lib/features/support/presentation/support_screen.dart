@@ -13,6 +13,7 @@ import 'widgets/education_resources_card.dart';
 import 'widgets/emergency_help_card.dart';
 import 'widgets/support_categories_card.dart';
 import 'widgets/support_contact_card.dart';
+import 'widgets/reminder_settings_card.dart';
 import 'widgets/support_quick_actions_card.dart';
 import 'widgets/trusted_accountability_card.dart';
 
@@ -60,6 +61,8 @@ class SupportScreen extends StatelessWidget {
                       ],
                     ),
                   ),
+                  const SizedBox(height: 16),
+                  const ReminderSettingsCard(),
                   const SizedBox(height: 16),
                   const SupportContactCard(),
                   const SizedBox(height: 16),

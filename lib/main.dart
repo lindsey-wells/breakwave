@@ -3,13 +3,16 @@
 // Project: BreakWave
 // File: main.dart
 // Purpose: App entrypoint for BreakWave.
-// Notes: Shell-first deterministic scaffold for BW-02.
+// Notes: Initializes local notifications for BW-22.
 // ------------------------------------------------------------
 
 import 'package:flutter/material.dart';
 
 import 'app/breakwave_app.dart';
+import 'core/reminders/breakwave_notifications.dart';
 
-void main() {
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await BreakWaveNotifications.initialize();
   runApp(const BreakWaveApp());
 }
