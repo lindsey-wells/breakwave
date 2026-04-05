@@ -54,7 +54,7 @@ class _EducateMeScreenState extends State<EducateMeScreen> {
                   ),
                   const SizedBox(height: 10),
                   const Text(
-                    'Keep this short. The point is to understand the pattern sooner so the next good move gets easier.',
+                    'Keep this short and useful. The aim is to understand the pattern sooner so you can interrupt it faster in real life.',
                   ),
                 ],
               ),

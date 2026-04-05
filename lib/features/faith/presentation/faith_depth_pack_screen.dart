@@ -103,7 +103,7 @@ class _FaithDepthPackScreenState extends State<FaithDepthPackScreen> {
                         ),
                         const SizedBox(height: 10),
                         const Text(
-                          'This pack goes deeper than rescue cards. It is built for grace-forward Christian reflection on shame, secrecy, loneliness, and rebuilding integrity.',
+                          'This pack goes beyond immediate rescue. It is built for grace-forward Christian reflection that helps you face shame, secrecy, loneliness, and integrity without drifting into denial or despair.',
                         ),
                       ],
                     ),
@@ -128,7 +128,7 @@ class _FaithDepthPackScreenState extends State<FaithDepthPackScreen> {
                           ),
                           const SizedBox(height: 10),
                           const Text(
-                            'Core rescue stays free. This depth pack is part of the premium transformation layer.',
+                            'Core rescue stays free. This pack belongs to the deeper transformation layer inside BreakWave Plus.',
                           ),
                           const SizedBox(height: 16),
                           FilledButton(
@@ -160,7 +160,7 @@ class _FaithDepthPackScreenState extends State<FaithDepthPackScreen> {
                           ),
                           const SizedBox(height: 10),
                           const Text(
-                            'This pack is intentionally Christian. It becomes fully active when BreakWave is set to the Christian recovery path.',
+                            'This pack is intentionally Christian. Switch BreakWave to the Christian recovery path to use the full content as written.',
                           ),
                         ],
                       ),

@@ -108,9 +108,8 @@ class _BreakWavePlusScreenState extends State<BreakWavePlusScreen> {
                     ),
                   ),
                   const SizedBox(height: 10),
-                  Text(
-                    'Core help stays free forever. BreakWave Plus is for deeper insight, planning, accountability, and guided growth.',
-                    style: theme.textTheme.bodyMedium,
+                  const Text(
+                    'BreakWave Plus does not gate immediate relief. It unlocks deeper tools for planning, insight, accountability, and long-term growth.',
                   ),
                   const SizedBox(height: 16),
                   Text(

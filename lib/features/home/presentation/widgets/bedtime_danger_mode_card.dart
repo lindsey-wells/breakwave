@@ -104,22 +104,22 @@ class _BedtimeDangerModeCardState extends State<BedtimeDangerModeCard> {
   String _bodyText() {
     if (_isRiskyTonight == true) {
       if (_mode == RecoveryMode.christian) {
-        return 'Tonight may need extra honesty, light, and quick obedience. Do not drift alone into the late-night window.';
+        return 'Tonight may need extra honesty, light, and quick obedience. Bring the wave into the open early instead of facing it alone in the dark.';
       }
-      return 'Tonight may need extra structure. Do not drift unprotected into the late-night window.';
+      return 'Tonight may need extra structure. Reduce isolation, reduce privacy, and interrupt the pattern before it gains momentum.';
     }
 
     if (_isRiskyTonight == false) {
       if (_mode == RecoveryMode.christian) {
-        return 'Tonight looks steadier. Stay watchful, stay honest, and take the safer path early if the wave rises.';
+        return 'Tonight looks steadier. Stay watchful, stay honest, and choose the safer path early if the wave starts rising.';
       }
       return 'Tonight looks steadier. Stay aware, and interrupt the pattern early if the wave starts rising.';
     }
 
     if (_mode == RecoveryMode.christian) {
-      return 'Late-night temptation often grows in secrecy and fatigue. Mark tonight honestly before the window gets harder.';
+      return 'Late-night temptation often grows where fatigue and secrecy meet. Mark tonight honestly before the window gets harder.';
     }
-    return 'Late-night drift is often the hardest window. Mark tonight honestly before the window gets louder.';
+    return 'Late-night drift often gets louder when fatigue and privacy combine. Mark tonight honestly before the window gets harder.';
   }
 
   @override

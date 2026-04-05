@@ -61,12 +61,12 @@ class _RecoveryModeScreenState extends State<RecoveryModeScreen> {
           padding: const EdgeInsets.fromLTRB(20, 20, 20, 24),
           children: [
             Text(
-              'This sets how BreakWave speaks to you during recovery moments.',
+              'Choose how BreakWave should speak to you when the wave rises.',
               style: theme.textTheme.titleMedium,
             ),
             const SizedBox(height: 8),
             Text(
-              'Choose the path that fits how you want support to show up when the wave rises.',
+              'This sets the tone for rescue, learning, and reflection. Pick the path that fits how you want support to show up in hard moments.',
               style: theme.textTheme.bodyMedium,
             ),
             const SizedBox(height: 24),
@@ -95,10 +95,12 @@ class _RecoveryModeScreenState extends State<RecoveryModeScreen> {
               decoration: BoxDecoration(
                 color: colorScheme.surfaceContainerHighest.withOpacity(0.55),
                 borderRadius: BorderRadius.circular(18),
-                border: Border.all(color: colorScheme.outlineVariant),
+                border: Border.all(
+                  color: colorScheme.outlineVariant,
+                ),
               ),
               child: Text(
-                'Christian mode is intentionally explicit. It should feel truly Christian, not generic wellness copy with a verse added later.',
+                'Christian mode is intentionally Christian. It should sound like grace, truth, prayer, and Scripture — not generic wellness language with a Bible verse attached.',
                 style: theme.textTheme.bodyMedium,
               ),
             ),
@@ -159,6 +161,16 @@ class _ModeCard extends StatelessWidget {
               color: borderColor,
               width: isSelected ? 2.5 : 1.2,
             ),
+            boxShadow: isSelected
+                ? [
+                    BoxShadow(
+                      blurRadius: 16,
+                      spreadRadius: 0,
+                      offset: const Offset(0, 6),
+                      color: colorScheme.primary.withOpacity(0.18),
+                    ),
+                  ]
+                : null,
           ),
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
