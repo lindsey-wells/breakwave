@@ -15,7 +15,7 @@ import '../../reasons/presentation/reasons_focus_card.dart';
 import '../../triggers/presentation/triggers_watch_card.dart';
 import 'widgets/daily_encouragement_card.dart';
 import 'widgets/fast_urge_entry_card.dart';
-import '../../../checkin/presentation/daily_check_in_card.dart';
+import '../../checkin/presentation/daily_check_in_card.dart';
 import 'widgets/home_hero_card.dart';
 import 'widgets/latest_logged_moment_card.dart';
 import 'widgets/recovery_cycle_preview_card.dart';
