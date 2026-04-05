@@ -10,6 +10,7 @@ import 'package:flutter/material.dart';
 
 import '../../../core/privacy/privacy_settings.dart';
 import '../../../core/privacy/privacy_settings_store.dart';
+import '../../../core/widget/home_widget_sync.dart';
 import '../../../core/ui/wave_surface.dart';
 import '../../checkin/presentation/daily_check_in_card.dart';
 import '../../insights/presentation/simple_insights_card.dart';
@@ -47,6 +48,7 @@ class _HomeScreenState extends State<HomeScreen> {
     super.initState();
     _privacyNotifier = PrivacySettingsStore.changes;
     _privacyNotifier.addListener(_handlePrivacyChanged);
+    BreakWaveHomeWidgetSync.sync();
   }
 
   @override

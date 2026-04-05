@@ -10,6 +10,7 @@ import 'package:flutter/material.dart';
 
 import '../../../core/checkin/daily_check_in_entry.dart';
 import '../../../core/checkin/daily_check_in_store.dart';
+import '../../../core/widget/home_widget_sync.dart';
 
 class DailyCheckInCard extends StatefulWidget {
   const DailyCheckInCard({super.key});
@@ -83,6 +84,7 @@ class _DailyCheckInCardState extends State<DailyCheckInCard> {
 
     try {
       await DailyCheckInStore.saveTodayStatus(status);
+      await BreakWaveHomeWidgetSync.sync();
       await _load();
 
       if (!mounted) return;

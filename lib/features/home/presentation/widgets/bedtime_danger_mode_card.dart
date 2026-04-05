@@ -12,6 +12,7 @@ import '../../../../core/bedtime/bedtime_mode_entry.dart';
 import '../../../../core/bedtime/bedtime_mode_store.dart';
 import '../../../../core/recovery/recovery_mode.dart';
 import '../../../../core/recovery/recovery_mode_store.dart';
+import '../../../../core/widget/home_widget_sync.dart';
 
 class BedtimeDangerModeCard extends StatefulWidget {
   const BedtimeDangerModeCard({
@@ -60,6 +61,7 @@ class _BedtimeDangerModeCardState extends State<BedtimeDangerModeCard> {
 
     try {
       await BedtimeModeStore.saveTodayRisk(isRisky);
+      await BreakWaveHomeWidgetSync.sync();
       if (!mounted) return;
 
       setState(() {
