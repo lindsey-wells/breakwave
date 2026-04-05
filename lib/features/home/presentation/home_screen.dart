@@ -16,6 +16,7 @@ import '../../triggers/presentation/triggers_watch_card.dart';
 import 'widgets/daily_encouragement_card.dart';
 import 'widgets/fast_urge_entry_card.dart';
 import '../../checkin/presentation/daily_check_in_card.dart';
+import '../../insights/presentation/simple_insights_card.dart';
 import 'widgets/home_hero_card.dart';
 import 'widgets/latest_logged_moment_card.dart';
 import 'widgets/recovery_cycle_preview_card.dart';
@@ -115,6 +116,8 @@ class HomeScreen extends StatelessWidget {
                       ),
                       const SizedBox(height: 16),
                       const DailyCheckInCard(),
+                      const SizedBox(height: 16),
+                      const SimpleInsightsCard(),
                       const SizedBox(height: 16),
                       const ReasonsFocusCard(),
                       const SizedBox(height: 16),
