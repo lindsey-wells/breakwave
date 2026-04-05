@@ -14,6 +14,7 @@ import 'widgets/emergency_help_card.dart';
 import 'widgets/support_categories_card.dart';
 import 'widgets/support_contact_card.dart';
 import 'widgets/reminder_settings_card.dart';
+import '../../faith/presentation/faith_depth_pack_screen.dart';
 import '../../premium/presentation/premium_gate_tile.dart';
 import 'widgets/privacy_settings_card.dart';
 import 'widgets/support_quick_actions_card.dart';
@@ -67,6 +68,18 @@ class SupportScreen extends StatelessWidget {
                   const PremiumGateTile(
                     title: 'Deeper insights and exports',
                     description: 'Unlock longer recovery history, deeper insight surfaces, advanced charts, and export tools in BreakWave Plus.',
+                  ),
+                  const SizedBox(height: 16),
+                  PremiumGateTile(
+                    title: 'Faith depth pack',
+                    description: 'Unlock grace-forward Christian depth on shame, secrecy, loneliness, and rebuilding integrity.',
+                    onUnlockedTap: () {
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (_) => const FaithDepthPackScreen(),
+                        ),
+                      );
+                    },
                   ),
                   const SizedBox(height: 16),
                   const PrivacySettingsCard(),
