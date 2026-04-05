@@ -42,7 +42,7 @@ class BreakWaveNotifications {
         InitializationSettings(android: androidSettings);
 
     await _plugin.initialize(
-      initializationSettings: initializationSettings,
+      settings: initializationSettings,
     );
 
     _initialized = true;
