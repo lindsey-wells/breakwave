@@ -33,7 +33,7 @@ EXPECTED_PATTERNS = {
     "lib/core/ui/wave_surface.dart": [
         "class WaveSurface",
         "LinearGradient(",
-        "BreakWaveColors.oceanDeep",
+        "Color(0xFF163F69)",
         "BreakWaveColors.waveBlue",
     ],
     "lib/app/breakwave_app.dart": [
