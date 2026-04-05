@@ -3,7 +3,7 @@
 // Project: BreakWave
 // File: wave_timer_card.dart
 // Purpose: BW-15 wave timer v1 for Rescue.
-// Notes: Adds a simple 90-second timer with outcome logging.
+// Notes: BW-30 ocean polish pass keeps behavior but refines the visual presentation.
 // ------------------------------------------------------------
 
 import 'dart:async';
@@ -156,17 +156,38 @@ class _WaveTimerCardState extends State<WaveTimerCard> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
+    final ThemeData theme = Theme.of(context);
+    final ColorScheme colorScheme = theme.colorScheme;
     final bool timerFinished = !_isRunning && _remainingSeconds == 0;
+
+    final double progress = timerFinished
+        ? 1
+        : _isRunning
+            ? (_totalSeconds - _remainingSeconds) / _totalSeconds
+            : 0;
 
     return Container(
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
-        color: theme.colorScheme.surfaceContainerHighest.withOpacity(0.45),
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(
-          color: theme.colorScheme.outlineVariant,
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: <Color>[
+            colorScheme.surfaceContainerHighest.withOpacity(0.62),
+            colorScheme.surfaceContainer.withOpacity(0.40),
+          ],
         ),
+        borderRadius: BorderRadius.circular(22),
+        border: Border.all(
+          color: colorScheme.outlineVariant,
+        ),
+        boxShadow: <BoxShadow>[
+          BoxShadow(
+            color: colorScheme.shadow.withOpacity(0.08),
+            blurRadius: 16,
+            offset: const Offset(0, 8),
+          ),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -183,11 +204,24 @@ class _WaveTimerCardState extends State<WaveTimerCard> {
             style: theme.textTheme.bodyMedium,
           ),
           const SizedBox(height: 16),
+          ClipRRect(
+            borderRadius: BorderRadius.circular(999),
+            child: LinearProgressIndicator(
+              value: progress,
+              minHeight: 10,
+              backgroundColor: colorScheme.surfaceContainerHighest,
+              valueColor: AlwaysStoppedAnimation<Color>(
+                timerFinished ? colorScheme.primary : colorScheme.secondary,
+              ),
+            ),
+          ),
+          const SizedBox(height: 14),
           Center(
             child: Text(
               _formatTime(_remainingSeconds),
               style: theme.textTheme.displaySmall?.copyWith(
-                fontWeight: FontWeight.w700,
+                fontWeight: FontWeight.w800,
+                letterSpacing: 1.2,
               ),
             ),
           ),
@@ -197,8 +231,9 @@ class _WaveTimerCardState extends State<WaveTimerCard> {
               _isRunning
                   ? 'One breath at a time.'
                   : timerFinished
-                      ? 'Now choose what happened.'
+                      ? 'The wave made it through 90 seconds. Mark what happened with honesty.'
                       : 'Start when you are ready.',
+              textAlign: TextAlign.center,
               style: theme.textTheme.bodyMedium,
             ),
           ),
