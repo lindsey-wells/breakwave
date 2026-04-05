@@ -61,8 +61,8 @@ REGEX_PATTERNS = {
         r"IndexedStack\s*\(",
     ],
     "lib/features/home/presentation/home_screen.dart": [
-        r"onOpenRescue\s*:\s*onOpenRescue",
-        r"onOpenLog\s*:\s*onOpenLog",
+        r"onOpenRescue\s*:\s*(widget\.)?onOpenRescue",
+        r"onOpenLog\s*:\s*(widget\.)?onOpenLog",
     ],
 }
 
