@@ -2,8 +2,8 @@
 // Cube23 Collaboration Header
 // Project: BreakWave
 // File: breakwave_notifications.dart
-// Purpose: BW-22 local reminders and risky-time nudges.
-// Notes: Schedules local notifications for daily check-in and risky-time support.
+// Purpose: BW-22/BW-24 local reminders and risky-time nudges.
+// Notes: Schedules local notifications and supports discreet notification copy.
 // ------------------------------------------------------------
 
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
@@ -11,6 +11,8 @@ import 'package:flutter_timezone/flutter_timezone.dart';
 import 'package:timezone/data/latest_all.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
 
+import '../privacy/privacy_settings.dart';
+import '../privacy/privacy_settings_store.dart';
 import '../triggers/triggers_selection.dart';
 import 'reminder_settings.dart';
 
@@ -60,14 +62,20 @@ class BreakWaveNotifications {
   }) async {
     await initialize();
 
+    final PrivacySettings privacy = await PrivacySettingsStore.load();
+
     await _plugin.cancel(id: dailyReminderId);
     await _plugin.cancel(id: riskyNudgeId);
 
     if (settings.dailyReminderEnabled) {
       await _plugin.zonedSchedule(
         id: dailyReminderId,
-        title: 'BreakWave check-in',
-        body: 'Take 20 seconds to name today honestly.',
+        title: privacy.discreetNotifications
+            ? 'Daily reminder'
+            : 'BreakWave check-in',
+        body: privacy.discreetNotifications
+            ? 'Take a brief moment to check in.'
+            : 'Take 20 seconds to name today honestly.',
         scheduledDate: _nextInstance(settings.dailyHour, settings.dailyMinute),
         notificationDetails: _details(),
         androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
@@ -87,14 +95,18 @@ class BreakWaveNotifications {
         if (preview.length == 2) break;
       }
 
-      final String body = preview.isEmpty
+      final String fullBody = preview.isEmpty
           ? 'Protect the next stretch before the wave rises.'
           : 'Watch for ${preview.join(' • ')}. Protect the next stretch early.';
 
       await _plugin.zonedSchedule(
         id: riskyNudgeId,
-        title: 'BreakWave watch-for nudge',
-        body: body,
+        title: privacy.discreetNotifications
+            ? 'Evening nudge'
+            : 'BreakWave watch-for nudge',
+        body: privacy.discreetNotifications
+            ? 'Protect the next stretch early.'
+            : fullBody,
         scheduledDate: _nextInstance(settings.riskyHour, settings.riskyMinute),
         notificationDetails: _details(),
         androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,

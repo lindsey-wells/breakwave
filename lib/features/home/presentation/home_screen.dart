@@ -3,27 +3,29 @@
 // Project: BreakWave
 // File: home_screen.dart
 // Purpose: BW-02 home dashboard structure for BreakWave.
-// Notes: BW-09 home summary from persisted data.
+// Notes: BW-24 privacy-aware Home surfaces.
 // ------------------------------------------------------------
 
 import 'package:flutter/material.dart';
 
-import '../../log/data/log_repository.dart';
-import '../../log/domain/log_entry.dart';
+import '../../../core/privacy/privacy_settings.dart';
+import '../../../core/privacy/privacy_settings_store.dart';
 import '../../../core/ui/wave_surface.dart';
-import '../../reasons/presentation/reasons_focus_card.dart';
-import '../../triggers/presentation/triggers_watch_card.dart';
-import 'widgets/daily_encouragement_card.dart';
-import 'widgets/fast_urge_entry_card.dart';
-import 'widgets/bedtime_danger_mode_card.dart';
 import '../../checkin/presentation/daily_check_in_card.dart';
 import '../../insights/presentation/simple_insights_card.dart';
+import '../../log/data/log_repository.dart';
+import '../../log/domain/log_entry.dart';
+import '../../reasons/presentation/reasons_focus_card.dart';
+import '../../triggers/presentation/triggers_watch_card.dart';
+import 'widgets/bedtime_danger_mode_card.dart';
+import 'widgets/daily_encouragement_card.dart';
+import 'widgets/fast_urge_entry_card.dart';
 import 'widgets/home_hero_card.dart';
 import 'widgets/latest_logged_moment_card.dart';
 import 'widgets/recovery_cycle_preview_card.dart';
 import 'widgets/recovery_snapshot_card.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   final VoidCallback onOpenRescue;
   final VoidCallback onOpenLog;
 
@@ -33,9 +35,35 @@ class HomeScreen extends StatelessWidget {
     required this.onOpenLog,
   });
 
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  late final ValueNotifier<int> _privacyNotifier;
+
+  @override
+  void initState() {
+    super.initState();
+    _privacyNotifier = PrivacySettingsStore.changes;
+    _privacyNotifier.addListener(_handlePrivacyChanged);
+  }
+
+  @override
+  void dispose() {
+    _privacyNotifier.removeListener(_handlePrivacyChanged);
+    super.dispose();
+  }
+
+  void _handlePrivacyChanged() {
+    if (!mounted) return;
+    setState(() {});
+  }
+
   Future<_HomeSummaryData> _loadSummary() async {
     final LogRepository repository = const LogRepository();
     final List<LogEntry> entries = await repository.loadEntries();
+    final PrivacySettings privacy = await PrivacySettingsStore.load();
 
     int urgeCount = 0;
     int slipCount = 0;
@@ -61,6 +89,7 @@ class HomeScreen extends StatelessWidget {
       slipCount: slipCount,
       victoryCount: victoryCount,
       latestEntry: entries.isEmpty ? null : entries.first,
+      privacy: privacy,
     );
   }
 
@@ -73,7 +102,8 @@ class HomeScreen extends StatelessWidget {
       body: SafeArea(
         child: FutureBuilder<_HomeSummaryData>(
           future: _loadSummary(),
-          builder: (BuildContext context, AsyncSnapshot<_HomeSummaryData> snapshot) {
+          builder:
+              (BuildContext context, AsyncSnapshot<_HomeSummaryData> snapshot) {
             final _HomeSummaryData summary =
                 snapshot.data ?? const _HomeSummaryData.empty();
 
@@ -113,16 +143,18 @@ class HomeScreen extends StatelessWidget {
                       ),
                       const SizedBox(height: 16),
                       FastUrgeEntryCard(
-                        onOpenRescue: onOpenRescue,
+                        onOpenRescue: widget.onOpenRescue,
                       ),
                       const SizedBox(height: 16),
                       BedtimeDangerModeCard(
-                        onOpenRescue: onOpenRescue,
+                        onOpenRescue: widget.onOpenRescue,
                       ),
                       const SizedBox(height: 16),
                       const DailyCheckInCard(),
-                      const SizedBox(height: 16),
-                      const SimpleInsightsCard(),
+                      if (!summary.privacy.hideHomeInsights) ...<Widget>[
+                        const SizedBox(height: 16),
+                        const SimpleInsightsCard(),
+                      ],
                       const SizedBox(height: 16),
                       const ReasonsFocusCard(),
                       const SizedBox(height: 16),
@@ -134,14 +166,16 @@ class HomeScreen extends StatelessWidget {
                         slipCount: summary.slipCount,
                         victoryCount: summary.victoryCount,
                       ),
-                      const SizedBox(height: 16),
-                      LatestLoggedMomentCard(
-                        entry: summary.latestEntry,
-                      ),
+                      if (!summary.privacy.hideLatestLoggedMoment) ...<Widget>[
+                        const SizedBox(height: 16),
+                        LatestLoggedMomentCard(
+                          entry: summary.latestEntry,
+                        ),
+                      ],
                       const SizedBox(height: 16),
                       HomeHeroCard(
-                        onOpenRescue: onOpenRescue,
-                        onOpenLog: onOpenLog,
+                        onOpenRescue: widget.onOpenRescue,
+                        onOpenLog: widget.onOpenLog,
                       ),
                       const SizedBox(height: 16),
                       const RecoveryCyclePreviewCard(),
@@ -165,6 +199,7 @@ class _HomeSummaryData {
   final int slipCount;
   final int victoryCount;
   final LogEntry? latestEntry;
+  final PrivacySettings privacy;
 
   const _HomeSummaryData({
     required this.totalEntries,
@@ -172,6 +207,7 @@ class _HomeSummaryData {
     required this.slipCount,
     required this.victoryCount,
     required this.latestEntry,
+    required this.privacy,
   });
 
   const _HomeSummaryData.empty()
@@ -179,5 +215,6 @@ class _HomeSummaryData {
         urgeCount = 0,
         slipCount = 0,
         victoryCount = 0,
-        latestEntry = null;
+        latestEntry = null,
+        privacy = PrivacySettings.defaults;
 }
