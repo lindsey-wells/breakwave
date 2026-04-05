@@ -2,95 +2,58 @@
 // Cube23 Collaboration Header
 // Project: BreakWave
 // File: recovery_cycle_preview_card.dart
-// Purpose: Recovery cycle preview card for the BW-02 home screen.
-// Notes: Shell-first deterministic scaffold for BW-02.
+// Purpose: BW-27 recovery cycle wheel entry card.
+// Notes: Opens the teachable recovery cycle wheel screen.
 // ------------------------------------------------------------
 
 import 'package:flutter/material.dart';
+
+import '../../../cycle/presentation/recovery_cycle_wheel_screen.dart';
 
 class RecoveryCyclePreviewCard extends StatelessWidget {
   const RecoveryCyclePreviewCard({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final TextTheme textTheme = Theme.of(context).textTheme;
+    final ThemeData theme = Theme.of(context);
+    final ColorScheme colorScheme = theme.colorScheme;
 
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(20),
+    return InkWell(
+      borderRadius: BorderRadius.circular(20),
+      onTap: () {
+        Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (_) => const RecoveryCycleWheelScreen(),
+          ),
+        );
+      },
+      child: Ink(
+        padding: const EdgeInsets.all(18),
+        decoration: BoxDecoration(
+          color: colorScheme.surfaceContainerHighest.withOpacity(0.45),
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(color: colorScheme.outlineVariant),
+        ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
             Text(
-              'Recovery Cycle Preview',
-              style: textTheme.titleLarge,
+              'Recovery cycle wheel',
+              style: theme.textTheme.titleMedium?.copyWith(
+                fontWeight: FontWeight.w700,
+              ),
             ),
-            const SizedBox(height: 8),
-            Text(
-              'The full recovery cycle wheel will come in a later pass. '
-              'For now, this card anchors the pattern BreakWave will help users interrupt.',
-              style: textTheme.bodyMedium,
+            const SizedBox(height: 10),
+            const Text(
+              'Trigger → Urge → Escalation → Action → Regret / Recovery',
             ),
-            const SizedBox(height: 18),
-            const _CycleStepRow(
-              icon: Icons.flash_on_outlined,
-              title: 'Trigger',
-              body: 'Stress, boredom, loneliness, habit, or environment.',
-            ),
-            const SizedBox(height: 12),
-            const _CycleStepRow(
-              icon: Icons.waves_outlined,
-              title: 'Urge',
-              body: 'The wave rises and asks for an immediate response.',
-            ),
-            const SizedBox(height: 12),
-            const _CycleStepRow(
-              icon: Icons.shield_outlined,
-              title: 'Response',
-              body: 'Pause, redirect, rescue, and log what happened.',
+            const SizedBox(height: 10),
+            const Text(
+              'Tap to learn where the wave usually grows and where you can interrupt it earlier.',
             ),
           ],
         ),
       ),
-    );
-  }
-}
-
-class _CycleStepRow extends StatelessWidget {
-  final IconData icon;
-  final String title;
-  final String body;
-
-  const _CycleStepRow({
-    required this.icon,
-    required this.title,
-    required this.body,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: <Widget>[
-        Padding(
-          padding: const EdgeInsets.only(top: 2),
-          child: Icon(icon),
-        ),
-        const SizedBox(width: 12),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
-              Text(
-                title,
-                style: Theme.of(context).textTheme.titleMedium,
-              ),
-              const SizedBox(height: 4),
-              Text(body),
-            ],
-          ),
-        ),
-      ],
     );
   }
 }
