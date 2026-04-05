@@ -41,7 +41,10 @@ class BreakWaveNotifications {
     const InitializationSettings initializationSettings =
         InitializationSettings(android: androidSettings);
 
-    await _plugin.initialize(initializationSettings);
+    await _plugin.initialize(
+      initializationSettings: initializationSettings,
+    );
+
     _initialized = true;
   }
 
@@ -57,16 +60,16 @@ class BreakWaveNotifications {
   }) async {
     await initialize();
 
-    await _plugin.cancel(dailyReminderId);
-    await _plugin.cancel(riskyNudgeId);
+    await _plugin.cancel(id: dailyReminderId);
+    await _plugin.cancel(id: riskyNudgeId);
 
     if (settings.dailyReminderEnabled) {
       await _plugin.zonedSchedule(
-        dailyReminderId,
-        'BreakWave check-in',
-        'Take 20 seconds to name today honestly.',
-        _nextInstance(settings.dailyHour, settings.dailyMinute),
-        _details(),
+        id: dailyReminderId,
+        title: 'BreakWave check-in',
+        body: 'Take 20 seconds to name today honestly.',
+        scheduledDate: _nextInstance(settings.dailyHour, settings.dailyMinute),
+        notificationDetails: _details(),
         androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
         matchDateTimeComponents: DateTimeComponents.time,
       );
@@ -89,11 +92,11 @@ class BreakWaveNotifications {
           : 'Watch for ${preview.join(' • ')}. Protect the next stretch early.';
 
       await _plugin.zonedSchedule(
-        riskyNudgeId,
-        'BreakWave watch-for nudge',
-        body,
-        _nextInstance(settings.riskyHour, settings.riskyMinute),
-        _details(),
+        id: riskyNudgeId,
+        title: 'BreakWave watch-for nudge',
+        body: body,
+        scheduledDate: _nextInstance(settings.riskyHour, settings.riskyMinute),
+        notificationDetails: _details(),
         androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
         matchDateTimeComponents: DateTimeComponents.time,
       );
