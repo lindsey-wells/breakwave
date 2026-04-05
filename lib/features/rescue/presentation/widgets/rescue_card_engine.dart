@@ -2,12 +2,15 @@
 // Cube23 Collaboration Header
 // Project: BreakWave
 // File: rescue_card_engine.dart
-// Purpose: BW-16 rescue card engine v1.
-// Notes: Renders reusable rescue cards from a starter pack.
+// Purpose: BW-16/BW-17 rescue card engine.
+// Notes: Renders starter or Christian rescue cards based on recovery mode.
 // ------------------------------------------------------------
 
 import 'package:flutter/material.dart';
 
+import '../../../../core/recovery/recovery_mode.dart';
+import '../../../../core/recovery/recovery_mode_store.dart';
+import '../../domain/christian_rescue_card_pack.dart';
 import '../../domain/rescue_card_content.dart';
 import '../../domain/rescue_card_pack.dart';
 
@@ -19,8 +22,33 @@ class RescueCardEngine extends StatefulWidget {
 }
 
 class _RescueCardEngineState extends State<RescueCardEngine> {
-  final List<RescueCardContent> _cards = RescueCardPack.starter;
+  List<RescueCardContent> _cards = const <RescueCardContent>[];
   int _currentIndex = 0;
+  bool _loading = true;
+  RecoveryMode? _mode;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadCards();
+  }
+
+  Future<void> _loadCards() async {
+    final RecoveryMode? mode = await RecoveryModeStore.loadMode();
+    if (!mounted) return;
+
+    final List<RescueCardContent> cards =
+        mode == RecoveryMode.christian
+            ? ChristianRescueCardPack.cards
+            : RescueCardPack.starter;
+
+    setState(() {
+      _mode = mode;
+      _cards = cards;
+      _currentIndex = 0;
+      _loading = false;
+    });
+  }
 
   void _nextCard() {
     if (_cards.isEmpty) return;
@@ -33,6 +61,20 @@ class _RescueCardEngineState extends State<RescueCardEngine> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+
+    if (_loading) {
+      return Container(
+        padding: const EdgeInsets.all(18),
+        decoration: BoxDecoration(
+          color: theme.colorScheme.surfaceContainerHighest.withOpacity(0.45),
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(color: theme.colorScheme.outlineVariant),
+        ),
+        child: const Center(
+          child: CircularProgressIndicator(),
+        ),
+      );
+    }
 
     if (_cards.isEmpty) {
       return Container(
@@ -47,6 +89,8 @@ class _RescueCardEngineState extends State<RescueCardEngine> {
     }
 
     final RescueCardContent card = _cards[_currentIndex];
+    final String packLabel =
+        _mode == RecoveryMode.christian ? 'Christian Rescue Card' : 'Rescue Card';
 
     return Container(
       padding: const EdgeInsets.all(18),
@@ -59,7 +103,7 @@ class _RescueCardEngineState extends State<RescueCardEngine> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
           Text(
-            'Rescue Card',
+            packLabel,
             style: theme.textTheme.titleMedium?.copyWith(
               fontWeight: FontWeight.w700,
             ),
@@ -99,9 +143,13 @@ class _RescueCardEngineState extends State<RescueCardEngine> {
           const SizedBox(height: 18),
           FilledButton.tonal(
             onPressed: _nextCard,
-            child: const Padding(
-              padding: EdgeInsets.symmetric(vertical: 14),
-              child: Text('Show another rescue card'),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 14),
+              child: Text(
+                _mode == RecoveryMode.christian
+                    ? 'Show another Christian rescue card'
+                    : 'Show another rescue card',
+              ),
             ),
           ),
         ],
