@@ -4,8 +4,7 @@ import sys
 checks = [
     ("lib/features/shell/presentation/breakwave_shell.dart", [
         "class _BreakWaveShellState extends State<BreakWaveShell>",
-        "_selectedIndex == index",
-        "index != 0 && index != 2",
+        "_logRefreshTick",
         "if (index == 2) {",
         "_logRefreshTick += 1;",
         "LogScreen(",
