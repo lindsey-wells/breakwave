@@ -15,6 +15,7 @@ import '../../reasons/presentation/reasons_focus_card.dart';
 import '../../triggers/presentation/triggers_watch_card.dart';
 import 'widgets/daily_encouragement_card.dart';
 import 'widgets/fast_urge_entry_card.dart';
+import 'widgets/bedtime_danger_mode_card.dart';
 import '../../checkin/presentation/daily_check_in_card.dart';
 import '../../insights/presentation/simple_insights_card.dart';
 import 'widgets/home_hero_card.dart';
@@ -112,6 +113,10 @@ class HomeScreen extends StatelessWidget {
                       ),
                       const SizedBox(height: 16),
                       FastUrgeEntryCard(
+                        onOpenRescue: onOpenRescue,
+                      ),
+                      const SizedBox(height: 16),
+                      BedtimeDangerModeCard(
                         onOpenRescue: onOpenRescue,
                       ),
                       const SizedBox(height: 16),
