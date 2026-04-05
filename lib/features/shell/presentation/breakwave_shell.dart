@@ -2,8 +2,8 @@
 // Cube23 Collaboration Header
 // Project: BreakWave
 // File: breakwave_shell.dart
-// Purpose: Bottom-tab shell for the first BreakWave navigation pass.
-// Notes: BW-13B refreshes Log after Rescue saves.
+// Purpose: Bottom-tab shell for BreakWave.
+// Notes: BW-35 refreshes Home and Log on tab re-entry.
 // ------------------------------------------------------------
 
 import 'package:flutter/material.dart';
@@ -22,12 +22,16 @@ class BreakWaveShell extends StatefulWidget {
 
 class _BreakWaveShellState extends State<BreakWaveShell> {
   int _selectedIndex = 0;
+  int _homeRefreshTick = 0;
   int _logRefreshTick = 0;
 
   void _onDestinationSelected(int index) {
-    if (_selectedIndex == index && index != 2) return;
+    if (_selectedIndex == index && index != 0 && index != 2) return;
 
     setState(() {
+      if (index == 0) {
+        _homeRefreshTick += 1;
+      }
       if (index == 2) {
         _logRefreshTick += 1;
       }
@@ -36,13 +40,17 @@ class _BreakWaveShellState extends State<BreakWaveShell> {
   }
 
   void _returnHome() {
-    _onDestinationSelected(0);
+    setState(() {
+      _homeRefreshTick += 1;
+      _selectedIndex = 0;
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     final List<Widget> screens = <Widget>[
       HomeScreen(
+        key: ValueKey<int>(_homeRefreshTick),
         onOpenRescue: () => _onDestinationSelected(1),
         onOpenLog: () => _onDestinationSelected(2),
       ),
