@@ -38,10 +38,10 @@ STRING_PATTERNS = {
     ],
     "lib/features/home/presentation/widgets/recovery_cycle_preview_card.dart": [
         "class RecoveryCyclePreviewCard",
-        "Recovery Cycle Preview",
+        "Recovery cycle wheel",
         "Trigger",
         "Urge",
-        "Response",
+        "Trigger → Urge → Escalation → Action → Regret / Recovery",
     ],
     "lib/features/home/presentation/widgets/daily_encouragement_card.dart": [
         "class DailyEncouragementCard",
