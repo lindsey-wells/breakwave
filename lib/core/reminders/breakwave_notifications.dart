@@ -56,6 +56,21 @@ class BreakWaveNotifications {
     await android?.requestNotificationsPermission();
   }
 
+  static Future<bool> safeRescheduleAll({
+    required ReminderSettings settings,
+    required TriggersSelection triggersSelection,
+  }) async {
+    try {
+      await rescheduleAll(
+        settings: settings,
+        triggersSelection: triggersSelection,
+      );
+      return true;
+    } catch (_) {
+      return false;
+    }
+  }
+
   static Future<void> rescheduleAll({
     required ReminderSettings settings,
     required TriggersSelection triggersSelection,

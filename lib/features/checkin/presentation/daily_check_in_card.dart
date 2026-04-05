@@ -91,7 +91,7 @@ class _DailyCheckInCardState extends State<DailyCheckInCard> {
 
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Saved today as: $status'),
+          content: Text('Saved today\'s check-in: $status'),
         ),
       );
     } catch (_) {

@@ -3,7 +3,7 @@
 // Project: BreakWave
 // File: home_widget_sync.dart
 // Purpose: BW-29 home widget sync helper.
-// Notes: Saves lightweight widget state and requests widget updates.
+// Notes: BW-33 hardens widget sync so failures never block core flows.
 // ------------------------------------------------------------
 
 import 'package:home_widget/home_widget.dart';
@@ -17,29 +17,33 @@ class BreakWaveHomeWidgetSync {
   static const String providerName = 'BreakWaveHomeWidgetProvider';
 
   static Future<void> sync() async {
-    final DailyCheckInEntry? todayCheckIn =
-        await DailyCheckInStore.loadTodayEntry();
-    final BedtimeModeEntry? tonightRisk =
-        await BedtimeModeStore.loadTodayEntry();
+    try {
+      final DailyCheckInEntry? todayCheckIn =
+          await DailyCheckInStore.loadTodayEntry();
+      final BedtimeModeEntry? tonightRisk =
+          await BedtimeModeStore.loadTodayEntry();
 
-    final String title = tonightRisk?.isRisky == true
-        ? 'Tonight feels risky'
-        : 'BreakWave';
+      final String title = tonightRisk?.isRisky == true
+          ? 'Tonight feels risky'
+          : 'BreakWave';
 
-    final String status = todayCheckIn == null
-        ? 'No daily check-in saved yet.'
-        : 'Today: ${todayCheckIn.status}';
+      final String status = todayCheckIn == null
+          ? 'No daily check-in saved yet.'
+          : 'Today: ${todayCheckIn.status}';
 
-    final String focus = tonightRisk?.isRisky == true
-        ? 'Open BreakWave and go to Rescue.'
-        : 'Ride the next wave clean.';
+      final String focus = tonightRisk?.isRisky == true
+          ? 'Open BreakWave and go to Rescue.'
+          : 'Ride the next wave clean.';
 
-    await HomeWidget.saveWidgetData<String>('bw_widget_title', title);
-    await HomeWidget.saveWidgetData<String>('bw_widget_status', status);
-    await HomeWidget.saveWidgetData<String>('bw_widget_focus', focus);
+      await HomeWidget.saveWidgetData<String>('bw_widget_title', title);
+      await HomeWidget.saveWidgetData<String>('bw_widget_status', status);
+      await HomeWidget.saveWidgetData<String>('bw_widget_focus', focus);
 
-    await HomeWidget.updateWidget(
-      name: providerName,
-    );
+      await HomeWidget.updateWidget(
+        name: providerName,
+      );
+    } catch (_) {
+      // Widget sync is optional. Never let it block a core save flow.
+    }
   }
 }

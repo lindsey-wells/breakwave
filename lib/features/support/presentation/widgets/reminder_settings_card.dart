@@ -114,7 +114,7 @@ class _ReminderSettingsCardState extends State<ReminderSettingsCard> {
     try {
       await ReminderSettingsStore.save(_settings);
       await BreakWaveNotifications.requestPermissions();
-      await BreakWaveNotifications.rescheduleAll(
+      final bool rescheduled = await BreakWaveNotifications.safeRescheduleAll(
         settings: _settings,
         triggersSelection: _triggers,
       );
@@ -122,8 +122,12 @@ class _ReminderSettingsCardState extends State<ReminderSettingsCard> {
       if (!mounted) return;
 
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Reminder settings saved.'),
+        SnackBar(
+          content: Text(
+            rescheduled
+                ? 'Reminder settings saved.'
+                : 'Reminder settings saved locally. Notification refresh may need another try.',
+          ),
         ),
       );
     } catch (_) {

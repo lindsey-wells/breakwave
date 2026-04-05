@@ -58,7 +58,7 @@ class _PrivacySettingsCardState extends State<PrivacySettingsCard> {
       final ReminderSettings reminderSettings = await ReminderSettingsStore.load();
       final TriggersSelection triggers = await TriggersStore.loadSelection();
 
-      await BreakWaveNotifications.rescheduleAll(
+      final bool rescheduled = await BreakWaveNotifications.safeRescheduleAll(
         settings: reminderSettings,
         triggersSelection: triggers,
       );
@@ -66,8 +66,12 @@ class _PrivacySettingsCardState extends State<PrivacySettingsCard> {
       if (!mounted) return;
 
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Privacy settings saved.'),
+        SnackBar(
+          content: Text(
+            rescheduled
+                ? 'Privacy settings saved.'
+                : 'Privacy settings saved locally. Notification refresh may need another try.',
+          ),
         ),
       );
     } catch (_) {
