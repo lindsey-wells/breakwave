@@ -3,7 +3,7 @@
 // Project: BreakWave
 // File: wave_surface.dart
 // Purpose: Shared ocean-themed surface for BreakWave.
-// Notes: BW-30 ocean polish pass.
+// Notes: BW-30A ocean identity correction.
 // ------------------------------------------------------------
 
 import 'package:flutter/material.dart';
@@ -32,11 +32,11 @@ class WaveSurface extends StatelessWidget {
             ],
           ),
           border: Border.all(
-            color: const Color(0xFF5DB7FF).withOpacity(0.20),
+            color: const Color(0xFF73C4FF).withOpacity(0.14),
           ),
           boxShadow: <BoxShadow>[
             BoxShadow(
-              color: const Color(0xFF061220).withOpacity(0.28),
+              color: const Color(0xFF061220).withOpacity(0.24),
               blurRadius: 20,
               offset: const Offset(0, 10),
             ),
@@ -53,18 +53,10 @@ class WaveSurface extends StatelessWidget {
             ),
             Positioned(
               top: -34,
-              right: -22,
+              right: -20,
               child: _GlowOrb(
-                size: 110,
-                color: const Color(0xFF4AB8FF).withOpacity(0.14),
-              ),
-            ),
-            Positioned(
-              bottom: -52,
-              left: -28,
-              child: _GlowOrb(
-                size: 132,
-                color: const Color(0xFF1C79D4).withOpacity(0.12),
+                size: 128,
+                color: const Color(0xFF73C4FF).withOpacity(0.08),
               ),
             ),
             Positioned(
@@ -72,12 +64,12 @@ class WaveSurface extends StatelessWidget {
               left: 0,
               right: 0,
               child: Container(
-                height: 3,
+                height: 2,
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
                     colors: <Color>[
                       Colors.white.withOpacity(0.00),
-                      Colors.white.withOpacity(0.28),
+                      Colors.white.withOpacity(0.20),
                       Colors.white.withOpacity(0.00),
                     ],
                   ),
@@ -138,61 +130,45 @@ class _WaveSurfacePainter extends CustomPainter {
     final Paint crestPaint = Paint()
       ..color = Colors.white.withOpacity(0.08)
       ..style = PaintingStyle.stroke
-      ..strokeWidth = 1.5;
+      ..strokeWidth = 1.8;
 
-    final Paint deepPaint = Paint()
+    final Paint swellPaint = Paint()
       ..color = const Color(0xFF73C4FF).withOpacity(0.10)
       ..style = PaintingStyle.stroke
-      ..strokeWidth = 1.2;
+      ..strokeWidth = 1.4;
 
     final Path topWave = Path()
-      ..moveTo(0, size.height * 0.28)
+      ..moveTo(-20, size.height * 0.34)
       ..quadraticBezierTo(
         size.width * 0.22,
-        size.height * 0.18,
-        size.width * 0.48,
-        size.height * 0.27,
+        size.height * 0.20,
+        size.width * 0.52,
+        size.height * 0.31,
       )
       ..quadraticBezierTo(
-        size.width * 0.72,
-        size.height * 0.36,
-        size.width,
-        size.height * 0.22,
-      );
-
-    final Path middleWave = Path()
-      ..moveTo(0, size.height * 0.58)
-      ..quadraticBezierTo(
-        size.width * 0.20,
-        size.height * 0.49,
-        size.width * 0.42,
-        size.height * 0.56,
-      )
-      ..quadraticBezierTo(
-        size.width * 0.68,
-        size.height * 0.64,
-        size.width,
-        size.height * 0.50,
+        size.width * 0.78,
+        size.height * 0.40,
+        size.width + 20,
+        size.height * 0.26,
       );
 
     final Path lowWave = Path()
-      ..moveTo(0, size.height * 0.80)
+      ..moveTo(-20, size.height * 0.74)
       ..quadraticBezierTo(
-        size.width * 0.18,
-        size.height * 0.73,
-        size.width * 0.40,
-        size.height * 0.81,
+        size.width * 0.20,
+        size.height * 0.63,
+        size.width * 0.46,
+        size.height * 0.72,
       )
       ..quadraticBezierTo(
-        size.width * 0.72,
-        size.height * 0.90,
-        size.width,
-        size.height * 0.76,
+        size.width * 0.76,
+        size.height * 0.84,
+        size.width + 20,
+        size.height * 0.66,
       );
 
     canvas.drawPath(topWave, crestPaint);
-    canvas.drawPath(middleWave, deepPaint);
-    canvas.drawPath(lowWave, crestPaint);
+    canvas.drawPath(lowWave, swellPaint);
   }
 
   @override
