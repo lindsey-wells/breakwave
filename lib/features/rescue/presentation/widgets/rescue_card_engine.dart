@@ -2,8 +2,8 @@
 // Cube23 Collaboration Header
 // Project: BreakWave
 // File: rescue_card_engine.dart
-// Purpose: BW-16/BW-17 rescue card engine.
-// Notes: Renders starter or Christian rescue cards based on recovery mode.
+// Purpose: BW-16/BW-17/BW-18 rescue card engine.
+// Notes: Renders Christian or secular rescue cards based on recovery mode.
 // ------------------------------------------------------------
 
 import 'package:flutter/material.dart';
@@ -12,7 +12,7 @@ import '../../../../core/recovery/recovery_mode.dart';
 import '../../../../core/recovery/recovery_mode_store.dart';
 import '../../domain/christian_rescue_card_pack.dart';
 import '../../domain/rescue_card_content.dart';
-import '../../domain/rescue_card_pack.dart';
+import '../../domain/secular_rescue_card_pack.dart';
 
 class RescueCardEngine extends StatefulWidget {
   const RescueCardEngine({super.key});
@@ -25,7 +25,7 @@ class _RescueCardEngineState extends State<RescueCardEngine> {
   List<RescueCardContent> _cards = const <RescueCardContent>[];
   int _currentIndex = 0;
   bool _loading = true;
-  RecoveryMode? _mode;
+  RecoveryMode _mode = RecoveryMode.secular;
 
   @override
   void initState() {
@@ -34,13 +34,15 @@ class _RescueCardEngineState extends State<RescueCardEngine> {
   }
 
   Future<void> _loadCards() async {
-    final RecoveryMode? mode = await RecoveryModeStore.loadMode();
-    if (!mounted) return;
+    final RecoveryMode mode =
+        await RecoveryModeStore.loadMode() ?? RecoveryMode.secular;
 
     final List<RescueCardContent> cards =
         mode == RecoveryMode.christian
             ? ChristianRescueCardPack.cards
-            : RescueCardPack.starter;
+            : SecularRescueCardPack.cards;
+
+    if (!mounted) return;
 
     setState(() {
       _mode = mode;
@@ -89,8 +91,7 @@ class _RescueCardEngineState extends State<RescueCardEngine> {
     }
 
     final RescueCardContent card = _cards[_currentIndex];
-    final String packLabel =
-        _mode == RecoveryMode.christian ? 'Christian Rescue Card' : 'Rescue Card';
+    final bool isChristian = _mode == RecoveryMode.christian;
 
     return Container(
       padding: const EdgeInsets.all(18),
@@ -103,7 +104,7 @@ class _RescueCardEngineState extends State<RescueCardEngine> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
           Text(
-            packLabel,
+            isChristian ? 'Christian Rescue Card' : 'Secular Rescue Card',
             style: theme.textTheme.titleMedium?.copyWith(
               fontWeight: FontWeight.w700,
             ),
@@ -146,9 +147,9 @@ class _RescueCardEngineState extends State<RescueCardEngine> {
             child: Padding(
               padding: const EdgeInsets.symmetric(vertical: 14),
               child: Text(
-                _mode == RecoveryMode.christian
+                isChristian
                     ? 'Show another Christian rescue card'
-                    : 'Show another rescue card',
+                    : 'Show another secular rescue card',
               ),
             ),
           ),

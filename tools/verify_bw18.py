@@ -2,20 +2,26 @@ from pathlib import Path
 import sys
 
 checks = [
+    ("lib/features/rescue/domain/secular_rescue_card_pack.dart", [
+        "class SecularRescueCardPack",
+        "cards = <RescueCardContent>",
+        "Slow the first minute",
+        "Change the setup",
+        "Name the wave clearly",
+        "this is an urge, not a decision yet.",
+    ]),
+    ("lib/features/rescue/presentation/widgets/rescue_card_engine.dart", [
+        "RecoveryMode.secular",
+        "SecularRescueCardPack.cards",
+        "ChristianRescueCardPack.cards",
+        "Secular Rescue Card",
+        "Show another secular rescue card",
+        "Christian Rescue Card",
+        "Show another Christian rescue card",
+    ]),
     ("lib/features/rescue/domain/christian_rescue_card_pack.dart", [
         "class ChristianRescueCardPack",
         "cards = <RescueCardContent>",
-        "Grace first, not panic",
-        "Lord, help me obey You in the next minute.",
-        "Step into the light",
-        "Interrupt the pattern",
-    ]),
-    ("lib/features/rescue/presentation/widgets/rescue_card_engine.dart", [
-        "RecoveryModeStore.loadMode()",
-        "RecoveryMode.christian",
-        "ChristianRescueCardPack.cards",
-        "Christian Rescue Card",
-        "Show another Christian rescue card",
     ]),
 ]
 
@@ -37,4 +43,4 @@ for rel_path, needles in checks:
 if failed:
     sys.exit(1)
 
-print("PASS: BW-17 Christian rescue pack verified.")
+print("PASS: BW-18 secular rescue pack verified.")
