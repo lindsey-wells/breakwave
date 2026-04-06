@@ -2,14 +2,15 @@
 // Cube23 Collaboration Header
 // Project: BreakWave
 // File: support_quick_actions_card.dart
-// Purpose: BW-21 support quick actions card.
-// Notes: Copies discreet support messages for the saved trusted contact.
+// Purpose: BW-21/BW-37 support quick actions card.
+// Notes: Supports direct text/email actions and keeps copy actions as fallback.
 // ------------------------------------------------------------
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import '../../../../core/support/support_contact.dart';
+import '../../../../core/support/support_contact_actions.dart';
 import '../../../../core/support/support_contact_store.dart';
 
 class SupportQuickActionsCard extends StatefulWidget {
@@ -65,27 +66,24 @@ class _SupportQuickActionsCardState extends State<SupportQuickActionsCard> {
     );
   }
 
+  Future<void> _runAction(Future<bool> Function() action, String failureText) async {
+    final bool ok = await action();
+    if (!mounted) return;
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(ok ? 'Opening your messaging app.' : failureText),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final ThemeData theme = Theme.of(context);
     final ColorScheme colorScheme = theme.colorScheme;
-
     final bool hasContact = _contact != null;
-
-    final List<_QuickAction> actions = <_QuickAction>[
-      const _QuickAction(
-        label: 'Copy "I’m struggling"',
-        message: 'I’m struggling right now. Please check on me when you can.',
-      ),
-      const _QuickAction(
-        label: 'Copy "Please check on me"',
-        message: 'Please check on me soon. I could use support right now.',
-      ),
-      const _QuickAction(
-        label: 'Copy "Can you call me?"',
-        message: 'Can you call me when you can? I need some support right now.',
-      ),
-    ];
+    final bool hasPhone = _contact?.hasPhone ?? false;
+    final bool hasEmail = _contact?.hasEmail ?? false;
 
     return Container(
       padding: const EdgeInsets.all(18),
@@ -108,33 +106,95 @@ class _SupportQuickActionsCardState extends State<SupportQuickActionsCard> {
                 const SizedBox(height: 10),
                 Text(
                   hasContact
-                      ? 'Ready for ${_contact!.name} • ${_contact!.contactLine}'
-                      : 'Save a trusted contact first, then copy a ready-to-send support message.',
+                      ? 'Ready for ${_contact!.name}${hasPhone ? ' • ${_contact!.phoneNumber}' : ''}${hasEmail ? '${hasPhone ? ' • ' : ' • '}${_contact!.emailAddress}' : ''}'
+                      : 'Save a trusted contact first, then send a direct text or email.',
                   style: theme.textTheme.bodyMedium,
                 ),
                 const SizedBox(height: 16),
-                for (final _QuickAction action in actions) ...<Widget>[
-                  FilledButton.tonal(
-                    onPressed: hasContact ? () => _copyMessage(action.message) : null,
+
+                if (hasPhone) ...<Widget>[
+                  FilledButton(
+                    onPressed: () => _runAction(
+                      () => SupportContactActions.sendStrugglingText(_contact!),
+                      'Unable to open text message right now.',
+                    ),
                     child: Padding(
                       padding: const EdgeInsets.symmetric(vertical: 14),
-                      child: Text(action.label),
+                      child: Text('Text ${_contact!.name}: I’m struggling'),
                     ),
                   ),
-                  if (action != actions.last) const SizedBox(height: 10),
+                  const SizedBox(height: 10),
+                  FilledButton.tonal(
+                    onPressed: () => _runAction(
+                      () => SupportContactActions.sendCheckOnMeText(_contact!),
+                      'Unable to open text message right now.',
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 14),
+                      child: Text('Text ${_contact!.name}: Please check on me'),
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  FilledButton.tonal(
+                    onPressed: () => _runAction(
+                      () => SupportContactActions.sendCallMeText(_contact!),
+                      'Unable to open text message right now.',
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 14),
+                      child: Text('Text ${_contact!.name}: Can you call me?'),
+                    ),
+                  ),
+                  const SizedBox(height: 14),
                 ],
+
+                if (hasEmail) ...<Widget>[
+                  OutlinedButton(
+                    onPressed: () => _runAction(
+                      () => SupportContactActions.sendSupportEmail(_contact!),
+                      'Unable to open email right now.',
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 14),
+                      child: Text('Email ${_contact!.name} now'),
+                    ),
+                  ),
+                  const SizedBox(height: 14),
+                ],
+
+                Text(
+                  'Copy fallback',
+                  style: theme.textTheme.titleSmall?.copyWith(
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+                const SizedBox(height: 10),
+                Wrap(
+                  spacing: 10,
+                  runSpacing: 10,
+                  children: <Widget>[
+                    OutlinedButton(
+                      onPressed: () => _copyMessage(
+                        'I’m struggling right now. Please check on me when you can.',
+                      ),
+                      child: const Text('Copy "I’m struggling"'),
+                    ),
+                    OutlinedButton(
+                      onPressed: () => _copyMessage(
+                        'Please check on me soon. I could use support right now.',
+                      ),
+                      child: const Text('Copy "Please check on me"'),
+                    ),
+                    OutlinedButton(
+                      onPressed: () => _copyMessage(
+                        'Can you call me when you can? I need some support right now.',
+                      ),
+                      child: const Text('Copy "Can you call me?"'),
+                    ),
+                  ],
+                ),
               ],
             ),
     );
   }
-}
-
-class _QuickAction {
-  const _QuickAction({
-    required this.label,
-    required this.message,
-  });
-
-  final String label;
-  final String message;
 }

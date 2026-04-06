@@ -2,8 +2,8 @@
 // Cube23 Collaboration Header
 // Project: BreakWave
 // File: support_contact_card.dart
-// Purpose: BW-21 support contact card.
-// Notes: Saves one trusted contact for quick support actions.
+// Purpose: BW-21/BW-37 support contact card.
+// Notes: Saves one trusted contact with phone and/or email for direct actions.
 // ------------------------------------------------------------
 
 import 'package:flutter/material.dart';
@@ -20,7 +20,8 @@ class SupportContactCard extends StatefulWidget {
 
 class _SupportContactCardState extends State<SupportContactCard> {
   late final TextEditingController _nameController;
-  late final TextEditingController _contactLineController;
+  late final TextEditingController _phoneController;
+  late final TextEditingController _emailController;
 
   bool _loading = true;
   bool _saving = false;
@@ -30,14 +31,16 @@ class _SupportContactCardState extends State<SupportContactCard> {
   void initState() {
     super.initState();
     _nameController = TextEditingController();
-    _contactLineController = TextEditingController();
+    _phoneController = TextEditingController();
+    _emailController = TextEditingController();
     _load();
   }
 
   @override
   void dispose() {
     _nameController.dispose();
-    _contactLineController.dispose();
+    _phoneController.dispose();
+    _emailController.dispose();
     super.dispose();
   }
 
@@ -46,7 +49,8 @@ class _SupportContactCardState extends State<SupportContactCard> {
     if (!mounted) return;
 
     _nameController.text = contact?.name ?? '';
-    _contactLineController.text = contact?.contactLine ?? '';
+    _phoneController.text = contact?.phoneNumber ?? '';
+    _emailController.text = contact?.emailAddress ?? '';
 
     setState(() {
       _hasSavedContact = contact != null;
@@ -56,9 +60,12 @@ class _SupportContactCardState extends State<SupportContactCard> {
 
   Future<void> _save() async {
     final String name = _nameController.text.trim();
-    final String contactLine = _contactLineController.text.trim();
+    final String phoneNumber = _phoneController.text.trim();
+    final String emailAddress = _emailController.text.trim();
 
-    if (name.isEmpty || contactLine.isEmpty || _saving) return;
+    if (name.isEmpty || (phoneNumber.isEmpty && emailAddress.isEmpty) || _saving) {
+      return;
+    }
 
     setState(() {
       _saving = true;
@@ -68,7 +75,8 @@ class _SupportContactCardState extends State<SupportContactCard> {
       await SupportContactStore.saveContact(
         SupportContact(
           name: name,
-          contactLine: contactLine,
+          phoneNumber: phoneNumber,
+          emailAddress: emailAddress,
         ),
       );
 
@@ -113,7 +121,8 @@ class _SupportContactCardState extends State<SupportContactCard> {
       if (!mounted) return;
 
       _nameController.clear();
-      _contactLineController.clear();
+      _phoneController.clear();
+      _emailController.clear();
 
       setState(() {
         _hasSavedContact = false;
@@ -166,7 +175,7 @@ class _SupportContactCardState extends State<SupportContactCard> {
                 ),
                 const SizedBox(height: 10),
                 Text(
-                  'Save one person you can reach when the wave starts getting louder.',
+                  'Save one person you can reach when the wave starts getting louder. Add a phone number, an email, or both.',
                   style: theme.textTheme.bodyMedium,
                 ),
                 const SizedBox(height: 16),
@@ -174,15 +183,25 @@ class _SupportContactCardState extends State<SupportContactCard> {
                   controller: _nameController,
                   decoration: const InputDecoration(
                     labelText: 'Contact name',
-                    hintText: 'Example: Leah',
+                    hintText: 'Example: Alex',
                   ),
                 ),
                 const SizedBox(height: 12),
                 TextField(
-                  controller: _contactLineController,
+                  controller: _phoneController,
+                  keyboardType: TextInputType.phone,
                   decoration: const InputDecoration(
-                    labelText: 'Reach line',
-                    hintText: 'Example: text first • 555-0101',
+                    labelText: 'Phone number',
+                    hintText: 'Example: 8005551212',
+                  ),
+                ),
+                const SizedBox(height: 12),
+                TextField(
+                  controller: _emailController,
+                  keyboardType: TextInputType.emailAddress,
+                  decoration: const InputDecoration(
+                    labelText: 'Email address',
+                    hintText: 'Example: alex@example.com',
                   ),
                 ),
                 const SizedBox(height: 16),
