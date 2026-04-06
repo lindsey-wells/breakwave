@@ -68,7 +68,7 @@ class _TrustedAccountabilityCardState extends State<TrustedAccountabilityCard> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
           Text(
-            'Trusted person and accountability',
+            'Trusted Person and Accountability',
             style: theme.textTheme.titleMedium?.copyWith(
               fontWeight: FontWeight.w700,
             ),

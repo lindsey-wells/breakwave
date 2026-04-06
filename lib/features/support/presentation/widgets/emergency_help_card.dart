@@ -3,10 +3,11 @@
 // Project: BreakWave
 // File: emergency_help_card.dart
 // Purpose: Immediate support card for BreakWave.
-// Notes: BW-37 replaces stub CTA with real trusted-contact actions.
+// Notes: BW-37 replaces unfinished CTA with real trusted-contact actions.
 // ------------------------------------------------------------
 
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../../../core/support/support_contact.dart';
 import '../../../../core/support/support_contact_actions.dart';
@@ -51,6 +52,27 @@ class _EmergencyHelpCardState extends State<EmergencyHelpCard> {
     );
   }
 
+  Future<void> _callEmergencyServices() async {
+    final Uri uri = Uri(
+      scheme: 'tel',
+      path: '911',
+    );
+
+    final bool ok = await launchUrl(
+      uri,
+      mode: LaunchMode.externalApplication,
+    );
+
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          ok ? 'Opening your phone app.' : 'Unable to open the phone app right now.',
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final ThemeData theme = Theme.of(context);
@@ -69,7 +91,7 @@ class _EmergencyHelpCardState extends State<EmergencyHelpCard> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
           Text(
-            'Immediate support',
+            'Emergency Help',
             style: theme.textTheme.titleMedium?.copyWith(
               fontWeight: FontWeight.w700,
             ),
@@ -80,8 +102,16 @@ class _EmergencyHelpCardState extends State<EmergencyHelpCard> {
             style: theme.textTheme.bodyMedium,
           ),
           const SizedBox(height: 16),
+          FilledButton(
+            onPressed: _callEmergencyServices,
+            child: const Padding(
+              padding: EdgeInsets.symmetric(vertical: 14),
+              child: Text('Call emergency services'),
+            ),
+          ),
+          if (hasPhone) const SizedBox(height: 10),
           if (hasPhone)
-            FilledButton(
+            FilledButton.tonal(
               onPressed: () => _run(
                 () => SupportContactActions.sendStrugglingText(_contact!),
                 'Unable to open text message right now.',
@@ -91,7 +121,7 @@ class _EmergencyHelpCardState extends State<EmergencyHelpCard> {
                 child: Text('Text trusted contact now'),
               ),
             ),
-          if (hasPhone) const SizedBox(height: 10),
+          if (hasEmail) const SizedBox(height: 10),
           if (hasEmail)
             OutlinedButton(
               onPressed: () => _run(
@@ -103,11 +133,13 @@ class _EmergencyHelpCardState extends State<EmergencyHelpCard> {
                 child: Text('Email trusted contact now'),
               ),
             ),
-          if (!hasPhone && !hasEmail)
+          if (!hasPhone && !hasEmail) ...<Widget>[
+            const SizedBox(height: 10),
             Text(
               'Save a trusted contact below to unlock direct emergency contact actions.',
               style: theme.textTheme.bodyMedium,
             ),
+          ],
         ],
       ),
     );
