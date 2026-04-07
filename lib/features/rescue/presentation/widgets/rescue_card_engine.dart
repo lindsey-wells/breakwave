@@ -30,7 +30,8 @@ class _RescueCardEngineState extends State<RescueCardEngine> {
   @override
   void initState() {
     super.initState();
-    _loadCards();
+        RecoveryModeStore.changes.addListener(_handleModeChange);
+_loadCards();
   }
 
   Future<void> _loadCards() async {
@@ -58,6 +59,16 @@ class _RescueCardEngineState extends State<RescueCardEngine> {
     setState(() {
       _currentIndex = (_currentIndex + 1) % _cards.length;
     });
+  }
+
+  void _handleModeChange() {
+    _loadMode();
+  }
+
+  @override
+  void dispose() {
+    RecoveryModeStore.changes.removeListener(_handleModeChange);
+    super.dispose();
   }
 
   @override

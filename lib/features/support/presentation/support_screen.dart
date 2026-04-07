@@ -18,6 +18,7 @@ import '../../faith/presentation/faith_depth_pack_screen.dart';
 import '../../premium/presentation/premium_gate_tile.dart';
 import 'widgets/privacy_settings_card.dart';
 import 'widgets/educate_me_entry_card.dart';
+import 'widgets/recovery_mode_settings_card.dart';
 import 'widgets/support_quick_actions_card.dart';
 import 'widgets/trusted_accountability_card.dart';
 
@@ -65,6 +66,8 @@ class SupportScreen extends StatelessWidget {
                       ],
                     ),
                   ),
+                  const SizedBox(height: 16),
+                  const RecoveryModeSettingsCard(),
                   const SizedBox(height: 16),
                   const EducateMeEntryCard(),
                   const SizedBox(height: 16),
