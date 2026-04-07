@@ -13,6 +13,7 @@ import '../../log/data/log_repository.dart';
 import '../../log/domain/log_entry.dart';
 import 'widgets/calm_reset_card.dart';
 import 'widgets/redirect_actions_card.dart';
+import 'widgets/remember_why_card.dart';
 import 'widgets/support_escalation_card.dart';
 import 'widgets/rescue_card_engine.dart';
 import 'widgets/wave_timer_card.dart';
@@ -150,6 +151,8 @@ class _RescueScreenState extends State<RescueScreen> {
                   ),
                   const SizedBox(height: 16),
                   const CalmResetCard(),
+                  const SizedBox(height: 16),
+                  const RememberWhyCard(),
                   const SizedBox(height: 16),
                   const RedirectActionsCard(),
                   const SizedBox(height: 16),
