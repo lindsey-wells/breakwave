@@ -62,7 +62,7 @@ _loadCards();
   }
 
   void _handleModeChange() {
-    _loadMode();
+    _loadCards();
   }
 
   @override
