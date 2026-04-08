@@ -9,6 +9,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../core/ui/wave_surface.dart';
+import '../../../core/ui/section_header.dart';
 import 'widgets/education_resources_card.dart';
 import 'widgets/emergency_help_card.dart';
 import 'widgets/support_categories_card.dart';
@@ -62,12 +63,16 @@ class SupportScreen extends StatelessWidget {
                         ),
                         SizedBox(height: 8),
                         Text(
-                          'This space should feel like safe water: practical, calm, and easy to reach when the tide gets rough.',
+                          'Practical, calm support you can reach quickly when the tide gets rough.',
                         ),
                       ],
                     ),
                   ),
                   const SizedBox(height: 16),
+                  const SectionHeader(
+                    eyebrow: 'Settings and learning',
+                    title: 'Adjust how BreakWave supports you',
+                  ),
                   const RecoveryModeSettingsCard(),
                   const SizedBox(height: 16),
                   const CustomWhySettingsCard(),
@@ -94,16 +99,24 @@ class SupportScreen extends StatelessWidget {
                   const PrivacySettingsCard(),
                   const SizedBox(height: 16),
                   const ReminderSettingsCard(),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 20),
+                  const SectionHeader(
+                    eyebrow: 'Contact and quick help',
+                    title: 'Reduce isolation fast',
+                  ),
                   const SupportContactCard(),
                   const SizedBox(height: 16),
                   const SupportQuickActionsCard(),
                   const SizedBox(height: 16),
-                  const SupportCategoriesCard(),
-                  const SizedBox(height: 16),
                   const EmergencyHelpCard(),
                   const SizedBox(height: 16),
                   const TrustedAccountabilityCard(),
+                  const SizedBox(height: 20),
+                  const SectionHeader(
+                    eyebrow: 'Resources',
+                    title: 'Use support tools that teach and guide',
+                  ),
+                  const SupportCategoriesCard(),
                   const SizedBox(height: 16),
                   const EducationResourcesCard(),
                 ],

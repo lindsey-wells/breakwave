@@ -9,6 +9,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../core/ui/wave_surface.dart';
+import '../../../core/ui/section_header.dart';
 import '../../log/data/log_repository.dart';
 import '../../log/domain/log_entry.dart';
 import 'widgets/calm_reset_card.dart';
@@ -139,6 +140,10 @@ class _RescueScreenState extends State<RescueScreen> {
                     ),
                   ),
                   const SizedBox(height: 16),
+                  const SectionHeader(
+                    eyebrow: 'Ride the wave',
+                    title: 'Slow the surge before it gets louder',
+                  ),
                   WaveTimerCard(
                     onReturnHome: widget.onReturnHome,
                   ),
@@ -151,11 +156,19 @@ class _RescueScreenState extends State<RescueScreen> {
                   ),
                   const SizedBox(height: 16),
                   const CalmResetCard(),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 20),
+                  const SectionHeader(
+                    eyebrow: 'Interrupt now',
+                    title: 'Use one immediate redirect',
+                  ),
                   const RememberWhyCard(),
                   const SizedBox(height: 16),
                   const RedirectActionsCard(),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 20),
+                  const SectionHeader(
+                    eyebrow: 'Finish honestly',
+                    title: 'Mark what happened and get support',
+                  ),
                   WaveCompletionCard(
                     onComplete: _completeWave,
                   ),

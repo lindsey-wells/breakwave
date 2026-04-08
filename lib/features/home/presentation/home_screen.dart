@@ -12,6 +12,7 @@ import '../../../core/privacy/privacy_settings.dart';
 import '../../../core/privacy/privacy_settings_store.dart';
 import '../../../core/widget/home_widget_sync.dart';
 import '../../../core/ui/wave_surface.dart';
+import '../../../core/ui/section_header.dart';
 import '../../checkin/presentation/daily_check_in_card.dart';
 import '../../insights/presentation/simple_insights_card.dart';
 import '../../log/data/log_repository.dart';
@@ -138,7 +139,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             ),
                             SizedBox(height: 8),
                             Text(
-                              'BreakWave is designed to feel calm, steady, and blue-led — like a wave you can learn to ride instead of fear.',
+                              'Calm, steady support for the next good move when the wave starts rising.',
                             ),
                           ],
                         ),
@@ -162,6 +163,10 @@ class _HomeScreenState extends State<HomeScreen> {
                       const SizedBox(height: 16),
                       const TriggersWatchCard(),
                       const SizedBox(height: 16),
+                      const SectionHeader(
+                        eyebrow: 'Current snapshot',
+                        title: 'See where you are right now',
+                      ),
                       RecoverySnapshotCard(
                         totalEntries: summary.totalEntries,
                         urgeCount: summary.urgeCount,
@@ -175,11 +180,19 @@ class _HomeScreenState extends State<HomeScreen> {
                         ),
                       ],
                       const SizedBox(height: 16),
+                      const SectionHeader(
+                        eyebrow: 'Act now',
+                        title: 'Use the fastest next step',
+                      ),
                       HomeHeroCard(
                         onOpenRescue: widget.onOpenRescue,
                         onOpenLog: widget.onOpenLog,
                       ),
                       const SizedBox(height: 16),
+                      const SectionHeader(
+                        eyebrow: 'Pattern awareness',
+                        title: 'Learn what keeps the wave going',
+                      ),
                       const RecoveryCyclePreviewCard(),
                       const SizedBox(height: 16),
                       const DailyEncouragementCard(),
