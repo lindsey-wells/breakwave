@@ -106,11 +106,11 @@ class _CustomWhySettingsCardState extends State<CustomWhySettingsCard> {
           content: Text('Why image selected. Save to keep it.'),
         ),
       );
-    } catch (_) {
+    } catch (error) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Unable to pick an image right now.'),
+        SnackBar(
+          content: Text('Unable to pick an image right now: $error'),
         ),
       );
     }

@@ -28,14 +28,18 @@ class CustomWhyImageService {
       await whyDir.create(recursive: true);
     }
 
-    final String sourcePath = picked.path;
-    final String extension = sourcePath.contains('.')
-        ? sourcePath.substring(sourcePath.lastIndexOf('.'))
+    final String sourceName = picked.name;
+    final String extension = sourceName.contains('.')
+        ? sourceName.substring(sourceName.lastIndexOf('.'))
         : '.jpg';
 
     final String targetPath = '${whyDir.path}/custom_why_image$extension';
-    final File copied = await File(sourcePath).copy(targetPath);
-    return copied.path;
+
+    final List<int> bytes = await picked.readAsBytes();
+    final File targetFile = File(targetPath);
+    await targetFile.writeAsBytes(bytes, flush: true);
+
+    return targetFile.path;
   }
 
   static Future<void> deleteImageIfPresent(String imagePath) async {
