@@ -18,7 +18,7 @@ import 'email_capture_store.dart';
 
 class EmailExportService {
   static String _timestampToken(DateTime now) {
-    final String two(int value) => value.toString().padLeft(2, '0');
+    String two(int value) => value.toString().padLeft(2, '0');
     return '${now.year}${two(now.month)}${two(now.day)}_${two(now.hour)}${two(now.minute)}${two(now.second)}';
   }
 
