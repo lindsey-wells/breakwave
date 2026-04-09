@@ -22,6 +22,7 @@ import 'widgets/educate_me_entry_card.dart';
 import 'widgets/recovery_mode_settings_card.dart';
 import 'widgets/privacy_lock_settings_card.dart';
 import 'widgets/email_capture_settings_card.dart';
+import 'widgets/email_export_card.dart';
 import 'widgets/custom_why_settings_card.dart';
 import 'widgets/support_quick_actions_card.dart';
 import 'widgets/trusted_accountability_card.dart';
@@ -80,6 +81,8 @@ class SupportScreen extends StatelessWidget {
                   const PrivacyLockSettingsCard(),
                   const SizedBox(height: 16),
                   const EmailCaptureSettingsCard(),
+                  const SizedBox(height: 16),
+                  const EmailExportCard(),
                   const SizedBox(height: 16),
                   const CustomWhySettingsCard(),
                   const SizedBox(height: 16),
