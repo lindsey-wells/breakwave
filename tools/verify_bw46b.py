@@ -25,4 +25,4 @@ for needle in blocked:
 if failed:
     sys.exit(1)
 
-print("PASS: BW-46A/B home_widget pinned below Glance alpha release line.")
+print("PASS: BW-46B home_widget pinned to pre-Glance-alpha release line.")
