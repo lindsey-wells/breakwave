@@ -11,6 +11,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 
 import '../../../../core/why/custom_why_entry.dart';
+import '../../../../core/why/custom_why_fullscreen_image_viewer.dart';
 import '../../../../core/why/custom_why_image_service.dart';
 import '../../../../core/why/custom_why_store.dart';
 
@@ -182,20 +183,9 @@ class _CustomWhySettingsCardState extends State<CustomWhySettingsCard> {
                 ),
                 const SizedBox(height: 16),
                 if (_imagePath.trim().isNotEmpty) ...<Widget>[
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(16),
-                    child: Image.file(
-                      File(_imagePath),
-                      height: 180,
-                      width: double.infinity,
-                      fit: BoxFit.cover,
-                      errorBuilder: (_, __, ___) => Container(
-                        height: 180,
-                        alignment: Alignment.center,
-                        color: colorScheme.surfaceContainer,
-                        child: const Text('Saved why image could not be loaded.'),
-                      ),
-                    ),
+                  _EditableWhyImagePreview(
+                    imagePath: _imagePath,
+                    colorScheme: colorScheme,
                   ),
                   const SizedBox(height: 12),
                 ],
@@ -224,6 +214,76 @@ class _CustomWhySettingsCardState extends State<CustomWhySettingsCard> {
                 ),
               ],
             ),
+    );
+  }
+}
+
+
+class _EditableWhyImagePreview extends StatelessWidget {
+  const _EditableWhyImagePreview({
+    required this.imagePath,
+    required this.colorScheme,
+  });
+
+  final String imagePath;
+  final ColorScheme colorScheme;
+  static const String _heroTag = 'custom-why-settings-image';
+
+  @override
+  Widget build(BuildContext context) {
+    final ThemeData theme = Theme.of(context);
+
+    return Semantics(
+      button: true,
+      label: 'Open saved why image full screen',
+      child: GestureDetector(
+        onTap: () => CustomWhyFullscreenImageViewer.show(
+          context,
+          imagePath: imagePath,
+          heroTag: _heroTag,
+        ),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(16),
+          child: Stack(
+            alignment: Alignment.bottomRight,
+            children: <Widget>[
+              Hero(
+                tag: _heroTag,
+                child: Image.file(
+                  File(imagePath),
+                  height: 180,
+                  width: double.infinity,
+                  fit: BoxFit.cover,
+                  errorBuilder: (_, __, ___) => Container(
+                    height: 180,
+                    alignment: Alignment.center,
+                    color: colorScheme.surfaceContainer,
+                    child: const Text('Saved why image could not be loaded.'),
+                  ),
+                ),
+              ),
+              Container(
+                margin: const EdgeInsets.all(8),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 10,
+                  vertical: 6,
+                ),
+                decoration: BoxDecoration(
+                  color: Colors.black54,
+                  borderRadius: BorderRadius.circular(999),
+                ),
+                child: Text(
+                  'Tap to enlarge',
+                  style: theme.textTheme.labelSmall?.copyWith(
+                    color: Colors.white,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 }
