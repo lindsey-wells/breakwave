@@ -33,7 +33,8 @@ class CustomWhyImageService {
         ? sourceName.substring(sourceName.lastIndexOf('.'))
         : '.jpg';
 
-    final String targetPath = '${whyDir.path}/custom_why_image$extension';
+    final int timestamp = DateTime.now().millisecondsSinceEpoch;
+    final String targetPath = '${whyDir.path}/custom_why_image_$timestamp$extension';
 
     final List<int> bytes = await picked.readAsBytes();
     final File targetFile = File(targetPath);

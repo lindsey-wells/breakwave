@@ -93,18 +93,37 @@ class _CustomWhySettingsCardState extends State<CustomWhySettingsCard> {
   Future<void> _chooseImage() async {
     if (_saving) return;
 
+    setState(() {
+      _saving = true;
+    });
+
     try {
       final String? nextPath =
           await CustomWhyImageService.pickAndPersistWhyImage();
-      if (nextPath == null || !mounted) return;
+      if (nextPath == null || !mounted) {
+        if (mounted) {
+          setState(() {
+            _saving = false;
+          });
+        }
+        return;
+      }
 
       setState(() {
         _imagePath = nextPath;
       });
 
+      await CustomWhyStore.save(
+        CustomWhyEntry(
+          whyText: _whyController.text.trim(),
+          imagePath: nextPath,
+        ),
+      );
+
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('Why image selected. Save to keep it.'),
+          content: Text('Why image saved.'),
         ),
       );
     } catch (error) {
@@ -114,6 +133,12 @@ class _CustomWhySettingsCardState extends State<CustomWhySettingsCard> {
           content: Text('Unable to pick an image right now: $error'),
         ),
       );
+    } finally {
+      if (mounted) {
+        setState(() {
+          _saving = false;
+        });
+      }
     }
   }
 
@@ -122,24 +147,40 @@ class _CustomWhySettingsCardState extends State<CustomWhySettingsCard> {
 
     final String oldPath = _imagePath;
     setState(() {
+      _saving = true;
       _imagePath = '';
     });
 
     try {
+      await CustomWhyStore.save(
+        CustomWhyEntry(
+          whyText: _whyController.text.trim(),
+          imagePath: '',
+        ),
+      );
       await CustomWhyImageService.deleteImageIfPresent(oldPath);
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('Why image removed. Save to keep that change.'),
+          content: Text('Why image removed.'),
         ),
       );
     } catch (_) {
       if (!mounted) return;
+      setState(() {
+        _imagePath = oldPath;
+      });
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Unable to remove the image right now.'),
         ),
       );
+    } finally {
+      if (mounted) {
+        setState(() {
+          _saving = false;
+        });
+      }
     }
   }
 
