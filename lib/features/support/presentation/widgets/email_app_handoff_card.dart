@@ -67,10 +67,21 @@ class _EmailAppHandoffCardState extends State<EmailAppHandoffCard> {
     if (_working) return;
 
     final String email = _teamEmailController.text.trim();
+    if (email.isEmpty) {
+      await EmailAppHandoffStore.clear();
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Using default BreakWave team email.'),
+        ),
+      );
+      return;
+    }
+
     if (!(email.contains('@') && email.contains('.'))) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('Enter a valid BreakWave team email address first.'),
+          content: Text('Enter a valid team email override, or leave it blank to use the default.'),
         ),
       );
       return;
@@ -88,7 +99,7 @@ class _EmailAppHandoffCardState extends State<EmailAppHandoffCard> {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('BreakWave team email saved locally.'),
+          content: Text('BreakWave team email override saved locally.'),
         ),
       );
     } catch (_) {
@@ -122,7 +133,7 @@ class _EmailAppHandoffCardState extends State<EmailAppHandoffCard> {
 
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('BreakWave team email cleared.'),
+          content: Text('Using default BreakWave team email.'),
         ),
       );
     } catch (_) {
@@ -205,7 +216,7 @@ class _EmailAppHandoffCardState extends State<EmailAppHandoffCard> {
                 ),
                 const SizedBox(height: 10),
                 Text(
-                  'Manual only. Save one team email address, then open a prefilled draft in Gmail or the default email app when you choose.',
+                  'Manual only. BreakWave opens a prefilled email draft so you can review and send your saved email preferences.',
                   style: theme.textTheme.bodyMedium,
                 ),
                 const SizedBox(height: 16),
@@ -213,16 +224,23 @@ class _EmailAppHandoffCardState extends State<EmailAppHandoffCard> {
                   controller: _teamEmailController,
                   keyboardType: TextInputType.emailAddress,
                   decoration: const InputDecoration(
-                    labelText: 'BreakWave team email',
-                    hintText: 'Example: team@breakwave.app',
+                    labelText: 'BreakWave team email override',
+                    hintText: EmailAppHandoffService.defaultTeamEmailAddress,
                   ),
                 ),
                 const SizedBox(height: 12),
                 Text(
                   hasData
                       ? 'Saved email-consent data is ready to send.'
-                      : 'No saved email-consent data yet.',
+                      : 'Save email preferences first, then send the handoff when ready.',
                   style: theme.textTheme.bodyMedium,
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  _handoffSettings.hasRecipient
+                      ? 'Using saved team email override.'
+                      : 'Default inbox: ${EmailAppHandoffService.defaultTeamEmailAddress}',
+                  style: theme.textTheme.bodySmall,
                 ),
                 const SizedBox(height: 16),
                 Wrap(
@@ -238,11 +256,7 @@ class _EmailAppHandoffCardState extends State<EmailAppHandoffCard> {
                       child: const Text('Clear team email'),
                     ),
                     FilledButton(
-                      onPressed: (!_working &&
-                              _handoffSettings.hasRecipient &&
-                              hasData)
-                          ? _openDraft
-                          : null,
+                      onPressed: (!_working && hasData) ? _openDraft : null,
                       child: Text(_working ? 'Opening...' : 'Send saved data now'),
                     ),
                   ],

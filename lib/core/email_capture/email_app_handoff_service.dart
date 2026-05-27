@@ -14,6 +14,8 @@ import 'email_capture_settings.dart';
 import 'email_capture_store.dart';
 
 class EmailAppHandoffService {
+  static const String defaultTeamEmailAddress = 'BreakWaveapp@proton.me';
+
   static bool hasSendableData(EmailCaptureSettings settings) {
     return settings.emailAddress.trim().isNotEmpty ||
         settings.marketingOptIn ||
@@ -28,14 +30,21 @@ class EmailAppHandoffService {
     EmailCaptureSettings settings,
     DateTime now,
   ) {
+    final String email = settings.emailAddress.trim();
+
     return [
-      'BreakWave lead / consent submission',
+      'BreakWave email / consent handoff',
       '',
-      'Email address: ${settings.emailAddress.trim().isEmpty ? '(none)' : settings.emailAddress.trim()}',
-      'Marketing opt-in: ${settings.marketingOptIn}',
-      'Research opt-in: ${settings.researchOptIn}',
+      'This message was created by the BreakWave app after the user chose to send their saved email preferences.',
+      '',
+      'Email address: ${email.isEmpty ? '(none)' : email}',
+      'Marketing updates consent: ${settings.marketingOptIn ? 'yes' : 'no'}',
+      'Research / feedback consent: ${settings.researchOptIn ? 'yes' : 'no'}',
+      '',
       'Timestamp ISO: ${now.toIso8601String()}',
-      'Source: BreakWave',
+      'Source: BreakWave Android MVP',
+      '',
+      'Privacy note: this handoff is manual. The user can review, edit, or cancel this email before sending.',
     ].join('\n');
   }
 
@@ -52,9 +61,9 @@ class EmailAppHandoffService {
     final EmailCaptureSettings emailSettings =
         await EmailCaptureStore.load();
 
-    if (!handoffSettings.hasRecipient) {
-      throw StateError('Missing BreakWave team email address.');
-    }
+    final String recipient = handoffSettings.hasRecipient
+        ? handoffSettings.teamEmailAddress.trim()
+        : defaultTeamEmailAddress;
 
     if (!hasSendableData(emailSettings)) {
       throw StateError('No saved email-consent data to send.');
@@ -62,7 +71,7 @@ class EmailAppHandoffService {
 
     final Uri uri = Uri(
       scheme: 'mailto',
-      path: handoffSettings.teamEmailAddress.trim(),
+      path: recipient,
       query: _encodeQueryParameters(<String, String>{
         'subject': buildSubject(),
         'body': buildBody(emailSettings, DateTime.now()),
