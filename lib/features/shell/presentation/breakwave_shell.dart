@@ -30,8 +30,11 @@ class _BreakWaveShellState extends State<BreakWaveShell>
   int _homeRefreshTick = 0;
   int _logRefreshTick = 0;
 
+  static const Duration _privacyRelockGracePeriod = Duration(minutes: 2);
+
   bool _lockLoading = true;
   bool _sessionUnlocked = false;
+  DateTime? _privacyLockBackgroundedAt;
   PrivacyLockSettings _lockSettings = PrivacyLockSettings.defaults;
 
   @override
@@ -53,13 +56,31 @@ class _BreakWaveShellState extends State<BreakWaveShell>
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (!_lockSettings.isEnabled) return;
 
-    if (state == AppLifecycleState.inactive ||
-        state == AppLifecycleState.paused ||
-        state == AppLifecycleState.detached) {
-      setState(() {
-        _sessionUnlocked = false;
-      });
+    if (state == AppLifecycleState.resumed) {
+      _handleAppResumedForPrivacyLock();
+      return;
     }
+
+    if (state == AppLifecycleState.paused ||
+        state == AppLifecycleState.detached) {
+      _privacyLockBackgroundedAt ??= DateTime.now();
+    }
+  }
+
+  void _handleAppResumedForPrivacyLock() {
+    final DateTime? backgroundedAt = _privacyLockBackgroundedAt;
+    _privacyLockBackgroundedAt = null;
+
+    if (backgroundedAt == null) return;
+
+    final Duration awayFor = DateTime.now().difference(backgroundedAt);
+    if (awayFor < _privacyRelockGracePeriod) return;
+
+    if (!mounted) return;
+
+    setState(() {
+      _sessionUnlocked = false;
+    });
   }
 
   Future<void> _loadLockSettings() async {
@@ -75,8 +96,10 @@ class _BreakWaveShellState extends State<BreakWaveShell>
       _lockLoading = false;
 
       if (!settings.isEnabled) {
+        _privacyLockBackgroundedAt = null;
         _sessionUnlocked = false;
       } else if (lockChanged) {
+        _privacyLockBackgroundedAt = null;
         _sessionUnlocked = false;
       }
     });
@@ -103,6 +126,7 @@ class _BreakWaveShellState extends State<BreakWaveShell>
 
   void _handleUnlocked() {
     setState(() {
+      _privacyLockBackgroundedAt = null;
       _sessionUnlocked = true;
     });
   }
