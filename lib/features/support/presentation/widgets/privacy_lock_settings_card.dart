@@ -226,7 +226,7 @@ class _PrivacyLockSettingsCardState extends State<PrivacyLockSettingsCard> {
                 ),
                 const SizedBox(height: 10),
                 Text(
-                  'Add a passcode so sensitive parts of BreakWave feel safer to use honestly. Brief notification popups should not relock the app immediately.',
+                  'Add a passcode so sensitive parts of BreakWave feel safer to use honestly. Lock Log & Support keeps Home and Rescue reachable while protecting the most sensitive screens.',
                   style: theme.textTheme.bodyMedium,
                 ),
                 const SizedBox(height: 16),

@@ -116,7 +116,7 @@ class _PrivacySettingsCardState extends State<PrivacySettingsCard> {
                 ),
                 const SizedBox(height: 10),
                 Text(
-                  'Reduce visible detail on Home and make notifications more discreet.',
+                  'Reduce visible detail on Home, make notifications more discreet, and keep Rescue easy to reach when you need fast help.',
                   style: theme.textTheme.bodyMedium,
                 ),
                 const SizedBox(height: 12),
@@ -136,7 +136,7 @@ class _PrivacySettingsCardState extends State<PrivacySettingsCard> {
                 SwitchListTile.adaptive(
                   contentPadding: EdgeInsets.zero,
                   title: const Text('Hide Home insights'),
-                  subtitle: const Text('Hide the simple insights card on Home.'),
+                  subtitle: const Text('Recommended when using Lock Log & Support so Home reveals less recovery detail.'),
                   value: _settings.hideHomeInsights,
                   onChanged: (bool value) {
                     setState(() {
@@ -149,7 +149,7 @@ class _PrivacySettingsCardState extends State<PrivacySettingsCard> {
                 SwitchListTile.adaptive(
                   contentPadding: EdgeInsets.zero,
                   title: const Text('Hide latest logged moment'),
-                  subtitle: const Text('Hide recent logged event details on Home.'),
+                  subtitle: const Text('Prevents recent log details from appearing on Home while the app is unlocked.'),
                   value: _settings.hideLatestLoggedMoment,
                   onChanged: (bool value) {
                     setState(() {
@@ -162,7 +162,7 @@ class _PrivacySettingsCardState extends State<PrivacySettingsCard> {
                 SwitchListTile.adaptive(
                   contentPadding: EdgeInsets.zero,
                   title: const Text('Prefer Rescue as safe visible path'),
-                  subtitle: const Text('Keep Rescue treated as the safer obvious path while other surfaces get quieter.'),
+                  subtitle: const Text('Keeps urgent help easy to find while other screens reveal less detail.'),
                   value: _settings.preferRescueAsSafePath,
                   onChanged: (bool value) {
                     setState(() {

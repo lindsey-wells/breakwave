@@ -14,7 +14,7 @@ checks = [
         "_sessionUnlocked = false;",
     ]),
     ("lib/features/support/presentation/widgets/privacy_lock_settings_card.dart", [
-        "Brief notification popups should not relock the app immediately.",
+        "Lock Log & Support keeps Home and Rescue reachable while protecting the most sensitive screens.",
     ]),
 ]
 

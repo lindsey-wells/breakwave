@@ -8,7 +8,7 @@ checks = [
         "fullApp",
         "sensitiveSections",
         "Lock full app",
-        "Lock sensitive sections",
+        "Lock Log & Support",
     ]),
     ("lib/core/privacy_lock/privacy_lock_settings.dart", [
         "class PrivacyLockSettings",

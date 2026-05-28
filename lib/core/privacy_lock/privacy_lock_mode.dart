@@ -20,7 +20,7 @@ enum PrivacyLockMode {
       case PrivacyLockMode.fullApp:
         return 'Lock full app';
       case PrivacyLockMode.sensitiveSections:
-        return 'Lock sensitive sections';
+        return 'Lock Log & Support';
     }
   }
 
@@ -31,7 +31,7 @@ enum PrivacyLockMode {
       case PrivacyLockMode.fullApp:
         return 'Require a passcode before anything in BreakWave can be viewed.';
       case PrivacyLockMode.sensitiveSections:
-        return 'Keep Rescue reachable, but require a passcode for Log and Support.';
+        return 'Keep Home and Rescue reachable, but require a passcode for Log and Support.';
     }
   }
 
