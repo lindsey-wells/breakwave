@@ -28,3 +28,12 @@ Release copy now clarifies:
 - Privacy lock is app-level protection, not medical-grade security.
 - Lock Log & Support keeps Home and Rescue reachable.
 - Failed PIN attempts trigger cooldown instead of automatic data deletion.
+
+
+## BW-50 AAB artifact
+
+GitHub Actions now builds and uploads:
+- release APK artifact for device smoke testing
+- release AAB artifact for Play Store preparation
+
+The AAB artifact is not the final signed Play upload flow yet. Play signing/upload key configuration is handled in BW-51.

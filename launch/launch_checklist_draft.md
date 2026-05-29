@@ -31,6 +31,7 @@
 - [ ] Release notes draft
 - [ ] Final CI release build passes
 - [ ] AAB artifact confirmed
+- [ ] AAB artifact confirmed in GitHub Actions
 - [ ] Play upload signing key configured
 - [ ] Play Console listing fields prepared
 - [ ] Internal test build reviewed
