@@ -13,3 +13,10 @@ Use this file only for real launch blockers found during BW-36 smoke testing.
 ## Notes
 - Keep this list short
 - Prefer facts, reproduction steps, and affected flow
+
+
+## Privacy/security release note
+
+Privacy/security copy reviewed in BW-49D. No blocker logged.
+
+Do not claim HIPAA compliance, medical-grade security, guaranteed anonymity, account MFA, or clone prevention for MVP.

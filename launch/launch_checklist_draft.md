@@ -19,6 +19,8 @@
 
 ## Policy / trust
 - [ ] Privacy policy draft
+- [ ] Privacy/security release copy reviewed
+- [ ] Play Data Safety answers drafted
 - [ ] Terms draft if needed
 - [ ] Subscription disclosure wording reviewed
 - [ ] Crisis/help language reviewed
@@ -28,6 +30,8 @@
 - [ ] Version number set
 - [ ] Release notes draft
 - [ ] Final CI release build passes
+- [ ] AAB artifact confirmed
+- [ ] Play upload signing key configured
 - [ ] Play Console listing fields prepared
 - [ ] Internal test build reviewed
 

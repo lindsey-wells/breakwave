@@ -52,3 +52,12 @@ privacy
 bedtime urges
 accountability
 self-control
+
+
+## Privacy & security positioning
+
+BreakWave is built with privacy-conscious recovery support in mind.
+
+The MVP is local-first for core recovery data and does not require an account to use immediate help tools. Optional email preferences are stored locally and can be manually sent through the user's email app after review.
+
+BreakWave includes an app-level 6-digit privacy lock with modes for locking the full app or protecting Log and Support while keeping Home and Rescue reachable.
