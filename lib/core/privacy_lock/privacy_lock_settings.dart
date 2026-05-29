@@ -17,7 +17,7 @@ class PrivacyLockSettings {
   final PrivacyLockMode mode;
   final String passcode;
 
-  bool get isEnabled => mode != PrivacyLockMode.none && passcode.length == 4;
+  bool get isEnabled => mode != PrivacyLockMode.none && passcode.length == 6;
 
   Map<String, dynamic> toMap() {
     return <String, dynamic>{

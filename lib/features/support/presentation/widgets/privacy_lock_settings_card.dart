@@ -3,7 +3,7 @@
 // Project: BreakWave
 // File: privacy_lock_settings_card.dart
 // Purpose: BW-41 privacy lock settings card.
-// Notes: Lets the user choose lock mode and save a 4-digit passcode.
+// Notes: Lets the user choose lock mode and save a 6-digit PIN.
 // ------------------------------------------------------------
 
 import 'package:flutter/material.dart';
@@ -106,10 +106,10 @@ class _PrivacyLockSettingsCardState extends State<PrivacyLockSettingsCard> {
     final String effectiveConfirm =
         passcode.isEmpty && confirm.isEmpty ? _savedPasscode : confirm;
 
-    if (effectivePasscode.length != 4 || effectiveConfirm.length != 4) {
+    if (effectivePasscode.length != 6 || effectiveConfirm.length != 6) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('Enter and confirm a 4-digit passcode.'),
+          content: Text('Enter and confirm a 6-digit PIN.'),
         ),
       );
       return;
@@ -255,12 +255,12 @@ class _PrivacyLockSettingsCardState extends State<PrivacyLockSettingsCard> {
                   controller: _passcodeController,
                   keyboardType: TextInputType.number,
                   obscureText: true,
-                  maxLength: 4,
+                  maxLength: 6,
                   inputFormatters: <TextInputFormatter>[
                     FilteringTextInputFormatter.digitsOnly,
                   ],
                   decoration: const InputDecoration(
-                    labelText: 'Set 4-digit passcode',
+                    labelText: 'Set 6-digit PIN',
                     hintText: 'Example: 1234',
                   ),
                 ),
@@ -269,12 +269,12 @@ class _PrivacyLockSettingsCardState extends State<PrivacyLockSettingsCard> {
                   controller: _confirmController,
                   keyboardType: TextInputType.number,
                   obscureText: true,
-                  maxLength: 4,
+                  maxLength: 6,
                   inputFormatters: <TextInputFormatter>[
                     FilteringTextInputFormatter.digitsOnly,
                   ],
                   decoration: const InputDecoration(
-                    labelText: 'Confirm 4-digit passcode',
+                    labelText: 'Confirm 6-digit PIN',
                   ),
                 ),
                 const SizedBox(height: 16),

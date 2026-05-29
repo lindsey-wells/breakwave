@@ -26,14 +26,14 @@ checks = [
     ("lib/features/privacy_lock/presentation/privacy_unlock_screen.dart", [
         "class PrivacyUnlockScreen",
         "Privacy lock",
-        "4-digit passcode",
+        "6-digit PIN",
         "Unlock",
     ]),
     ("lib/features/support/presentation/widgets/privacy_lock_settings_card.dart", [
         "class PrivacyLockSettingsCard",
         "Privacy lock",
-        "Set 4-digit passcode",
-        "Confirm 4-digit passcode",
+        "Set 6-digit PIN",
+        "Confirm 6-digit PIN",
         "Save privacy lock",
         "Clear privacy lock",
     ]),

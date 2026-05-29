@@ -6,6 +6,8 @@
 // Notes: Simple 4-digit unlock surface for full-app or sensitive-section locks.
 // ------------------------------------------------------------
 
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -27,9 +29,15 @@ class PrivacyUnlockScreen extends StatefulWidget {
 }
 
 class _PrivacyUnlockScreenState extends State<PrivacyUnlockScreen> {
+  static const int _failedAttemptCooldownThreshold = 10;
+  static const Duration _failedAttemptCooldownDuration = Duration(minutes: 5);
+
   late final TextEditingController _controller;
   String? _error;
   bool _unlocking = false;
+  int _failedAttempts = 0;
+  DateTime? _cooldownUntil;
+  Timer? _cooldownTimer;
 
   @override
   void initState() {
@@ -39,6 +47,7 @@ class _PrivacyUnlockScreenState extends State<PrivacyUnlockScreen> {
 
   @override
   void dispose() {
+    _cooldownTimer?.cancel();
     _controller.dispose();
     super.dispose();
   }
@@ -46,16 +55,43 @@ class _PrivacyUnlockScreenState extends State<PrivacyUnlockScreen> {
   String _modeCopy() {
     switch (widget.settings.mode) {
       case PrivacyLockMode.fullApp:
-        return 'BreakWave is locked. Enter your 4-digit passcode to continue.';
+        return 'BreakWave is locked. Enter your 6-digit PIN to continue.';
       case PrivacyLockMode.sensitiveSections:
-        return 'This section is locked. Enter your 4-digit passcode to continue.';
+        return 'This section is locked. Enter your 6-digit PIN to continue.';
       case PrivacyLockMode.none:
-        return 'Enter your 4-digit passcode.';
+        return 'Enter your 6-digit PIN.';
     }
+  }
+
+  bool get _isCoolingDown {
+    final DateTime? until = _cooldownUntil;
+    return until != null && DateTime.now().isBefore(until);
+  }
+
+  void _startCooldownWindow() {
+    _cooldownTimer?.cancel();
+    _cooldownUntil = DateTime.now().add(_failedAttemptCooldownDuration);
+
+    _cooldownTimer = Timer(_failedAttemptCooldownDuration, () {
+      if (!mounted) return;
+
+      setState(() {
+        _cooldownUntil = null;
+        _failedAttempts = 0;
+        _error = null;
+      });
+    });
   }
 
   void _unlock() {
     if (_unlocking) return;
+
+    if (_isCoolingDown) {
+      setState(() {
+        _error = 'Too many failed attempts. Try again in 5 minutes.';
+      });
+      return;
+    }
 
     final String entered = _controller.text.trim();
 
@@ -65,13 +101,28 @@ class _PrivacyUnlockScreenState extends State<PrivacyUnlockScreen> {
     });
 
     if (entered == widget.settings.passcode) {
+      _cooldownTimer?.cancel();
+      _failedAttempts = 0;
+      _cooldownUntil = null;
       widget.onUnlocked();
       return;
     }
 
+    final int nextFailedAttempts = _failedAttempts + 1;
+    final int attemptsRemaining =
+        _failedAttemptCooldownThreshold - nextFailedAttempts;
+
     setState(() {
       _unlocking = false;
-      _error = 'That passcode does not match.';
+      _failedAttempts = nextFailedAttempts;
+
+      if (nextFailedAttempts >= _failedAttemptCooldownThreshold) {
+        _startCooldownWindow();
+        _error = 'Too many failed attempts. Try again in 5 minutes.';
+      } else {
+        _error =
+            'That PIN does not match. $attemptsRemaining attempts before a temporary cooldown.';
+      }
     });
   }
 
@@ -113,19 +164,19 @@ class _PrivacyUnlockScreenState extends State<PrivacyUnlockScreen> {
                     controller: _controller,
                     keyboardType: TextInputType.number,
                     obscureText: true,
-                    maxLength: 4,
+                    maxLength: 6,
                     inputFormatters: <TextInputFormatter>[
                       FilteringTextInputFormatter.digitsOnly,
                     ],
                     decoration: InputDecoration(
-                      labelText: '4-digit passcode',
+                      labelText: '6-digit PIN',
                       errorText: _error,
                     ),
                     onSubmitted: (_) => _unlock(),
                   ),
                   const SizedBox(height: 8),
                   FilledButton(
-                    onPressed: _unlocking ? null : _unlock,
+                    onPressed: (_unlocking || _isCoolingDown) ? null : _unlock,
                     child: const Padding(
                       padding: EdgeInsets.symmetric(vertical: 14),
                       child: Text('Unlock'),
