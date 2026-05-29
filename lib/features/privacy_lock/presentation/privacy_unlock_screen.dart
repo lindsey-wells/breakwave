@@ -2,8 +2,8 @@
 // Cube23 Collaboration Header
 // Project: BreakWave
 // File: privacy_unlock_screen.dart
-// Purpose: BW-41 privacy unlock screen.
-// Notes: Simple 4-digit unlock surface for full-app or sensitive-section locks.
+// Purpose: BW-49C 6-digit privacy unlock screen.
+// Notes: Simple 6-digit PIN unlock surface with failed-attempt cooldown.
 // ------------------------------------------------------------
 
 import 'dart:async';
@@ -52,6 +52,11 @@ class _PrivacyUnlockScreenState extends State<PrivacyUnlockScreen> {
     super.dispose();
   }
 
+  bool get _isCoolingDown {
+    final DateTime? until = _cooldownUntil;
+    return until != null && DateTime.now().isBefore(until);
+  }
+
   String _modeCopy() {
     switch (widget.settings.mode) {
       case PrivacyLockMode.fullApp:
@@ -61,11 +66,6 @@ class _PrivacyUnlockScreenState extends State<PrivacyUnlockScreen> {
       case PrivacyLockMode.none:
         return 'Enter your 6-digit PIN.';
     }
-  }
-
-  bool get _isCoolingDown {
-    final DateTime? until = _cooldownUntil;
-    return until != null && DateTime.now().isBefore(until);
   }
 
   void _startCooldownWindow() {
@@ -120,8 +120,7 @@ class _PrivacyUnlockScreenState extends State<PrivacyUnlockScreen> {
         _startCooldownWindow();
         _error = 'Too many failed attempts. Try again in 5 minutes.';
       } else {
-        _error =
-            'That PIN does not match. $attemptsRemaining attempts before a temporary cooldown.';
+        _error = 'Wrong PIN. $attemptsRemaining tries left before cooldown.';
       }
     });
   }
@@ -168,13 +167,22 @@ class _PrivacyUnlockScreenState extends State<PrivacyUnlockScreen> {
                     inputFormatters: <TextInputFormatter>[
                       FilteringTextInputFormatter.digitsOnly,
                     ],
-                    decoration: InputDecoration(
+                    decoration: const InputDecoration(
                       labelText: '6-digit PIN',
-                      errorText: _error,
                     ),
                     onSubmitted: (_) => _unlock(),
                   ),
                   const SizedBox(height: 8),
+                  if (_error != null) ...<Widget>[
+                    Text(
+                      _error!,
+                      softWrap: true,
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        color: colorScheme.error,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                  ],
                   FilledButton(
                     onPressed: (_unlocking || _isCoolingDown) ? null : _unlock,
                     child: const Padding(

@@ -19,7 +19,7 @@ checks = [
         "DateTime? _cooldownUntil",
         "Timer? _cooldownTimer",
         "Too many failed attempts. Try again in 5 minutes.",
-        "attempts before a temporary cooldown",
+        "tries left before cooldown",
         "labelText: '6-digit PIN'",
         "maxLength: 6",
         "onPressed: (_unlocking || _isCoolingDown) ? null : _unlock",

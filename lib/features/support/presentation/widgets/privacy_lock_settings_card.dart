@@ -261,7 +261,7 @@ class _PrivacyLockSettingsCardState extends State<PrivacyLockSettingsCard> {
                   ],
                   decoration: const InputDecoration(
                     labelText: 'Set 6-digit PIN',
-                    hintText: 'Example: 1234',
+                    hintText: 'Example: 123456',
                   ),
                 ),
                 const SizedBox(height: 12),
