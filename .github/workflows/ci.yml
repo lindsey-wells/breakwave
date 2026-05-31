@@ -39,6 +39,27 @@ jobs:
       - name: Get dependencies
         run: flutter pub get
 
+      - name: Run BreakWave verification scripts
+        run: |
+          set -e
+          if [ -d tools ]; then
+            found=0
+            while IFS= read -r script; do
+              found=1
+              echo "Running $script"
+              python3 "$script"
+            done < <(find tools -maxdepth 1 -type f -name 'verify_bw*.py' | sort)
+
+            if [ "$found" -eq 0 ]; then
+              echo "No verify_bw*.py scripts found in tools/"
+            fi
+          else
+            echo "No tools/ directory found"
+          fi
+
+      - name: Flutter test
+        run: flutter test
+
       - name: Prepare Android release signing
         env:
           ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
@@ -66,26 +87,6 @@ jobs:
           storeFile=upload-keystore.jks
           EOF
 
-      - name: Run BreakWave verification scripts
-        run: |
-          set -e
-          if [ -d tools ]; then
-            found=0
-            while IFS= read -r script; do
-              found=1
-              echo "Running $script"
-              python3 "$script"
-            done < <(find tools -maxdepth 1 -type f -name 'verify_bw*.py' | sort)
-
-            if [ "$found" -eq 0 ]; then
-              echo "No verify_bw*.py scripts found in tools/"
-            fi
-          else
-            echo "No tools/ directory found"
-          fi
-
-      - name: Flutter test
-        run: flutter test
 
       - name: Build release APK
         run: flutter build apk --release

@@ -1,4 +1,5 @@
 from pathlib import Path
+import subprocess
 import sys
 
 checks = [
@@ -26,6 +27,8 @@ checks = [
         "cat > android/key.properties <<EOF",
         "No Android signing secrets found. Release build will use debug signing fallback.",
         "Android signing secrets are incomplete.",
+        "Build release APK",
+        "Build release AAB",
     ]),
     ("android/.gitignore", [
         "key.properties",
@@ -64,18 +67,35 @@ for rel_path, needles in checks:
             print(f"FAIL {rel_path} missing: {needle}")
             failed = True
 
-blocked_paths = [
-    Path("upload-keystore.base64"),
-    Path("upload-keystore.jks"),
-    Path("ANDROID_KEYSTORE_BASE64.txt"),
-    Path("android/app/upload-keystore.jks"),
-    Path("android/key.properties"),
-]
+# CI may create signing files from secrets during the workflow.
+# The release safety rule is: secret files must never be tracked by git.
+tracked = subprocess.check_output(
+    ["git", "ls-files"],
+    text=True,
+).splitlines()
 
-for path in blocked_paths:
-    if path.exists():
-        print(f"FAIL secret/signing file must not exist in repo: {path}")
+blocked_tracked = {
+    "upload-keystore.base64",
+    "upload-keystore.jks",
+    "ANDROID_KEYSTORE_BASE64.txt",
+    "android/app/upload-keystore.jks",
+    "android/key.properties",
+}
+
+for rel_path in blocked_tracked:
+    if rel_path in tracked:
+        print(f"FAIL secret/signing file must not be tracked by git: {rel_path}")
         failed = True
+
+workflow = Path(".github/workflows/ci.yml").read_text(encoding="utf-8")
+signing_index = workflow.find("Prepare Android release signing")
+verify_index = workflow.find("Run BreakWave verification scripts")
+test_index = workflow.find("Flutter test")
+build_apk_index = workflow.find("Build release APK")
+
+if not (verify_index < test_index < signing_index < build_apk_index):
+    print("FAIL signing prep should run after verifiers/tests and before release builds")
+    failed = True
 
 if failed:
     sys.exit(1)
