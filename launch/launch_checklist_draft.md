@@ -35,6 +35,9 @@
 - [ ] Play upload signing key configured
 - [ ] Play Console listing fields prepared
 - [ ] Internal test build reviewed
+- [ ] Internal testing setup doc reviewed
+- [ ] Internal tester opt-in link created
+- [ ] Signed AAB uploaded to internal testing
 
 ## Open decisions
 - [ ] Annual no-trial vs annual 7-day trial

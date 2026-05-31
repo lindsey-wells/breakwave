@@ -37,3 +37,15 @@ GitHub Actions now builds and uploads:
 - release AAB artifact for Play Store preparation
 
 The AAB artifact is not the final signed Play upload flow yet. Play signing/upload key configuration is handled in BW-51.
+
+
+## BW-52 Play internal testing setup
+
+Internal testing setup doc added.
+
+Next handoff step:
+- Upload the signed AAB artifact to Google Play Console internal testing.
+- Add tester emails.
+- Roll out the internal test release.
+- Send tester opt-in link.
+- Verify install through Google Play.
