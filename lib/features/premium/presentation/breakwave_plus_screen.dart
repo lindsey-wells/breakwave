@@ -2,8 +2,8 @@
 // Cube23 Collaboration Header
 // Project: BreakWave
 // File: breakwave_plus_screen.dart
-// Purpose: BW-25 BreakWave Plus paywall shell.
-// Notes: Local scaffold only. No real billing integration yet.
+// Purpose: BW-54 BreakWave Plus value wall.
+// Notes: Plus preview screen only. Real billing waits for Play account/Billing setup.
 // ------------------------------------------------------------
 
 import 'package:flutter/material.dart';
@@ -36,8 +36,8 @@ class _BreakWavePlusScreenState extends State<BreakWavePlusScreen> {
         SnackBar(
           content: Text(
             variant == 'annual_trial'
-                ? 'Saved paywall variant: annual with 7-day trial.'
-                : 'Saved paywall variant: annual without trial.',
+                ? 'Saved Plus offer preview: annual with 7-day trial.'
+                : 'Saved Plus offer preview: annual without trial.',
           ),
         ),
       );
@@ -50,7 +50,7 @@ class _BreakWavePlusScreenState extends State<BreakWavePlusScreen> {
     }
   }
 
-  Future<void> _debugUnlock() async {
+  Future<void> _enablePlusPreview() async {
     if (_saving) return;
 
     setState(() {
@@ -64,7 +64,7 @@ class _BreakWavePlusScreenState extends State<BreakWavePlusScreen> {
 
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('BreakWave Plus unlocked locally for scaffold testing.'),
+          content: Text('BreakWave Plus preview enabled for testing.'),
         ),
       );
 
@@ -81,7 +81,6 @@ class _BreakWavePlusScreenState extends State<BreakWavePlusScreen> {
   @override
   Widget build(BuildContext context) {
     final ThemeData theme = Theme.of(context);
-    final ColorScheme colorScheme = theme.colorScheme;
 
     return Scaffold(
       appBar: AppBar(
@@ -89,133 +88,311 @@ class _BreakWavePlusScreenState extends State<BreakWavePlusScreen> {
       ),
       body: SafeArea(
         child: ListView(
-          padding: const EdgeInsets.all(20),
+          padding: const EdgeInsets.fromLTRB(20, 20, 20, 120),
           children: <Widget>[
-            Container(
-              padding: const EdgeInsets.all(18),
-              decoration: BoxDecoration(
-                color: colorScheme.surfaceContainerHighest.withOpacity(0.45),
-                borderRadius: BorderRadius.circular(20),
-                border: Border.all(color: colorScheme.outlineVariant),
-              ),
+            _PlusCard(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
                   Text(
                     'Free immediate relief. Paid ongoing transformation.',
-                    style: theme.textTheme.titleLarge?.copyWith(
-                      fontWeight: FontWeight.w700,
+                    style: theme.textTheme.headlineSmall?.copyWith(
+                      fontWeight: FontWeight.w800,
                     ),
                   ),
-                  const SizedBox(height: 10),
+                  const SizedBox(height: 12),
                   const Text(
-                    'BreakWave Plus does not gate immediate relief. It unlocks deeper tools for planning, insight, accountability, and long-term growth.',
+                    'BreakWave Plus does not gate immediate relief. BreakWave keeps urgent help free and unlocks deeper tools for planning, insight, accountability, and long-term growth. BreakWave Plus is for users who want deeper insight, a personal plan, stronger accountability, and guided recovery structure.',
                   ),
                   const SizedBox(height: 16),
-                  Text(
-                    'BreakWave Plus Annual',
-                    style: theme.textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.w700,
+                  FilledButton(
+                    onPressed: _saving ? null : _enablePlusPreview,
+                    child: const Padding(
+                      padding: EdgeInsets.symmetric(vertical: 14),
+                      child: Text('Enable Plus preview for testing'),
                     ),
                   ),
-                  const SizedBox(height: 6),
-                  const Text('\$59.99/year • shown first by default'),
-                  const SizedBox(height: 14),
-                  Text(
-                    'BreakWave Plus Monthly',
-                    style: theme.textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
-                  const SizedBox(height: 6),
-                  const Text('\$8.99/month • secondary option'),
                 ],
               ),
             ),
             const SizedBox(height: 16),
-            Container(
-              padding: const EdgeInsets.all(18),
-              decoration: BoxDecoration(
-                color: colorScheme.surfaceContainerHighest.withOpacity(0.45),
-                borderRadius: BorderRadius.circular(20),
-                border: Border.all(color: colorScheme.outlineVariant),
+            _PlusCard(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: const <Widget>[
+                  Text(
+                    'Free vs Plus',
+                    style: TextStyle(
+                      fontSize: 22,
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
+                  SizedBox(height: 12),
+                  _Bullet(
+                    title: 'Free core',
+                    body: 'Rescue, basic logging, recent history, privacy basics, recovery mode, and support resources stay available.',
+                  ),
+                  SizedBox(height: 12),
+                  _Bullet(
+                    title: 'BreakWave Plus',
+                    body: 'Unlock the deeper transformation layer: insights, guided plans, premium Christian depth, accountability templates, exports, and advanced privacy tools.',
+                  ),
+                ],
               ),
+            ),
+            const SizedBox(height: 16),
+            _PlusCard(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: const <Widget>[
                   Text(
                     'BreakWave Plus includes',
                     style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w700,
+                      fontSize: 22,
+                      fontWeight: FontWeight.w800,
                     ),
                   ),
-                  SizedBox(height: 10),
-                  Text('• full rescue card engine library'),
-                  Text('• custom rescue plans'),
-                  Text('• deeper recovery insights'),
-                  Text('• advanced charts and longer history'),
-                  Text('• accountability tools'),
-                  Text('• check-in templates'),
-                  Text('• premium guided routines'),
-                  Text('• premium Christian content packs'),
-                  Text('• home widgets'),
-                  Text('• advanced privacy lock modes'),
-                  Text('• exports'),
+                  SizedBox(height: 14),
+                  _FeaturePillar(
+                    title: 'Deep Insights',
+                    body: 'Longer history, trigger trends, risky-time patterns, weekly summaries, and clearer “what usually happens before a slip” views.',
+                  ),
+                  _FeaturePillar(
+                    title: 'Custom Rescue Plan',
+                    body: 'A personal plan built around your triggers, danger times, reasons, redirect actions, trusted person, and after-slip reset.',
+                  ),
+                  _FeaturePillar(
+                    title: 'Guided Recovery Routines',
+                    body: 'Morning reset, bedtime protection, after-slip recovery, loneliness plan, stress plan, and phone-boundary routines.',
+                  ),
+                  _FeaturePillar(
+                    title: 'Accountability Tools',
+                    body: 'Trusted-person check-ins, shareable summaries, honesty templates, victory reports, and “I need help now” messages.',
+                  ),
+                  _FeaturePillar(
+                    title: 'Premium Christian Depth',
+                    body: 'Grace-forward paths for shame, secrecy, loneliness, rebuilding integrity, and nighttime temptation.',
+                  ),
+                  _FeaturePillar(
+                    title: 'Advanced Privacy and Exports',
+                    body: 'Longer export options, advanced privacy controls, and deeper data tools once billing and release systems are live.',
+                  ),
                 ],
               ),
             ),
             const SizedBox(height: 16),
-            Container(
-              padding: const EdgeInsets.all(18),
-              decoration: BoxDecoration(
-                color: colorScheme.surfaceContainerHighest.withOpacity(0.45),
-                borderRadius: BorderRadius.circular(20),
-                border: Border.all(color: colorScheme.outlineVariant),
+            _PlusCard(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: const <Widget>[
+                  Text(
+                    'Launch pricing direction',
+                    style: TextStyle(
+                      fontSize: 22,
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
+                  SizedBox(height: 12),
+                  _PlanRow(
+                    title: 'BreakWave Plus Annual',
+                    price: '\$59.99/year',
+                    note: 'Best value. Shown first by default.',
+                  ),
+                  SizedBox(height: 12),
+                  _PlanRow(
+                    title: 'BreakWave Plus Monthly',
+                    price: '\$8.99/month',
+                    note: 'Secondary option for users who prefer flexibility.',
+                  ),
+                  SizedBox(height: 12),
+                  Text(
+                    'No weekly plan. No lifetime plan at launch.',
+                  ),
+                ],
               ),
+            ),
+            const SizedBox(height: 16),
+            _PlusCard(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
                   Text(
                     'Offer test variant',
-                    style: theme.textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.w700,
+                    style: theme.textTheme.titleLarge?.copyWith(
+                      fontWeight: FontWeight.w800,
                     ),
                   ),
                   const SizedBox(height: 10),
                   const Text(
-                    'Use this scaffold to compare annual no-trial versus annual 7-day trial before locking the launch default.',
+                    'Use this internal scaffold to compare annual no-trial versus annual 7-day trial before locking the launch default.',
                   ),
                   const SizedBox(height: 16),
                   FilledButton.tonal(
-                    onPressed: _saving ? null : () => _setVariant('annual_no_trial'),
+                    onPressed: _saving
+                        ? null
+                        : () => _setVariant('annual_no_trial'),
                     child: const Padding(
                       padding: EdgeInsets.symmetric(vertical: 14),
-                      child: Text('Set annual no-trial variant'),
+                      child: Text('Preview annual no-trial'),
                     ),
                   ),
                   const SizedBox(height: 10),
                   FilledButton.tonal(
-                    onPressed: _saving ? null : () => _setVariant('annual_trial'),
+                    onPressed: _saving
+                        ? null
+                        : () => _setVariant('annual_trial'),
                     child: const Padding(
                       padding: EdgeInsets.symmetric(vertical: 14),
-                      child: Text('Set annual 7-day trial variant'),
+                      child: Text('Preview annual 7-day trial'),
                     ),
                   ),
                 ],
               ),
             ),
             const SizedBox(height: 16),
-            OutlinedButton(
-              onPressed: _saving ? null : _debugUnlock,
-              child: const Padding(
-                padding: EdgeInsets.symmetric(vertical: 14),
-                child: Text('Debug unlock BreakWave Plus'),
+            _PlusCard(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: const <Widget>[
+                  Text(
+                    'Billing status',
+                    style: TextStyle(
+                      fontSize: 22,
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
+                  SizedBox(height: 10),
+                  Text(
+                    'This build shows the BreakWave Plus value wall and allows local preview testing. Real purchases require the Google Play Developer account, Play Billing setup, product IDs, and entitlement verification.',
+                  ),
+                ],
               ),
             ),
           ],
         ),
       ),
+    );
+  }
+}
+
+class _PlusCard extends StatelessWidget {
+  const _PlusCard({
+    required this.child,
+  });
+
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    final ColorScheme colorScheme = Theme.of(context).colorScheme;
+
+    return Container(
+      padding: const EdgeInsets.all(18),
+      decoration: BoxDecoration(
+        color: colorScheme.surfaceContainerHighest.withOpacity(0.45),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: colorScheme.outlineVariant),
+      ),
+      child: child,
+    );
+  }
+}
+
+class _Bullet extends StatelessWidget {
+  const _Bullet({
+    required this.title,
+    required this.body,
+  });
+
+  final String title;
+  final String body;
+
+  @override
+  Widget build(BuildContext context) {
+    final ThemeData theme = Theme.of(context);
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: <Widget>[
+        Text(
+          title,
+          style: theme.textTheme.titleMedium?.copyWith(
+            fontWeight: FontWeight.w800,
+          ),
+        ),
+        const SizedBox(height: 4),
+        Text(body),
+      ],
+    );
+  }
+}
+
+class _FeaturePillar extends StatelessWidget {
+  const _FeaturePillar({
+    required this.title,
+    required this.body,
+  });
+
+  final String title;
+  final String body;
+
+  @override
+  Widget build(BuildContext context) {
+    final ThemeData theme = Theme.of(context);
+
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 14),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          Text(
+            title,
+            style: theme.textTheme.titleMedium?.copyWith(
+              fontWeight: FontWeight.w800,
+            ),
+          ),
+          const SizedBox(height: 4),
+          Text(body),
+        ],
+      ),
+    );
+  }
+}
+
+class _PlanRow extends StatelessWidget {
+  const _PlanRow({
+    required this.title,
+    required this.price,
+    required this.note,
+  });
+
+  final String title;
+  final String price;
+  final String note;
+
+  @override
+  Widget build(BuildContext context) {
+    final ThemeData theme = Theme.of(context);
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: <Widget>[
+        Text(
+          title,
+          style: theme.textTheme.titleMedium?.copyWith(
+            fontWeight: FontWeight.w800,
+          ),
+        ),
+        const SizedBox(height: 4),
+        Text(
+          price,
+          style: theme.textTheme.titleLarge?.copyWith(
+            fontWeight: FontWeight.w800,
+          ),
+        ),
+        const SizedBox(height: 4),
+        Text(note),
+      ],
     );
   }
 }
