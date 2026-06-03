@@ -49,7 +49,7 @@ EXPECTED_PATTERNS = {
         "class SupportEscalationCard",
         "Support and Escalation",
         "trusted person",
-        "Support tools expanding soon",
+        "Open Support",
     ],
 }
 

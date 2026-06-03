@@ -24,10 +24,10 @@ checks = [
     ]),
     ("lib/features/support/presentation/widgets/email_app_handoff_card.dart", [
         "class EmailAppHandoffCard",
-        "Send to BreakWave team",
-        "BreakWave team email",
-        "Save team email",
-        "Clear team email",
+        "Send feedback to BreakWave",
+        "BreakWave recipient email",
+        "Save recipient email",
+        "Use default email",
         "Send saved data now",
     ]),
     ("lib/features/support/presentation/support_screen.dart", [
@@ -38,7 +38,7 @@ checks = [
         "saved email address",
         "marketing opt-in",
         "research opt-in",
-        "Send to BreakWave team",
+        "Send feedback to BreakWave",
     ]),
 ]
 

@@ -14,8 +14,8 @@ Open the user's email app with a prefilled draft containing saved BreakWave emai
 
 ## App flow
 1. Save optional email preferences in BreakWave
-2. Enter the BreakWave team email address under **Send to BreakWave team**
-3. Save the team email
+2. Enter the BreakWave recipient email address under **Send feedback to BreakWave**
+3. Save the recipient email
 4. Tap **Send saved data now**
 5. Review the prefilled email draft
 6. Tap send in Gmail or the preferred email app

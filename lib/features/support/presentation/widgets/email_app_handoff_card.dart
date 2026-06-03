@@ -81,7 +81,7 @@ class _EmailAppHandoffCardState extends State<EmailAppHandoffCard> {
     if (!(email.contains('@') && email.contains('.'))) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('Enter a valid team email override, or leave it blank to use the default.'),
+          content: Text('Enter a valid recipient email, or leave it blank to use the default.'),
         ),
       );
       return;
@@ -99,7 +99,7 @@ class _EmailAppHandoffCardState extends State<EmailAppHandoffCard> {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('BreakWave team email override saved locally.'),
+          content: Text('BreakWave recipient email saved locally.'),
         ),
       );
     } catch (_) {
@@ -209,14 +209,14 @@ class _EmailAppHandoffCardState extends State<EmailAppHandoffCard> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
                 Text(
-                  'Send to BreakWave team',
+                  'Send feedback to BreakWave',
                   style: theme.textTheme.titleMedium?.copyWith(
                     fontWeight: FontWeight.w700,
                   ),
                 ),
                 const SizedBox(height: 10),
                 Text(
-                  'Manual only. BreakWave opens a prefilled email draft so you can review and send your saved email preferences.',
+                  'Manual only. BreakWave opens a prefilled email draft so you can review, edit, send, or cancel before anything leaves your device.',
                   style: theme.textTheme.bodyMedium,
                 ),
                 const SizedBox(height: 16),
@@ -224,7 +224,7 @@ class _EmailAppHandoffCardState extends State<EmailAppHandoffCard> {
                   controller: _teamEmailController,
                   keyboardType: TextInputType.emailAddress,
                   decoration: const InputDecoration(
-                    labelText: 'BreakWave team email override',
+                    labelText: 'BreakWave recipient email',
                     hintText: EmailAppHandoffService.defaultTeamEmailAddress,
                   ),
                 ),
@@ -238,7 +238,7 @@ class _EmailAppHandoffCardState extends State<EmailAppHandoffCard> {
                 const SizedBox(height: 8),
                 Text(
                   _handoffSettings.hasRecipient
-                      ? 'Using saved team email override.'
+                      ? 'Using saved BreakWave recipient email.'
                       : 'Default inbox: ${EmailAppHandoffService.defaultTeamEmailAddress}',
                   style: theme.textTheme.bodySmall,
                 ),
@@ -249,11 +249,11 @@ class _EmailAppHandoffCardState extends State<EmailAppHandoffCard> {
                   children: <Widget>[
                     FilledButton.tonal(
                       onPressed: _working ? null : _saveRecipient,
-                      child: const Text('Save team email'),
+                      child: const Text('Save recipient email'),
                     ),
                     OutlinedButton(
                       onPressed: _working ? null : _clearRecipient,
-                      child: const Text('Clear team email'),
+                      child: const Text('Use default email'),
                     ),
                     FilledButton(
                       onPressed: (!_working && hasData) ? _openDraft : null,

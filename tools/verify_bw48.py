@@ -13,7 +13,7 @@ checks = [
         "path: recipient",
     ]),
     ("lib/features/support/presentation/widgets/email_app_handoff_card.dart", [
-        "BreakWave team email override",
+        "BreakWave recipient email",
         "EmailAppHandoffService.defaultTeamEmailAddress",
         "Using default BreakWave team email.",
         "Default inbox:",

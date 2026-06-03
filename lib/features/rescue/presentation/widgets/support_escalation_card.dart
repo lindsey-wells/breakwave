@@ -47,7 +47,7 @@ class SupportEscalationCard extends StatelessWidget {
             OutlinedButton.icon(
               onPressed: () {},
               icon: const Icon(Icons.support_outlined),
-              label: const Text('Support tools expanding soon'),
+              label: const Text('Open Support'),
             ),
           ],
         ),

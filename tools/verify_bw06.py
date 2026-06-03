@@ -58,7 +58,7 @@ EXPECTED_PATTERNS = {
     "lib/features/support/presentation/support_screen.dart": [
         "WaveSurface(",
         "Support Harbor",
-        "Support makes the wave smaller.",
+        "Get support before the wave gets louder.",
     ],
 }
 
