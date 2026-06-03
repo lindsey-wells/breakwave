@@ -141,6 +141,17 @@ class _RescueScreenState extends State<RescueScreen> {
                   ),
                   const SizedBox(height: 16),
                   const SectionHeader(
+                    eyebrow: 'Start here',
+                    title: 'Name the wave, then remember why',
+                  ),
+                  UrgeIntensitySection(
+                    selectedIntensity: _selectedIntensity,
+                    onSelected: _setIntensity,
+                  ),
+                  const SizedBox(height: 16),
+                  const RememberWhyCard(),
+                  const SizedBox(height: 20),
+                  const SectionHeader(
                     eyebrow: 'Ride the wave',
                     title: 'Slow the surge before it gets louder',
                   ),
@@ -148,21 +159,14 @@ class _RescueScreenState extends State<RescueScreen> {
                     onReturnHome: widget.onReturnHome,
                   ),
                   const SizedBox(height: 16),
-                  const RescueCardEngine(),
-                  const SizedBox(height: 16),
-                  UrgeIntensitySection(
-                    selectedIntensity: _selectedIntensity,
-                    onSelected: _setIntensity,
-                  ),
-                  const SizedBox(height: 16),
                   const CalmResetCard(),
+                  const SizedBox(height: 16),
+                  const RescueCardEngine(),
                   const SizedBox(height: 20),
                   const SectionHeader(
                     eyebrow: 'Interrupt now',
                     title: 'Use one immediate redirect',
                   ),
-                  const RememberWhyCard(),
-                  const SizedBox(height: 16),
                   const RedirectActionsCard(),
                   const SizedBox(height: 20),
                   const SectionHeader(
