@@ -153,6 +153,8 @@ class _HomeScreenState extends State<HomeScreen> {
                         onOpenRescue: widget.onOpenRescue,
                         onOpenLog: widget.onOpenLog,
                       ),
+                      const SizedBox(height: 16),
+                      const DailyEncouragementCard(),
                       const SizedBox(height: 20),
                       const SectionHeader(
                         eyebrow: 'Today',
@@ -200,8 +202,6 @@ class _HomeScreenState extends State<HomeScreen> {
                         title: 'Learn what keeps the wave going',
                       ),
                       const RecoveryCyclePreviewCard(),
-                      const SizedBox(height: 16),
-                      const DailyEncouragementCard(),
                     ],
                   ),
                 ),

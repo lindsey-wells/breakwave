@@ -32,6 +32,7 @@ for needle in checks:
 order = [
     "FastUrgeEntryCard",
     "HomeHeroCard",
+    "DailyEncouragementCard",
     "eyebrow: 'Today'",
     "DailyCheckInCard",
     "BedtimeDangerModeCard",
@@ -42,7 +43,6 @@ order = [
     "RecoverySnapshotCard",
     "Pattern awareness",
     "RecoveryCyclePreviewCard",
-    "DailyEncouragementCard",
 ]
 
 positions = {}
