@@ -2,8 +2,8 @@
 // Cube23 Collaboration Header
 // Project: BreakWave
 // File: home_screen.dart
-// Purpose: BW-02 home dashboard structure for BreakWave.
-// Notes: BW-24 privacy-aware Home surfaces.
+// Purpose: BW-57 home dashboard cleanup for BreakWave.
+// Notes: Reduces empty-state clutter and keeps Rescue/action paths obvious.
 // ------------------------------------------------------------
 
 import 'package:flutter/material.dart';
@@ -109,9 +109,10 @@ class _HomeScreenState extends State<HomeScreen> {
               (BuildContext context, AsyncSnapshot<_HomeSummaryData> snapshot) {
             final _HomeSummaryData summary =
                 snapshot.data ?? const _HomeSummaryData.empty();
+            final bool hasRecoveryData = summary.totalEntries > 0;
 
             return SingleChildScrollView(
-              padding: const EdgeInsets.all(20),
+              padding: const EdgeInsets.fromLTRB(20, 20, 20, 120),
               child: Center(
                 child: ConstrainedBox(
                   constraints: const BoxConstraints(maxWidth: 720),
@@ -139,7 +140,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             ),
                             SizedBox(height: 8),
                             Text(
-                              'Calm, steady support for the next good move when the wave starts rising.',
+                              'When the wave rises, start with Rescue. When something happens, log it fast and keep moving.',
                             ),
                           ],
                         ),
@@ -149,46 +150,52 @@ class _HomeScreenState extends State<HomeScreen> {
                         onOpenRescue: widget.onOpenRescue,
                       ),
                       const SizedBox(height: 16),
-                      BedtimeDangerModeCard(
-                        onOpenRescue: widget.onOpenRescue,
-                      ),
-                      const SizedBox(height: 16),
-                      const DailyCheckInCard(),
-                      if (!summary.privacy.hideHomeInsights) ...<Widget>[
-                        const SizedBox(height: 16),
-                        const SimpleInsightsCard(),
-                      ],
-                      const SizedBox(height: 16),
-                      const ReasonsFocusCard(),
-                      const SizedBox(height: 16),
-                      const TriggersWatchCard(),
-                      const SizedBox(height: 16),
-                      const SectionHeader(
-                        eyebrow: 'Current snapshot',
-                        title: 'See where you are right now',
-                      ),
-                      RecoverySnapshotCard(
-                        totalEntries: summary.totalEntries,
-                        urgeCount: summary.urgeCount,
-                        slipCount: summary.slipCount,
-                        victoryCount: summary.victoryCount,
-                      ),
-                      if (!summary.privacy.hideLatestLoggedMoment) ...<Widget>[
-                        const SizedBox(height: 16),
-                        LatestLoggedMomentCard(
-                          entry: summary.latestEntry,
-                        ),
-                      ],
-                      const SizedBox(height: 16),
-                      const SectionHeader(
-                        eyebrow: 'Act now',
-                        title: 'Use the fastest next step',
-                      ),
                       HomeHeroCard(
                         onOpenRescue: widget.onOpenRescue,
                         onOpenLog: widget.onOpenLog,
                       ),
+                      const SizedBox(height: 20),
+                      const SectionHeader(
+                        eyebrow: 'Today',
+                        title: 'Check in and prepare for risk windows',
+                      ),
+                      const DailyCheckInCard(),
                       const SizedBox(height: 16),
+                      BedtimeDangerModeCard(
+                        onOpenRescue: widget.onOpenRescue,
+                      ),
+                      const SizedBox(height: 20),
+                      const SectionHeader(
+                        eyebrow: 'Your setup',
+                        title: 'Keep your reasons and triggers visible',
+                      ),
+                      const ReasonsFocusCard(),
+                      const SizedBox(height: 16),
+                      const TriggersWatchCard(),
+                      if (hasRecoveryData) ...<Widget>[
+                        const SizedBox(height: 20),
+                        const SectionHeader(
+                          eyebrow: 'Current snapshot',
+                          title: 'See where you are right now',
+                        ),
+                        RecoverySnapshotCard(
+                          totalEntries: summary.totalEntries,
+                          urgeCount: summary.urgeCount,
+                          slipCount: summary.slipCount,
+                          victoryCount: summary.victoryCount,
+                        ),
+                        if (!summary.privacy.hideLatestLoggedMoment) ...<Widget>[
+                          const SizedBox(height: 16),
+                          LatestLoggedMomentCard(
+                            entry: summary.latestEntry,
+                          ),
+                        ],
+                        if (!summary.privacy.hideHomeInsights) ...<Widget>[
+                          const SizedBox(height: 16),
+                          const SimpleInsightsCard(),
+                        ],
+                      ],
+                      const SizedBox(height: 20),
                       const SectionHeader(
                         eyebrow: 'Pattern awareness',
                         title: 'Learn what keeps the wave going',

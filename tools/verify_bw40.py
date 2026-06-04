@@ -10,10 +10,10 @@ checks = [
     ("lib/features/home/presentation/home_screen.dart", [
         "SectionHeader",
         "Current snapshot",
-        "Act now",
+        "Today",
         "Pattern awareness",
         "See where you are right now",
-        "Use the fastest next step",
+        "Check in and prepare for risk windows",
         "Learn what keeps the wave going",
     ]),
     ("lib/features/rescue/presentation/rescue_screen.dart", [
