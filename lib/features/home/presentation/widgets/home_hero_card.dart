@@ -29,13 +29,13 @@ class HomeHeroCard extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
             Text(
-              'Ride the urge. Regain control.',
+              'Use the next right step.',
               style: textTheme.headlineSmall,
             ),
             const SizedBox(height: 10),
             Text(
-              'BreakWave is being shaped into a calm, practical recovery tool. '
-              'When an urge hits, go straight to Rescue. When something happens, log it fast.',
+              'When an urge hits, open Rescue. calm, practical recovery tool. '
+              'When When something happens, log it fast. Keep the next move simple. When something happens, log it fast.',
               style: textTheme.bodyLarge,
             ),
             const SizedBox(height: 18),

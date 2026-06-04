@@ -9,6 +9,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../core/ui/wave_surface.dart';
+import '../../../core/ui/breakwave_app_bar.dart';
 import '../data/log_repository.dart';
 import '../domain/log_entry.dart';
 import 'widgets/log_entry_type_section.dart';
@@ -204,9 +205,7 @@ class _LogScreenState extends State<LogScreen> {
     final bool isEditing = _editingEntryId != null;
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Log'),
-      ),
+      appBar: const BreakWaveAppBar(sectionTitle: 'Log'),
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(20),

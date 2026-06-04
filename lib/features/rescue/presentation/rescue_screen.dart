@@ -10,6 +10,7 @@ import 'package:flutter/material.dart';
 
 import '../../../core/ui/wave_surface.dart';
 import '../../../core/ui/section_header.dart';
+import '../../../core/ui/breakwave_app_bar.dart';
 import '../../log/data/log_repository.dart';
 import '../../log/domain/log_entry.dart';
 import 'widgets/calm_reset_card.dart';
@@ -97,9 +98,7 @@ class _RescueScreenState extends State<RescueScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Rescue'),
-      ),
+      appBar: const BreakWaveAppBar(sectionTitle: 'Rescue'),
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(20),

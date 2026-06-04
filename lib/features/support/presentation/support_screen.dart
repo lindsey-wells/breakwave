@@ -10,6 +10,7 @@ import 'package:flutter/material.dart';
 
 import '../../../core/ui/wave_surface.dart';
 import '../../../core/ui/section_header.dart';
+import '../../../core/ui/breakwave_app_bar.dart';
 import '../../faith/presentation/faith_depth_pack_screen.dart';
 import '../../premium/presentation/breakwave_plus_screen.dart';
 import '../../premium/presentation/premium_gate_tile.dart';
@@ -36,9 +37,7 @@ class SupportScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Support'),
-      ),
+      appBar: const BreakWaveAppBar(sectionTitle: 'Support'),
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.fromLTRB(20, 20, 20, 120),

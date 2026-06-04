@@ -32,7 +32,7 @@ STRING_PATTERNS = {
     ],
     "lib/features/home/presentation/widgets/home_hero_card.dart": [
         "class HomeHeroCard",
-        "Ride the urge. Regain control.",
+        "Use the next right step.",
         "Open Rescue",
         "Quick Log",
     ],

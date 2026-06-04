@@ -13,6 +13,7 @@ import '../../../core/privacy/privacy_settings_store.dart';
 import '../../../core/widget/home_widget_sync.dart';
 import '../../../core/ui/wave_surface.dart';
 import '../../../core/ui/section_header.dart';
+import '../../../core/ui/breakwave_app_bar.dart';
 import '../../checkin/presentation/daily_check_in_card.dart';
 import '../../insights/presentation/simple_insights_card.dart';
 import '../../log/data/log_repository.dart';
@@ -99,9 +100,7 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('BreakWave'),
-      ),
+      appBar: const BreakWaveAppBar(sectionTitle: 'Home'),
       body: SafeArea(
         child: FutureBuilder<_HomeSummaryData>(
           future: _loadSummary(),
