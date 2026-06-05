@@ -5,20 +5,20 @@ path = Path("lib/features/home/presentation/home_screen.dart")
 text = path.read_text(encoding="utf-8")
 
 checks = [
-    "Purpose: BW-57 home dashboard cleanup",
-    "final bool hasRecoveryData = summary.totalEntries > 0;",
-    "EdgeInsets.fromLTRB(20, 20, 20, 120)",
-    "When the wave rises, start with Rescue.",
-        "eyebrow: 'Today'",
-    "Check in and prepare for risk windows",
-    "eyebrow: 'Your setup'",
-    "Keep your reasons and triggers visible",
-    "if (hasRecoveryData) ...<Widget>",
-    "RecoverySnapshotCard",
-    "LatestLoggedMomentCard",
-    "SimpleInsightsCard",
-    "Pattern awareness",
+    "FastUrgeEntryCard",
     "DailyEncouragementCard",
+    "eyebrow: 'Today'",
+    "DailyCheckInCard",
+    "BedtimeDangerModeCard",
+    "eyebrow: 'Your setup'",
+    "RecoverySnapshotCard",
+    "SimpleInsightsCard",
+    "RecoveryCyclePreviewCard",
+]
+
+blocked = [
+    "HomeHeroCard(",
+    "home_hero_card.dart",
 ]
 
 failed = False
@@ -28,15 +28,18 @@ for needle in checks:
         print(f"FAIL home_screen.dart missing: {needle}")
         failed = True
 
+for needle in blocked:
+    if needle in text:
+        print(f"FAIL home_screen.dart still contains duplicate action card marker: {needle}")
+        failed = True
+
 order = [
     "FastUrgeEntryCard",
-        "DailyEncouragementCard",
+    "DailyEncouragementCard",
     "eyebrow: 'Today'",
     "DailyCheckInCard",
     "BedtimeDangerModeCard",
     "eyebrow: 'Your setup'",
-    "ReasonsFocusCard",
-    "TriggersWatchCard",
     "if (hasRecoveryData) ...<Widget>",
     "RecoverySnapshotCard",
     "Pattern awareness",
@@ -44,13 +47,13 @@ order = [
 ]
 
 positions = {}
-for needle in order:
-    index = text.find(needle)
+for marker in order:
+    index = text.find(marker)
     if index == -1:
-        print(f"FAIL cannot find order marker: {needle}")
+        print(f"FAIL missing order marker: {marker}")
         failed = True
     else:
-        positions[needle] = index
+        positions[marker] = index
 
 if len(positions) == len(order):
     for before, after in zip(order, order[1:]):
@@ -61,4 +64,4 @@ if len(positions) == len(order):
 if failed:
     sys.exit(1)
 
-print("PASS: BW-57 Home cleanup and empty-state reduction verified.")
+print("PASS: BW-61 Home screenshot polish verified.")

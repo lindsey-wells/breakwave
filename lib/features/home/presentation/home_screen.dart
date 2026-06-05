@@ -23,7 +23,6 @@ import '../../triggers/presentation/triggers_watch_card.dart';
 import 'widgets/bedtime_danger_mode_card.dart';
 import 'widgets/daily_encouragement_card.dart';
 import 'widgets/fast_urge_entry_card.dart';
-import 'widgets/home_hero_card.dart';
 import 'widgets/latest_logged_moment_card.dart';
 import 'widgets/recovery_cycle_preview_card.dart';
 import 'widgets/recovery_snapshot_card.dart';
@@ -147,11 +146,6 @@ class _HomeScreenState extends State<HomeScreen> {
                       const SizedBox(height: 16),
                       FastUrgeEntryCard(
                         onOpenRescue: widget.onOpenRescue,
-                      ),
-                      const SizedBox(height: 16),
-                      HomeHeroCard(
-                        onOpenRescue: widget.onOpenRescue,
-                        onOpenLog: widget.onOpenLog,
                       ),
                       const SizedBox(height: 16),
                       const DailyEncouragementCard(),

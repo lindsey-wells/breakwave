@@ -10,7 +10,6 @@ checks = [
         "Quick Log",
     ]),
     ("lib/features/home/presentation/home_screen.dart", [
-        "HomeHeroCard",
         "DailyEncouragementCard",
         "eyebrow: 'Today'",
         "DailyCheckInCard",
@@ -54,7 +53,6 @@ for rel_path, needle in blocked:
 home_text = Path("lib/features/home/presentation/home_screen.dart").read_text(encoding="utf-8")
 order = [
     "FastUrgeEntryCard",
-    "HomeHeroCard",
     "DailyEncouragementCard",
     "eyebrow: 'Today'",
     "DailyCheckInCard",

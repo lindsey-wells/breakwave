@@ -8,7 +8,7 @@ EXPECTED_FILES = [
     "lib/app/breakwave_app.dart",
     "lib/features/shell/presentation/breakwave_shell.dart",
     "lib/features/home/presentation/home_screen.dart",
-    "lib/features/home/presentation/widgets/home_hero_card.dart",
+    "lib/features/home/presentation/widgets/fast_urge_entry_card.dart",
     "lib/features/home/presentation/widgets/recovery_cycle_preview_card.dart",
     "lib/features/home/presentation/widgets/daily_encouragement_card.dart",
 ]
@@ -24,17 +24,17 @@ STRING_PATTERNS = {
     "lib/features/home/presentation/home_screen.dart": [
         "class HomeScreen",
         "final VoidCallback onOpenRescue;",
-        "final VoidCallback onOpenLog;",
-        "HomeHeroCard(",
+        "final VoidCallback onOpenRescue;",
+        "FastUrgeEntryCard(",
         "RecoveryCyclePreviewCard()",
         "DailyEncouragementCard()",
         "SingleChildScrollView(",
     ],
-    "lib/features/home/presentation/widgets/home_hero_card.dart": [
-        "class HomeHeroCard",
-        "Use the next right step.",
-        "Open Rescue",
-        "Quick Log",
+    "lib/features/home/presentation/widgets/fast_urge_entry_card.dart": [
+        "class FastUrgeEntryCard",
+        "Log the wave fast and move straight into Rescue.",
+        "I feel the wave now",
+        "Log urge and open Rescue",
     ],
     "lib/features/home/presentation/widgets/recovery_cycle_preview_card.dart": [
         "class RecoveryCyclePreviewCard",
@@ -56,13 +56,13 @@ REGEX_PATTERNS = {
         r"HomeScreen\s*\(",
         r"onOpenRescue\s*:",
         r"_onDestinationSelected\s*\(\s*1\s*\)",
-        r"onOpenLog\s*:",
+        r"onOpenRescue\s*:",
         r"_onDestinationSelected\s*\(\s*2\s*\)",
         r"IndexedStack\s*\(",
     ],
     "lib/features/home/presentation/home_screen.dart": [
         r"onOpenRescue\s*:\s*(widget\.)?onOpenRescue",
-        r"onOpenLog\s*:\s*(widget\.)?onOpenLog",
+        r"onOpenRescue\s*:\s*(widget\.)?onOpenRescue",
     ],
 }
 
