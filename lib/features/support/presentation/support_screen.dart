@@ -15,6 +15,8 @@ import '../../faith/presentation/faith_depth_pack_screen.dart';
 import '../../premium/presentation/breakwave_plus_screen.dart';
 import '../../premium/presentation/premium_gate_tile.dart';
 import 'widgets/breakwave_contact_links_card.dart';
+import 'widgets/cbt_informed_support_card.dart';
+import 'widgets/professional_help_card.dart';
 import 'widgets/custom_why_settings_card.dart';
 import 'widgets/educate_me_entry_card.dart';
 import 'widgets/education_resources_card.dart';
@@ -140,6 +142,10 @@ class SupportScreen extends StatelessWidget {
                     eyebrow: 'Learn and resources',
                     title: 'Understand the pattern and choose next steps',
                   ),
+                  const CbtInformedSupportCard(),
+                  const SizedBox(height: 16),
+                  const ProfessionalHelpCard(),
+                  const SizedBox(height: 16),
                   const SupportCategoriesCard(),
                   const SizedBox(height: 16),
                   const EducationResourcesCard(),
