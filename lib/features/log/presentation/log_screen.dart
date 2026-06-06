@@ -17,6 +17,7 @@ import 'widgets/log_intensity_section.dart';
 import 'widgets/log_notes_card.dart';
 import 'widgets/log_save_card.dart';
 import 'widgets/log_trigger_chips_section.dart';
+import 'widgets/log_cbt_reflection_card.dart';
 import 'widgets/recent_log_entries_card.dart';
 
 class LogScreen extends StatefulWidget {
@@ -37,6 +38,11 @@ class _LogScreenState extends State<LogScreen> {
   String _entryType = 'Urge';
   int _intensity = 3;
   final Set<String> _selectedTriggers = <String>{};
+  String? _selectedReplacementAction;
+  late final TextEditingController _thoughtController;
+  late final TextEditingController _actionTakenController;
+  late final TextEditingController _consequenceController;
+  late final TextEditingController _betterPlanController;
   late final TextEditingController _notesController;
 
   int _savedEntryCount = 0;
@@ -53,15 +59,32 @@ class _LogScreenState extends State<LogScreen> {
     'Environment',
   ];
 
+  static const List<String> _healthyReplacementActions = <String>[
+    'Open Rescue',
+    'Leave the room',
+    'Text someone safe',
+    'Take a short walk',
+    'Cold water reset',
+    'Put the phone down',
+  ];
+
   @override
   void initState() {
     super.initState();
+    _thoughtController = TextEditingController();
+    _actionTakenController = TextEditingController();
+    _consequenceController = TextEditingController();
+    _betterPlanController = TextEditingController();
     _notesController = TextEditingController();
     _refreshFromStorage();
   }
 
   @override
   void dispose() {
+    _thoughtController.dispose();
+    _actionTakenController.dispose();
+    _consequenceController.dispose();
+    _betterPlanController.dispose();
     _notesController.dispose();
     super.dispose();
   }
@@ -99,6 +122,12 @@ class _LogScreenState extends State<LogScreen> {
     });
   }
 
+  void _setReplacementAction(String? value) {
+    setState(() {
+      _selectedReplacementAction = value;
+    });
+  }
+
   void _populateDraftFromEntry(LogEntry entry) {
     setState(() {
       _editingEntryId = entry.id;
@@ -107,6 +136,13 @@ class _LogScreenState extends State<LogScreen> {
       _selectedTriggers
         ..clear()
         ..addAll(entry.triggers);
+      _selectedReplacementAction = entry.replacementAction.trim().isEmpty
+          ? null
+          : entry.replacementAction;
+      _thoughtController.text = entry.thought;
+      _actionTakenController.text = entry.actionTaken;
+      _consequenceController.text = entry.consequence;
+      _betterPlanController.text = entry.betterPlan;
       _notesController.text = entry.notes;
     });
   }
@@ -120,6 +156,11 @@ class _LogScreenState extends State<LogScreen> {
         _entryType = 'Urge';
         _intensity = 3;
         _selectedTriggers.clear();
+        _selectedReplacementAction = null;
+        _thoughtController.clear();
+        _actionTakenController.clear();
+        _consequenceController.clear();
+        _betterPlanController.clear();
         _notesController.clear();
       });
     }
@@ -149,6 +190,11 @@ class _LogScreenState extends State<LogScreen> {
         entryType: savedType,
         intensity: _intensity,
         triggers: _selectedTriggers.toList(),
+        thought: _thoughtController.text.trim(),
+        actionTaken: _actionTakenController.text.trim(),
+        consequence: _consequenceController.text.trim(),
+        betterPlan: _betterPlanController.text.trim(),
+        replacementAction: _selectedReplacementAction ?? '',
         notes: _notesController.text.trim(),
         createdAtIso: DateTime.now().toIso8601String(),
       );
@@ -170,6 +216,11 @@ class _LogScreenState extends State<LogScreen> {
         _entryType = 'Urge';
         _intensity = 3;
         _selectedTriggers.clear();
+        _selectedReplacementAction = null;
+        _thoughtController.clear();
+        _actionTakenController.clear();
+        _consequenceController.clear();
+        _betterPlanController.clear();
         _notesController.clear();
         _isSaving = false;
       });
@@ -274,6 +325,16 @@ class _LogScreenState extends State<LogScreen> {
                     availableTriggers: _availableTriggers,
                     selectedTriggers: _selectedTriggers,
                     onToggle: _toggleTrigger,
+                  ),
+                  const SizedBox(height: 16),
+                  LogCbtReflectionCard(
+                    thoughtController: _thoughtController,
+                    actionTakenController: _actionTakenController,
+                    consequenceController: _consequenceController,
+                    betterPlanController: _betterPlanController,
+                    replacementActions: _healthyReplacementActions,
+                    selectedReplacementAction: _selectedReplacementAction,
+                    onReplacementSelected: _setReplacementAction,
                   ),
                   const SizedBox(height: 16),
                   LogNotesCard(

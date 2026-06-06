@@ -1,0 +1,130 @@
+// ------------------------------------------------------------
+// Cube23 Collaboration Header
+// Project: BreakWave
+// File: log_cbt_reflection_card.dart
+// Purpose: BW-63 CBT-informed log reflection card.
+// Notes: Keeps CBT logging lightweight, practical, and non-clinical.
+// ------------------------------------------------------------
+
+import 'package:flutter/material.dart';
+
+class LogCbtReflectionCard extends StatelessWidget {
+  const LogCbtReflectionCard({
+    super.key,
+    required this.thoughtController,
+    required this.actionTakenController,
+    required this.consequenceController,
+    required this.betterPlanController,
+    required this.replacementActions,
+    required this.selectedReplacementAction,
+    required this.onReplacementSelected,
+  });
+
+  final TextEditingController thoughtController;
+  final TextEditingController actionTakenController;
+  final TextEditingController consequenceController;
+  final TextEditingController betterPlanController;
+  final List<String> replacementActions;
+  final String? selectedReplacementAction;
+  final ValueChanged<String?> onReplacementSelected;
+
+  @override
+  Widget build(BuildContext context) {
+    final ThemeData theme = Theme.of(context);
+    final ColorScheme colorScheme = theme.colorScheme;
+
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            Text(
+              'Trigger → Thought → Urge → Action',
+              style: theme.textTheme.titleLarge,
+            ),
+            const SizedBox(height: 8),
+            const Text(
+              'Use this as a quick CBT-informed check. Name the pattern, then choose the next healthier response.',
+            ),
+            const SizedBox(height: 16),
+            TextField(
+              controller: thoughtController,
+              minLines: 1,
+              maxLines: 3,
+              decoration: const InputDecoration(
+                labelText: 'Thought before the urge',
+                hintText: 'Example: I need this to calm down.',
+              ),
+            ),
+            const SizedBox(height: 14),
+            Text(
+              'Healthy replacement action',
+              style: theme.textTheme.titleMedium?.copyWith(
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Wrap(
+              spacing: 10,
+              runSpacing: 10,
+              children: replacementActions.map((String action) {
+                final bool isSelected = selectedReplacementAction == action;
+
+                return ChoiceChip(
+                  label: Text(action),
+                  selected: isSelected,
+                  selectedColor: colorScheme.primary,
+                  labelStyle: TextStyle(
+                    color: isSelected
+                        ? colorScheme.onPrimary
+                        : colorScheme.onSurface,
+                    fontWeight: FontWeight.w700,
+                  ),
+                  side: BorderSide(
+                    color: isSelected
+                        ? colorScheme.primary
+                        : colorScheme.outlineVariant,
+                  ),
+                  onSelected: (bool selected) {
+                    onReplacementSelected(selected ? action : null);
+                  },
+                );
+              }).toList(),
+            ),
+            const SizedBox(height: 14),
+            TextField(
+              controller: actionTakenController,
+              minLines: 1,
+              maxLines: 3,
+              decoration: const InputDecoration(
+                labelText: 'Action taken',
+                hintText: 'Example: opened Rescue, left the room, texted Alex.',
+              ),
+            ),
+            const SizedBox(height: 14),
+            TextField(
+              controller: consequenceController,
+              minLines: 1,
+              maxLines: 3,
+              decoration: const InputDecoration(
+                labelText: 'Consequence / what happened next',
+                hintText: 'Example: the urge dropped after ten minutes.',
+              ),
+            ),
+            const SizedBox(height: 14),
+            TextField(
+              controller: betterPlanController,
+              minLines: 1,
+              maxLines: 3,
+              decoration: const InputDecoration(
+                labelText: 'Better plan for next time',
+                hintText: 'Example: charge phone outside the bedroom.',
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}

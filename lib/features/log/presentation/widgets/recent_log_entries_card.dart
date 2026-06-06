@@ -158,6 +158,41 @@ class _RecentEntryRow extends StatelessWidget {
             'Triggers: $triggerText',
             style: Theme.of(context).textTheme.bodyMedium,
           ),
+          if (entry.thought.trim().isNotEmpty) ...<Widget>[
+            const SizedBox(height: 8),
+            Text(
+              'Thought: ${entry.thought.trim()}',
+              style: Theme.of(context).textTheme.bodyMedium,
+            ),
+          ],
+          if (entry.replacementAction.trim().isNotEmpty) ...<Widget>[
+            const SizedBox(height: 8),
+            Text(
+              'Replacement action: ${entry.replacementAction.trim()}',
+              style: Theme.of(context).textTheme.bodyMedium,
+            ),
+          ],
+          if (entry.actionTaken.trim().isNotEmpty) ...<Widget>[
+            const SizedBox(height: 8),
+            Text(
+              'Action: ${entry.actionTaken.trim()}',
+              style: Theme.of(context).textTheme.bodyMedium,
+            ),
+          ],
+          if (entry.consequence.trim().isNotEmpty) ...<Widget>[
+            const SizedBox(height: 8),
+            Text(
+              'Consequence: ${entry.consequence.trim()}',
+              style: Theme.of(context).textTheme.bodyMedium,
+            ),
+          ],
+          if (entry.betterPlan.trim().isNotEmpty) ...<Widget>[
+            const SizedBox(height: 8),
+            Text(
+              'Better plan: ${entry.betterPlan.trim()}',
+              style: Theme.of(context).textTheme.bodyMedium,
+            ),
+          ],
           if (entry.notes.trim().isNotEmpty) ...<Widget>[
             const SizedBox(height: 8),
             Text(
