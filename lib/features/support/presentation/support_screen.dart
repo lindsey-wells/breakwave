@@ -76,6 +76,14 @@ class SupportScreen extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 20),
+                  const SectionHeader(
+                    eyebrow: 'Recovery model',
+                    title: 'Use CBT-informed tools, not shame',
+                  ),
+                  const CbtInformedSupportCard(),
+                  const SizedBox(height: 16),
+                  const ProfessionalHelpCard(),
+                  const SizedBox(height: 20),
 
                   const SectionHeader(
                     eyebrow: 'Get help now',
@@ -142,10 +150,6 @@ class SupportScreen extends StatelessWidget {
                     eyebrow: 'Learn and resources',
                     title: 'Understand the pattern and choose next steps',
                   ),
-                  const CbtInformedSupportCard(),
-                  const SizedBox(height: 16),
-                  const ProfessionalHelpCard(),
-                  const SizedBox(height: 16),
                   const SupportCategoriesCard(),
                   const SizedBox(height: 16),
                   const EducationResourcesCard(),
