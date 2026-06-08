@@ -46,6 +46,17 @@ class _RecoveryModeScreenState extends State<RecoveryModeScreen> {
     });
   }
 
+  String get _selectedModeExplanation {
+    final RecoveryMode mode = _selectedMode ?? RecoveryMode.secular;
+
+    switch (mode) {
+      case RecoveryMode.secular:
+        return 'Secular mode is intentionally practical. It should stay calm, direct, and focused on the next right move without religious language.';
+      case RecoveryMode.christian:
+        return 'Christian mode is intentionally Christian. It should sound like grace, truth, prayer, and Scripture — not generic wellness language with a Bible verse attached.';
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -100,7 +111,7 @@ class _RecoveryModeScreenState extends State<RecoveryModeScreen> {
                 ),
               ),
               child: Text(
-                'Christian mode is intentionally Christian. It should sound like grace, truth, prayer, and Scripture — not generic wellness language with a Bible verse attached.',
+                _selectedModeExplanation,
                 style: theme.textTheme.bodyMedium,
               ),
             ),
