@@ -4,7 +4,7 @@ import sys
 checks = [
     ("lib/core/ui/breakwave_app_bar.dart", [
         "class BreakWaveAppBar",
-        "Icons.waves_rounded",
+        "_BreakWaveBrandMark",
         "BreakWave",
         "fontWeight: FontWeight.w900",
         "letterSpacing: -0.8",
