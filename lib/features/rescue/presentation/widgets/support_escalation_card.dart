@@ -2,14 +2,19 @@
 // Cube23 Collaboration Header
 // Project: BreakWave
 // File: support_escalation_card.dart
-// Purpose: Support and escalation card for the BW-03 rescue flow.
-// Notes: Neutral rescue flow scaffold for BW-03.
+// Purpose: BW-66 Support escalation card for Rescue.
+// Notes: Open Support is now a real navigation action, not a placeholder.
 // ------------------------------------------------------------
 
 import 'package:flutter/material.dart';
 
 class SupportEscalationCard extends StatelessWidget {
-  const SupportEscalationCard({super.key});
+  const SupportEscalationCard({
+    super.key,
+    required this.onOpenSupport,
+  });
+
+  final VoidCallback onOpenSupport;
 
   @override
   Widget build(BuildContext context) {
@@ -45,7 +50,7 @@ class SupportEscalationCard extends StatelessWidget {
             ),
             const SizedBox(height: 16),
             OutlinedButton.icon(
-              onPressed: () {},
+              onPressed: onOpenSupport,
               icon: const Icon(Icons.support_outlined),
               label: const Text('Open Support'),
             ),

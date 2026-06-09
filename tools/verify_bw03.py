@@ -20,7 +20,7 @@ EXPECTED_PATTERNS = {
         "CalmResetCard()",
         "RedirectActionsCard(",
         "WaveCompletionCard(",
-        "SupportEscalationCard()",
+        "SupportEscalationCard(",
         "Current intensity:",
     ],
     "lib/features/rescue/presentation/widgets/urge_intensity_section.dart": [

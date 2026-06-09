@@ -45,7 +45,13 @@ class CalmResetCard extends StatelessWidget {
             ),
             const SizedBox(height: 16),
             OutlinedButton.icon(
-              onPressed: () {},
+              onPressed: () {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('Reset started. Breathe through the steps one round at a time.'),
+                  ),
+                );
+              },
               icon: const Icon(Icons.self_improvement_outlined),
               label: const Text('Start reset'),
             ),

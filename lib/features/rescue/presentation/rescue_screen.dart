@@ -24,10 +24,12 @@ import 'widgets/wave_completion_card.dart';
 
 class RescueScreen extends StatefulWidget {
   final VoidCallback onReturnHome;
+  final VoidCallback onOpenSupport;
 
   const RescueScreen({
     super.key,
     required this.onReturnHome,
+    required this.onOpenSupport,
   });
 
   @override
@@ -201,7 +203,9 @@ class _RescueScreenState extends State<RescueScreen> {
                     onComplete: _completeWave,
                   ),
                   const SizedBox(height: 16),
-                  const SupportEscalationCard(),
+                  SupportEscalationCard(
+                    onOpenSupport: widget.onOpenSupport,
+                  ),
                 ],
               ),
             ),
