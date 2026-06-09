@@ -38,10 +38,17 @@ class _RescueScreenState extends State<RescueScreen> {
   final LogRepository _repository = const LogRepository();
 
   int _selectedIntensity = 3;
+  String? _selectedNextAction;
 
   void _setIntensity(int value) {
     setState(() {
       _selectedIntensity = value;
+    });
+  }
+
+  void _setNextAction(String? value) {
+    setState(() {
+      _selectedNextAction = value;
     });
   }
 
@@ -63,12 +70,23 @@ class _RescueScreenState extends State<RescueScreen> {
   }
 
   Future<void> _completeWave() async {
+    final String? nextAction = _selectedNextAction;
+
     final LogEntry entry = LogEntry(
       id: DateTime.now().microsecondsSinceEpoch.toString(),
       entryType: 'Victory',
       intensity: _selectedIntensity,
       triggers: const <String>['Rescue Completion'],
-      notes: 'Made it through this wave from Rescue.',
+      actionTaken: nextAction == null
+          ? 'Completed Rescue without choosing a next right action.'
+          : 'Chose next right action: $nextAction',
+      betterPlan: nextAction == null
+          ? 'Choose one next right action earlier in Rescue next time.'
+          : 'Use $nextAction earlier when this wave appears again.',
+      replacementAction: nextAction ?? '',
+      notes: nextAction == null
+          ? 'Made it through this wave from Rescue.'
+          : 'Made it through this wave from Rescue using: $nextAction.',
       createdAtIso: DateTime.now().toIso8601String(),
     );
 
@@ -77,9 +95,13 @@ class _RescueScreenState extends State<RescueScreen> {
 
       if (!mounted) return;
 
+      setState(() {
+        _selectedNextAction = null;
+      });
+
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('Nice work. Wave saved and returning home.'),
+          content: Text('Nice work. Wave saved with your next right action.'),
         ),
       );
 
@@ -166,7 +188,10 @@ class _RescueScreenState extends State<RescueScreen> {
                     eyebrow: 'Interrupt now',
                     title: 'Use one immediate redirect',
                   ),
-                  const RedirectActionsCard(),
+                  RedirectActionsCard(
+                    selectedAction: _selectedNextAction,
+                    onActionSelected: _setNextAction,
+                  ),
                   const SizedBox(height: 20),
                   const SectionHeader(
                     eyebrow: 'Finish honestly',

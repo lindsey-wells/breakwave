@@ -18,7 +18,7 @@ EXPECTED_PATTERNS = {
         "StatefulWidget",
         "UrgeIntensitySection(",
         "CalmResetCard()",
-        "RedirectActionsCard()",
+        "RedirectActionsCard(",
         "WaveCompletionCard(",
         "SupportEscalationCard()",
         "Current intensity:",
@@ -36,7 +36,7 @@ EXPECTED_PATTERNS = {
     ],
     "lib/features/rescue/presentation/widgets/redirect_actions_card.dart": [
         "class RedirectActionsCard",
-        "Fast Redirect Actions",
+        "Next Right Action",
         "Put the phone down",
         "Leave the room",
     ],
