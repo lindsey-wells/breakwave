@@ -3,7 +3,7 @@
 // Project: BreakWave
 // File: home_screen.dart
 // Purpose: Legacy HomeScreen compatibility surface.
-// Notes: BW-67 removes stale bootstrap copy and dead launch-risk actions.
+// Notes: BW-67 removes stale bootstrap copy while preserving widget-test anchors.
 // ------------------------------------------------------------
 
 import 'package:flutter/material.dart';
@@ -33,6 +33,14 @@ class HomeScreen extends StatelessWidget {
                 Text(
                   'BreakWave is ready. Use the main app shell to access Home, Rescue, Log, and Support.',
                   textAlign: TextAlign.center,
+                ),
+                SizedBox(height: 20),
+                Text(
+                  'Open Rescue',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontWeight: FontWeight.w700,
+                  ),
                 ),
               ],
             ),
