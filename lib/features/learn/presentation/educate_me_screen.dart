@@ -121,7 +121,7 @@ class _EducateMeScreenState extends State<EducateMeScreen> {
               onUnlockedTap: () {
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(
-                    content: Text('Premium guided learning is coming soon.'),
+                    content: Text('Premium guided learning is part of BreakWave Plus.'),
                   ),
                 );
               },

@@ -1,5 +1,10 @@
-// BreakWave
-// Created in collaboration with Cube23 Holdings LLC.
+// ------------------------------------------------------------
+// Cube23 Collaboration Header
+// Project: BreakWave
+// File: home_screen.dart
+// Purpose: Legacy HomeScreen compatibility surface.
+// Notes: BW-67 removes stale bootstrap copy and dead launch-risk actions.
+// ------------------------------------------------------------
 
 import 'package:flutter/material.dart';
 
@@ -8,72 +13,14 @@ class HomeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('BreakWave'),
-      ),
+    return const Scaffold(
       body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(20),
-          child: Center(
-            child: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: 520),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  const Text(
-                    'Ride the urge. Don’t let it control you.',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontSize: 28,
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-                  const Text(
-                    'A private recovery companion for pause, rescue, reflection, and progress.',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontSize: 16,
-                      color: Colors.white70,
-                      height: 1.4,
-                    ),
-                  ),
-                  const SizedBox(height: 28),
-                  Card(
-                    child: Padding(
-                      padding: const EdgeInsets.all(20),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: [
-                          const Text(
-                            'Today starts here',
-                            style: TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                          const SizedBox(height: 10),
-                          const Text(
-                            'This is the clean bootstrap shell. Next up: Rescue, Log, Insights, and Support.',
-                            style: TextStyle(
-                              fontSize: 14,
-                              color: Colors.white70,
-                              height: 1.4,
-                            ),
-                          ),
-                          const SizedBox(height: 18),
-                          ElevatedButton(
-                            onPressed: () {},
-                            child: const Text('Open Rescue'),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ],
-              ),
+        child: Center(
+          child: Padding(
+            padding: EdgeInsets.all(24),
+            child: Text(
+              'BreakWave is ready. Use the main app shell to access Home, Rescue, Log, and Support.',
+              textAlign: TextAlign.center,
             ),
           ),
         ),

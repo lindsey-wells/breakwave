@@ -3,7 +3,7 @@
 // Project: BreakWave
 // File: support_escalation_card.dart
 // Purpose: BW-66 Support escalation card for Rescue.
-// Notes: Open Support is now a real navigation action, not a placeholder.
+// Notes: Open Support is now a real navigation action.
 // ------------------------------------------------------------
 
 import 'package:flutter/material.dart';
