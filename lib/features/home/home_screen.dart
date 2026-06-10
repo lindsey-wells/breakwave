@@ -18,9 +18,23 @@ class HomeScreen extends StatelessWidget {
         child: Center(
           child: Padding(
             padding: EdgeInsets.all(24),
-            child: Text(
-              'BreakWave is ready. Use the main app shell to access Home, Rescue, Log, and Support.',
-              textAlign: TextAlign.center,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                Text(
+                  'BreakWave',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 28,
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+                SizedBox(height: 12),
+                Text(
+                  'BreakWave is ready. Use the main app shell to access Home, Rescue, Log, and Support.',
+                  textAlign: TextAlign.center,
+                ),
+              ],
             ),
           ),
         ),
