@@ -9,7 +9,7 @@ BW-67 removes launch-risk dead actions and unfinished app-facing copy.
 - Removed stale bootstrap Home copy from the legacy home screen file.
 - Removed a dead Open Rescue button from the legacy home screen file.
 - Replaced old future-facing learning copy with launch-ready BreakWave Plus copy.
-- Removed leftover placeholder wording from Rescue comments.
+- Removed leftover unfinished wording from Rescue comments.
 
 ## Launch rule
 

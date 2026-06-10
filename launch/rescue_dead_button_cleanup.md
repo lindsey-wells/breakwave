@@ -2,7 +2,7 @@
 
 ## Purpose
 
-BW-66 removes launch-risk placeholder actions from Rescue.
+BW-66 removes launch-risk inactive actions from Rescue.
 
 ## Fixed
 
