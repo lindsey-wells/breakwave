@@ -3,7 +3,7 @@
 // Project: BreakWave
 // File: fast_urge_entry_card.dart
 // Purpose: BW-14 fast urge entry from Home.
-// Notes: Saves a quick urge and routes directly into Rescue.
+// Notes: BW-70A keeps the urgent CTA prominent while tightening Home layout.
 // ------------------------------------------------------------
 
 import 'package:flutter/material.dart';
@@ -11,7 +11,6 @@ import 'package:flutter/material.dart';
 import '../../../../core/ui/wave_surface.dart';
 import '../../../log/data/log_repository.dart';
 import '../../../log/domain/log_entry.dart';
-import '../../../triggers/presentation/triggers_risky_times_screen.dart';
 
 class FastUrgeEntryCard extends StatefulWidget {
   const FastUrgeEntryCard({
@@ -27,14 +26,6 @@ class FastUrgeEntryCard extends StatefulWidget {
 
 class _FastUrgeEntryCardState extends State<FastUrgeEntryCard> {
   final LogRepository _repository = const LogRepository();
-
-  static const List<String> _quickTriggers = <String>[
-    'Stress',
-    'Boredom',
-    'Lonely',
-    'Scrolling',
-    'Late night',
-  ];
 
   bool _isSaving = false;
 
@@ -101,27 +92,28 @@ class _FastUrgeEntryCardState extends State<FastUrgeEntryCard> {
           const Text(
             'Need help right now?',
             style: TextStyle(
-              fontSize: 14,
+              fontSize: 13,
               fontWeight: FontWeight.w700,
             ),
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 6),
           const Text(
             'Log the wave fast and move straight into Rescue.',
             style: TextStyle(
-              fontSize: 22,
-              fontWeight: FontWeight.w700,
+              fontSize: 21,
+              fontWeight: FontWeight.w800,
+              height: 1.12,
             ),
           ),
           const SizedBox(height: 8),
           const Text(
             'Use this when the wave is rising and you do not want extra steps.',
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 14),
           FilledButton(
             onPressed: _isSaving ? null : _openQuickEntry,
             child: Padding(
-              padding: const EdgeInsets.symmetric(vertical: 14),
+              padding: const EdgeInsets.symmetric(vertical: 12),
               child: Text(_isSaving ? 'Saving...' : 'I feel the wave now'),
             ),
           ),
@@ -156,10 +148,10 @@ class _QuickUrgeSheetState extends State<_QuickUrgeSheet> {
 
     return Padding(
       padding: EdgeInsets.only(
-        left: 20,
-        right: 20,
-        top: 20,
-        bottom: 20 + MediaQuery.of(context).viewInsets.bottom,
+        left: 18,
+        right: 18,
+        top: 18,
+        bottom: 18 + MediaQuery.of(context).viewInsets.bottom,
       ),
       child: ListView(
         shrinkWrap: true,
@@ -175,12 +167,12 @@ class _QuickUrgeSheetState extends State<_QuickUrgeSheet> {
             'Capture what is happening, then go straight into Rescue.',
             style: theme.textTheme.bodyMedium,
           ),
-          const SizedBox(height: 20),
+          const SizedBox(height: 18),
           Text(
             'Intensity',
             style: theme.textTheme.titleMedium,
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 10),
           Wrap(
             spacing: 10,
             runSpacing: 10,
@@ -197,12 +189,12 @@ class _QuickUrgeSheetState extends State<_QuickUrgeSheet> {
               );
             }),
           ),
-          const SizedBox(height: 24),
+          const SizedBox(height: 20),
           Text(
             'Trigger',
             style: theme.textTheme.titleMedium,
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 10),
           Wrap(
             spacing: 10,
             runSpacing: 10,
@@ -219,7 +211,7 @@ class _QuickUrgeSheetState extends State<_QuickUrgeSheet> {
                 ),
             ],
           ),
-          const SizedBox(height: 24),
+          const SizedBox(height: 22),
           FilledButton(
             onPressed: () {
               Navigator.of(context).pop(
@@ -230,7 +222,7 @@ class _QuickUrgeSheetState extends State<_QuickUrgeSheet> {
               );
             },
             child: const Padding(
-              padding: EdgeInsets.symmetric(vertical: 14),
+              padding: EdgeInsets.symmetric(vertical: 12),
               child: Text('Log urge and open Rescue'),
             ),
           ),

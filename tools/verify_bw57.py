@@ -7,7 +7,7 @@ text = path.read_text(encoding="utf-8")
 checks = [
     "Purpose: BW-57 home dashboard cleanup",
     "final bool hasRecoveryData = summary.totalEntries > 0;",
-    "EdgeInsets.fromLTRB(20, 20, 20, 120)",
+    "EdgeInsets.fromLTRB(16, 14, 16, 150)",
     "When the wave rises, start with Rescue.",
         "eyebrow: 'Today'",
     "Check in and prepare for risk windows",

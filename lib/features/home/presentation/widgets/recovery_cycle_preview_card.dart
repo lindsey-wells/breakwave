@@ -3,7 +3,7 @@
 // Project: BreakWave
 // File: recovery_cycle_preview_card.dart
 // Purpose: BW-27 recovery cycle wheel entry card.
-// Notes: BW-30A ocean identity correction for the cycle preview.
+// Notes: BW-70A compacts the cycle preview into a tighter Home teaser.
 // ------------------------------------------------------------
 
 import 'package:flutter/material.dart';
@@ -19,7 +19,7 @@ class RecoveryCyclePreviewCard extends StatelessWidget {
     final ColorScheme colorScheme = theme.colorScheme;
 
     return InkWell(
-      borderRadius: BorderRadius.circular(20),
+      borderRadius: BorderRadius.circular(18),
       onTap: () {
         Navigator.of(context).push(
           MaterialPageRoute(
@@ -37,7 +37,7 @@ class RecoveryCyclePreviewCard extends StatelessWidget {
               colorScheme.surfaceContainer.withOpacity(0.34),
             ],
           ),
-          borderRadius: BorderRadius.circular(20),
+          borderRadius: BorderRadius.circular(18),
           border: Border.all(
             color: colorScheme.outlineVariant.withOpacity(0.78),
           ),
@@ -70,7 +70,7 @@ class RecoveryCyclePreviewCard extends StatelessWidget {
               ),
             ),
             Padding(
-              padding: const EdgeInsets.all(18),
+              padding: const EdgeInsets.fromLTRB(16, 15, 16, 16),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
@@ -80,13 +80,14 @@ class RecoveryCyclePreviewCard extends StatelessWidget {
                       fontWeight: FontWeight.w700,
                     ),
                   ),
-                  const SizedBox(height: 10),
+                  const SizedBox(height: 8),
                   const Text(
                     'Trigger → Urge → Escalation → Action → Regret / Recovery',
                   ),
-                  const SizedBox(height: 10),
-                  const Text(
-                    'Tap to learn where the wave usually grows and where you can interrupt it earlier.',
+                  const SizedBox(height: 6),
+                  Text(
+                    'Tap to see where to interrupt the wave earlier.',
+                    style: theme.textTheme.bodyMedium,
                   ),
                 ],
               ),

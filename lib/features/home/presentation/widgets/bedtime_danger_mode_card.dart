@@ -128,10 +128,10 @@ class _BedtimeDangerModeCardState extends State<BedtimeDangerModeCard> {
     final ColorScheme colorScheme = theme.colorScheme;
 
     return Container(
-      padding: const EdgeInsets.all(18),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: colorScheme.surfaceContainerHighest.withOpacity(0.45),
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(18),
         border: Border.all(color: colorScheme.outlineVariant),
       ),
       child: _loading
@@ -145,15 +145,15 @@ class _BedtimeDangerModeCardState extends State<BedtimeDangerModeCard> {
                     fontWeight: FontWeight.w700,
                   ),
                 ),
-                const SizedBox(height: 10),
+                const SizedBox(height: 8),
                 Text(
                   _bodyText(),
                   style: theme.textTheme.bodyMedium,
                 ),
-                const SizedBox(height: 16),
+                const SizedBox(height: 12),
                 Wrap(
-                  spacing: 10,
-                  runSpacing: 10,
+                  spacing: 8,
+                  runSpacing: 8,
                   children: <Widget>[
                     ChoiceChip(
                       label: const Text('Tonight feels steady'),
@@ -174,11 +174,11 @@ class _BedtimeDangerModeCardState extends State<BedtimeDangerModeCard> {
                   ],
                 ),
                 if (_isRiskyTonight == true) ...<Widget>[
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 12),
                   FilledButton(
                     onPressed: widget.onOpenRescue,
                     child: const Padding(
-                      padding: EdgeInsets.symmetric(vertical: 14),
+                      padding: EdgeInsets.symmetric(vertical: 12),
                       child: Text('Open Rescue now'),
                     ),
                   ),

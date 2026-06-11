@@ -110,7 +110,7 @@ class _HomeScreenState extends State<HomeScreen> {
             final bool hasRecoveryData = summary.totalEntries > 0;
 
             return SingleChildScrollView(
-              padding: const EdgeInsets.fromLTRB(20, 20, 20, 120),
+              padding: const EdgeInsets.fromLTRB(16, 14, 16, 150),
               child: Center(
                 child: ConstrainedBox(
                   constraints: const BoxConstraints(maxWidth: 720),
@@ -124,7 +124,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             Text(
                               'Home Current',
                               style: TextStyle(
-                                fontSize: 14,
+                                fontSize: 13,
                                 fontWeight: FontWeight.w700,
                               ),
                             ),
@@ -132,8 +132,8 @@ class _HomeScreenState extends State<HomeScreen> {
                             Text(
                               'Steady water, clear direction.',
                               style: TextStyle(
-                                fontSize: 24,
-                                fontWeight: FontWeight.w700,
+                                fontSize: 22,
+                                fontWeight: FontWeight.w800,
                               ),
                             ),
                             SizedBox(height: 8),
@@ -143,29 +143,29 @@ class _HomeScreenState extends State<HomeScreen> {
                           ],
                         ),
                       ),
-                      const SizedBox(height: 16),
+                      const SizedBox(height: 12),
                       FastUrgeEntryCard(
                         onOpenRescue: widget.onOpenRescue,
                       ),
-                      const SizedBox(height: 16),
+                      const SizedBox(height: 12),
                       const DailyEncouragementCard(),
-                      const SizedBox(height: 20),
+                      const SizedBox(height: 16),
                       const SectionHeader(
                         eyebrow: 'Today',
                         title: 'Check in and prepare for risk windows',
                       ),
                       const DailyCheckInCard(),
-                      const SizedBox(height: 16),
+                      const SizedBox(height: 12),
                       BedtimeDangerModeCard(
                         onOpenRescue: widget.onOpenRescue,
                       ),
-                      const SizedBox(height: 20),
+                      const SizedBox(height: 16),
                       const SectionHeader(
                         eyebrow: 'Your setup',
                         title: 'Keep your reasons and triggers visible',
                       ),
                       const ReasonsFocusCard(),
-                      const SizedBox(height: 16),
+                      const SizedBox(height: 12),
                       const TriggersWatchCard(),
                       if (hasRecoveryData) ...<Widget>[
                         const SizedBox(height: 20),
@@ -190,7 +190,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           const SimpleInsightsCard(),
                         ],
                       ],
-                      const SizedBox(height: 20),
+                      const SizedBox(height: 16),
                       const SectionHeader(
                         eyebrow: 'Pattern awareness',
                         title: 'Learn what keeps the wave going',
