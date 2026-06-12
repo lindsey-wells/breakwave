@@ -10,6 +10,7 @@ import 'package:flutter/material.dart';
 
 import '../../../../core/privacy/privacy_settings.dart';
 import '../../../../core/privacy/privacy_settings_store.dart';
+import '../../../../core/privacy/screen_privacy_service.dart';
 import '../../../../core/reminders/breakwave_notifications.dart';
 import '../../../../core/reminders/reminder_settings.dart';
 import '../../../../core/reminders/reminder_settings_store.dart';
@@ -54,6 +55,9 @@ class _PrivacySettingsCardState extends State<PrivacySettingsCard> {
 
     try {
       await PrivacySettingsStore.save(_settings);
+      await ScreenPrivacyService.setScreenPrivacyEnabled(
+        _settings.blockScreenshotsAndScreenRecording,
+      );
 
       final ReminderSettings reminderSettings = await ReminderSettingsStore.load();
       final TriggersSelection triggers = await TriggersStore.loadSelection();
@@ -168,6 +172,21 @@ class _PrivacySettingsCardState extends State<PrivacySettingsCard> {
                     setState(() {
                       _settings = _settings.copyWith(
                         preferRescueAsSafePath: value,
+                      );
+                    });
+                  },
+                ),
+                SwitchListTile.adaptive(
+                  contentPadding: EdgeInsets.zero,
+                  title: const Text('Block screenshots and screen recording'),
+                  subtitle: const Text(
+                    'Asks Android to block normal screenshots and screen recordings while BreakWave is open. This reduces casual exposure but is not absolute protection.',
+                  ),
+                  value: _settings.blockScreenshotsAndScreenRecording,
+                  onChanged: (bool value) {
+                    setState(() {
+                      _settings = _settings.copyWith(
+                        blockScreenshotsAndScreenRecording: value,
                       );
                     });
                   },

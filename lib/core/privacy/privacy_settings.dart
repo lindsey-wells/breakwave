@@ -12,18 +12,21 @@ class PrivacySettings {
     required this.hideHomeInsights,
     required this.hideLatestLoggedMoment,
     required this.preferRescueAsSafePath,
+    required this.blockScreenshotsAndScreenRecording,
   });
 
   final bool discreetNotifications;
   final bool hideHomeInsights;
   final bool hideLatestLoggedMoment;
   final bool preferRescueAsSafePath;
+  final bool blockScreenshotsAndScreenRecording;
 
   static const PrivacySettings defaults = PrivacySettings(
     discreetNotifications: false,
     hideHomeInsights: false,
     hideLatestLoggedMoment: false,
     preferRescueAsSafePath: true,
+    blockScreenshotsAndScreenRecording: false,
   );
 
   PrivacySettings copyWith({
@@ -31,6 +34,7 @@ class PrivacySettings {
     bool? hideHomeInsights,
     bool? hideLatestLoggedMoment,
     bool? preferRescueAsSafePath,
+    bool? blockScreenshotsAndScreenRecording,
   }) {
     return PrivacySettings(
       discreetNotifications:
@@ -40,6 +44,9 @@ class PrivacySettings {
           hideLatestLoggedMoment ?? this.hideLatestLoggedMoment,
       preferRescueAsSafePath:
           preferRescueAsSafePath ?? this.preferRescueAsSafePath,
+      blockScreenshotsAndScreenRecording:
+          blockScreenshotsAndScreenRecording ??
+              this.blockScreenshotsAndScreenRecording,
     );
   }
 
@@ -49,6 +56,7 @@ class PrivacySettings {
       'hideHomeInsights': hideHomeInsights,
       'hideLatestLoggedMoment': hideLatestLoggedMoment,
       'preferRescueAsSafePath': preferRescueAsSafePath,
+      'blockScreenshotsAndScreenRecording': blockScreenshotsAndScreenRecording,
     };
   }
 
@@ -58,6 +66,8 @@ class PrivacySettings {
       hideHomeInsights: map['hideHomeInsights'] == true,
       hideLatestLoggedMoment: map['hideLatestLoggedMoment'] == true,
       preferRescueAsSafePath: map['preferRescueAsSafePath'] != false,
+      blockScreenshotsAndScreenRecording:
+          map['blockScreenshotsAndScreenRecording'] == true,
     );
   }
 }
