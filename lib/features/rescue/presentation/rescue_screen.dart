@@ -3,7 +3,7 @@
 // Project: BreakWave
 // File: rescue_screen.dart
 // Purpose: BW-03 rescue foundation screen for BreakWave.
-// Notes: BW-10 completion saves and returns home.
+// Notes: BW-71A makes Rescue more active with earlier action and honest outcomes.
 // ------------------------------------------------------------
 
 import 'package:flutter/material.dart';
@@ -71,24 +71,34 @@ class _RescueScreenState extends State<RescueScreen> {
     }
   }
 
-  Future<void> _completeWave() async {
+  Future<void> _saveRescueOutcome({
+    required String entryType,
+    required String actionTaken,
+    required String betterPlan,
+    required String notes,
+    required String snackBarText,
+    required bool returnHome,
+    required bool openSupport,
+  }) async {
     final String? nextAction = _selectedNextAction;
 
     final LogEntry entry = LogEntry(
       id: DateTime.now().microsecondsSinceEpoch.toString(),
-      entryType: 'Victory',
+      entryType: entryType,
       intensity: _selectedIntensity,
       triggers: const <String>['Rescue Completion'],
       actionTaken: nextAction == null
-          ? 'Completed Rescue without choosing a next right action.'
-          : 'Chose next right action: $nextAction',
+          ? actionTaken
+          : '$actionTaken Next right action: $nextAction',
       betterPlan: nextAction == null
-          ? 'Choose one next right action earlier in Rescue next time.'
-          : 'Use $nextAction earlier when this wave appears again.',
+          ? betterPlan
+          : '$betterPlan Use $nextAction earlier when this wave appears again.',
       replacementAction: nextAction ?? '',
       notes: nextAction == null
-          ? 'Made it through this wave from Rescue.'
-          : 'Made it through this wave from Rescue using: $nextAction.',
+          ? notes
+          : entryType == 'Victory'
+              ? 'Made it through this wave from Rescue using: $nextAction.'
+              : '$notes Selected next right action: $nextAction.',
       createdAtIso: DateTime.now().toIso8601String(),
     );
 
@@ -97,17 +107,26 @@ class _RescueScreenState extends State<RescueScreen> {
 
       if (!mounted) return;
 
-      setState(() {
-        _selectedNextAction = null;
-      });
+      if (entryType == 'Victory') {
+        setState(() {
+          _selectedNextAction = null;
+        });
+      }
 
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Nice work. Wave saved with your next right action.'),
+        SnackBar(
+          content: Text(snackBarText),
         ),
       );
 
-      widget.onReturnHome();
+      if (openSupport) {
+        widget.onOpenSupport();
+        return;
+      }
+
+      if (returnHome) {
+        widget.onReturnHome();
+      }
     } catch (_) {
       if (!mounted) return;
 
@@ -119,13 +138,49 @@ class _RescueScreenState extends State<RescueScreen> {
     }
   }
 
+  Future<void> _completeWave() async {
+    await _saveRescueOutcome(
+      entryType: 'Victory',
+      actionTaken: 'Completed Rescue.',
+      betterPlan: 'Repeat this Rescue path earlier next time.',
+      notes: 'Made it through this wave from Rescue.',
+      snackBarText: 'Nice work. Wave saved with your next right action.',
+      returnHome: true,
+      openSupport: false,
+    );
+  }
+
+  Future<void> _logStillStrong() async {
+    await _saveRescueOutcome(
+      entryType: 'Urge',
+      actionTaken: 'Marked the wave as still strong from Rescue.',
+      betterPlan: 'Stay in Rescue, choose one next right action, and reduce privacy or isolation.',
+      notes: 'Still strong after Rescue support.',
+      snackBarText: 'Still strong saved. Stay with Rescue and choose one clean next move.',
+      returnHome: false,
+      openSupport: false,
+    );
+  }
+
+  Future<void> _logSlip() async {
+    await _saveRescueOutcome(
+      entryType: 'Slip',
+      actionTaken: 'Marked a slip from Rescue.',
+      betterPlan: 'Reduce isolation, return to the plan, and use support instead of shame.',
+      notes: 'Slip logged from Rescue without shame.',
+      snackBarText: 'Slip saved. Opening Support so you can choose the next safe step.',
+      returnHome: false,
+      openSupport: true,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: const BreakWaveAppBar(sectionTitle: 'Rescue'),
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.all(20),
+          padding: const EdgeInsets.fromLTRB(20, 20, 20, 150),
           child: Center(
             child: ConstrainedBox(
               constraints: const BoxConstraints(maxWidth: 720),
@@ -175,6 +230,15 @@ class _RescueScreenState extends State<RescueScreen> {
                   const RememberWhyCard(),
                   const SizedBox(height: 20),
                   const SectionHeader(
+                    eyebrow: 'Interrupt now',
+                    title: 'Use one immediate redirect',
+                  ),
+                  RedirectActionsCard(
+                    selectedAction: _selectedNextAction,
+                    onActionSelected: _setNextAction,
+                  ),
+                  const SizedBox(height: 20),
+                  const SectionHeader(
                     eyebrow: 'Ride the wave',
                     title: 'Slow the surge before it gets louder',
                   ),
@@ -187,20 +251,13 @@ class _RescueScreenState extends State<RescueScreen> {
                   const RescueCardEngine(),
                   const SizedBox(height: 20),
                   const SectionHeader(
-                    eyebrow: 'Interrupt now',
-                    title: 'Use one immediate redirect',
-                  ),
-                  RedirectActionsCard(
-                    selectedAction: _selectedNextAction,
-                    onActionSelected: _setNextAction,
-                  ),
-                  const SizedBox(height: 20),
-                  const SectionHeader(
                     eyebrow: 'Finish honestly',
                     title: 'Mark what happened and get support',
                   ),
                   WaveCompletionCard(
                     onComplete: _completeWave,
+                    onStillStrong: _logStillStrong,
+                    onSlipped: _logSlip,
                   ),
                   const SizedBox(height: 16),
                   SupportEscalationCard(

@@ -7,6 +7,7 @@
 // ------------------------------------------------------------
 
 import 'dart:async';
+import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 
@@ -25,19 +26,31 @@ class WaveTimerCard extends StatefulWidget {
   State<WaveTimerCard> createState() => _WaveTimerCardState();
 }
 
-class _WaveTimerCardState extends State<WaveTimerCard> {
+class _WaveTimerCardState extends State<WaveTimerCard>
+    with SingleTickerProviderStateMixin {
   static const int _totalSeconds = 90;
 
   final LogRepository _repository = const LogRepository();
 
+  late final AnimationController _waveController;
   Timer? _timer;
   int _remainingSeconds = _totalSeconds;
   bool _isRunning = false;
   bool _isSaving = false;
 
   @override
+  void initState() {
+    super.initState();
+    _waveController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 2400),
+    )..repeat();
+  }
+
+  @override
   void dispose() {
     _timer?.cancel();
+    _waveController.dispose();
     super.dispose();
   }
 
@@ -204,16 +217,23 @@ class _WaveTimerCardState extends State<WaveTimerCard> {
             style: theme.textTheme.bodyMedium,
           ),
           const SizedBox(height: 16),
-          ClipRRect(
-            borderRadius: BorderRadius.circular(999),
-            child: LinearProgressIndicator(
-              value: progress,
-              minHeight: 10,
-              backgroundColor: colorScheme.surfaceContainerHighest,
-              valueColor: AlwaysStoppedAnimation<Color>(
-                timerFinished ? colorScheme.primary : colorScheme.secondary,
-              ),
-            ),
+          AnimatedBuilder(
+            animation: _waveController,
+            builder: (BuildContext context, Widget? child) {
+              return SizedBox(
+                height: 38,
+                width: double.infinity,
+                child: CustomPaint(
+                  painter: _WaveProgressPainter(
+                    progress: progress,
+                    phase: _waveController.value,
+                    isRunning: _isRunning,
+                    timerFinished: timerFinished,
+                    colorScheme: colorScheme,
+                  ),
+                ),
+              );
+            },
           ),
           const SizedBox(height: 14),
           Center(
@@ -306,3 +326,99 @@ class _WaveTimerCardState extends State<WaveTimerCard> {
     );
   }
 }
+
+class _WaveProgressPainter extends CustomPainter {
+  const _WaveProgressPainter({
+    required this.progress,
+    required this.phase,
+    required this.isRunning,
+    required this.timerFinished,
+    required this.colorScheme,
+  });
+
+  final double progress;
+  final double phase;
+  final bool isRunning;
+  final bool timerFinished;
+  final ColorScheme colorScheme;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final RRect track = RRect.fromRectAndRadius(
+      Rect.fromLTWH(0, size.height * 0.34, size.width, size.height * 0.32),
+      const Radius.circular(999),
+    );
+
+    final Paint trackPaint = Paint()
+      ..color = colorScheme.surfaceContainerHighest.withOpacity(0.56);
+
+    canvas.drawRRect(track, trackPaint);
+
+    final double progressWidth = math.max(0, size.width * progress);
+    if (progressWidth <= 0) {
+      return;
+    }
+
+    final Rect clipRect = Rect.fromLTWH(0, 0, progressWidth, size.height);
+    canvas.save();
+    canvas.clipRect(clipRect);
+
+    final double baseline = size.height * 0.50;
+    final double amplitude = isRunning ? size.height * 0.16 : size.height * 0.08;
+    final double frequency = math.pi * 2 / math.max(size.width * 0.42, 1);
+    final double phaseShift = phase * math.pi * 2;
+
+    final Path wavePath = Path()
+      ..moveTo(0, size.height)
+      ..lineTo(0, baseline);
+
+    for (double x = 0; x <= size.width + 8; x += 6) {
+      final double y = baseline + math.sin((x * frequency) + phaseShift) * amplitude;
+      wavePath.lineTo(x, y);
+    }
+
+    wavePath
+      ..lineTo(size.width, size.height)
+      ..close();
+
+    final Paint wavePaint = Paint()
+      ..shader = LinearGradient(
+        colors: <Color>[
+          colorScheme.primary.withOpacity(timerFinished ? 0.95 : 0.78),
+          colorScheme.secondary.withOpacity(0.88),
+        ],
+      ).createShader(Rect.fromLTWH(0, 0, size.width, size.height));
+
+    canvas.drawPath(wavePath, wavePaint);
+
+    final Paint crestPaint = Paint()
+      ..color = colorScheme.onPrimary.withOpacity(0.30)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1.3;
+
+    final Path crestPath = Path();
+    bool started = false;
+    for (double x = 0; x <= size.width + 8; x += 6) {
+      final double y = baseline + math.sin((x * frequency) + phaseShift) * amplitude;
+      if (!started) {
+        crestPath.moveTo(x, y);
+        started = true;
+      } else {
+        crestPath.lineTo(x, y);
+      }
+    }
+
+    canvas.drawPath(crestPath, crestPaint);
+    canvas.restore();
+  }
+
+  @override
+  bool shouldRepaint(covariant _WaveProgressPainter oldDelegate) {
+    return progress != oldDelegate.progress ||
+        phase != oldDelegate.phase ||
+        isRunning != oldDelegate.isRunning ||
+        timerFinished != oldDelegate.timerFinished ||
+        colorScheme != oldDelegate.colorScheme;
+  }
+}
+

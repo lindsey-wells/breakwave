@@ -3,16 +3,112 @@
 // Project: BreakWave
 // File: calm_reset_card.dart
 // Purpose: Calm reset guidance card for the BW-03 rescue flow.
-// Notes: Neutral rescue flow scaffold for BW-03.
+// Notes: BW-71A makes Calm Reset interactive with guided breathing steps.
 // ------------------------------------------------------------
+
+import 'dart:async';
 
 import 'package:flutter/material.dart';
 
-class CalmResetCard extends StatelessWidget {
+class CalmResetCard extends StatefulWidget {
   const CalmResetCard({super.key});
 
   @override
+  State<CalmResetCard> createState() => _CalmResetCardState();
+}
+
+class _CalmResetCardState extends State<CalmResetCard> {
+  static const List<_ResetStep> _steps = <_ResetStep>[
+    _ResetStep(
+      label: 'Inhale through the nose for 4 seconds.',
+      seconds: 4,
+      icon: Icons.looks_one_outlined,
+    ),
+    _ResetStep(
+      label: 'Hold gently for 4 seconds.',
+      seconds: 4,
+      icon: Icons.looks_two_outlined,
+    ),
+    _ResetStep(
+      label: 'Exhale slowly for 6 seconds.',
+      seconds: 6,
+      icon: Icons.looks_3_outlined,
+    ),
+  ];
+
+  Timer? _timer;
+  bool _isRunning = false;
+  int _activeStep = -1;
+  int _remainingSeconds = 0;
+  int _completedRounds = 0;
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    super.dispose();
+  }
+
+  void _startReset() {
+    _timer?.cancel();
+
+    setState(() {
+      _isRunning = true;
+      _activeStep = 0;
+      _remainingSeconds = _steps.first.seconds;
+    });
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Reset started. Breathe through the steps one round at a time.'),
+      ),
+    );
+
+    _timer = Timer.periodic(const Duration(seconds: 1), (Timer timer) {
+      if (!mounted) {
+        timer.cancel();
+        return;
+      }
+
+      if (_remainingSeconds > 1) {
+        setState(() {
+          _remainingSeconds -= 1;
+        });
+        return;
+      }
+
+      final int nextStep = _activeStep + 1;
+      if (nextStep >= _steps.length) {
+        timer.cancel();
+        setState(() {
+          _isRunning = false;
+          _activeStep = -1;
+          _remainingSeconds = 0;
+          _completedRounds += 1;
+        });
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('One calm reset round completed. Choose the next right action.'),
+          ),
+        );
+        return;
+      }
+
+      setState(() {
+        _activeStep = nextStep;
+        _remainingSeconds = _steps[nextStep].seconds;
+      });
+    });
+  }
+
+  bool _isCompleted(int index) {
+    return !_isRunning && _completedRounds > 0 || _isRunning && index < _activeStep;
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final ThemeData theme = Theme.of(context);
+
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(20),
@@ -28,32 +124,40 @@ class CalmResetCard extends StatelessWidget {
               'Reset the body first. A slower body gives you a better next decision.',
               style: Theme.of(context).textTheme.bodyMedium,
             ),
+            if (_isRunning) ...<Widget>[
+              const SizedBox(height: 10),
+              Text(
+                '${_steps[_activeStep].verb} • $_remainingSeconds seconds',
+                style: theme.textTheme.titleMedium?.copyWith(
+                  color: theme.colorScheme.primary,
+                  fontWeight: FontWeight.w800,
+                ),
+              ),
+            ],
+            if (_completedRounds > 0 && !_isRunning) ...<Widget>[
+              const SizedBox(height: 10),
+              Text(
+                'Completed $_completedRounds calm reset round${_completedRounds == 1 ? '' : 's'}.',
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+            ],
             const SizedBox(height: 16),
-            const _StepRow(
-              icon: Icons.looks_one_outlined,
-              text: 'Inhale through the nose for 4 seconds.',
-            ),
-            const SizedBox(height: 10),
-            const _StepRow(
-              icon: Icons.looks_two_outlined,
-              text: 'Hold gently for 4 seconds.',
-            ),
-            const SizedBox(height: 10),
-            const _StepRow(
-              icon: Icons.looks_3_outlined,
-              text: 'Exhale slowly for 6 seconds.',
-            ),
+            for (int index = 0; index < _steps.length; index++) ...<Widget>[
+              _StepRow(
+                icon: _steps[index].icon,
+                text: _steps[index].label,
+                isActive: _activeStep == index,
+                isCompleted: _isCompleted(index),
+              ),
+              if (index != _steps.length - 1) const SizedBox(height: 10),
+            ],
             const SizedBox(height: 16),
             OutlinedButton.icon(
-              onPressed: () {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('Reset started. Breathe through the steps one round at a time.'),
-                  ),
-                );
-              },
+              onPressed: _startReset,
               icon: const Icon(Icons.self_improvement_outlined),
-              label: const Text('Start reset'),
+              label: Text(_isRunning ? 'Restart reset' : 'Start reset'),
             ),
           ],
         ),
@@ -62,26 +166,84 @@ class CalmResetCard extends StatelessWidget {
   }
 }
 
+class _ResetStep {
+  const _ResetStep({
+    required this.label,
+    required this.seconds,
+    required this.icon,
+  });
+
+  final String label;
+  final int seconds;
+  final IconData icon;
+
+  String get verb {
+    if (label.startsWith('Inhale')) return 'Inhale';
+    if (label.startsWith('Hold')) return 'Hold';
+    return 'Exhale';
+  }
+}
+
 class _StepRow extends StatelessWidget {
   final IconData icon;
   final String text;
+  final bool isActive;
+  final bool isCompleted;
 
   const _StepRow({
     required this.icon,
     required this.text,
+    required this.isActive,
+    required this.isCompleted,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: <Widget>[
-        Icon(icon),
-        const SizedBox(width: 12),
-        Expanded(
-          child: Text(text),
-        ),
-      ],
+    final ThemeData theme = Theme.of(context);
+
+    final Color accentColor = isCompleted
+        ? theme.colorScheme.primary
+        : isActive
+            ? theme.colorScheme.secondary
+            : theme.colorScheme.onSurface;
+
+    final IconData statusIcon = isCompleted
+        ? Icons.check_circle_outline
+        : isActive
+            ? Icons.radio_button_checked
+            : icon;
+
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 220),
+      padding: EdgeInsets.all(isActive || isCompleted ? 10 : 0),
+      decoration: BoxDecoration(
+        color: isActive
+            ? theme.colorScheme.primary.withOpacity(0.14)
+            : isCompleted
+                ? theme.colorScheme.primary.withOpacity(0.10)
+                : Colors.transparent,
+        borderRadius: BorderRadius.circular(14),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          Icon(
+            statusIcon,
+            color: accentColor,
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Text(
+              text,
+              style: theme.textTheme.bodyMedium?.copyWith(
+                color: accentColor,
+                fontWeight:
+                    isActive || isCompleted ? FontWeight.w700 : FontWeight.w400,
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
