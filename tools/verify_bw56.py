@@ -28,7 +28,7 @@ for needle in checks:
 
 order = [
     ("UrgeIntensitySection", rescue_text.find("UrgeIntensitySection(")),
-    ("RememberWhyCard", rescue_text.find("RememberWhyCard()")),
+    ("RememberWhyCard", rescue_text.find("RememberWhyCard(")),
     ("RedirectActionsCard", rescue_text.find("RedirectActionsCard(")),
     ("WaveTimerCard", rescue_text.find("WaveTimerCard(")),
     ("CalmResetCard", rescue_text.find("CalmResetCard()")),

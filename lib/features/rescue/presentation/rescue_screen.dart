@@ -227,7 +227,7 @@ class _RescueScreenState extends State<RescueScreen> {
                     onSelected: _setIntensity,
                   ),
                   const SizedBox(height: 16),
-                  const RememberWhyCard(),
+                  RememberWhyCard(onOpenSupport: widget.onOpenSupport),
                   const SizedBox(height: 20),
                   const SectionHeader(
                     eyebrow: 'Interrupt now',

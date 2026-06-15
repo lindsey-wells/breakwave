@@ -3,7 +3,8 @@
 // Project: BreakWave
 // File: calm_reset_card.dart
 // Purpose: Calm reset guidance card for the BW-03 rescue flow.
-// Notes: BW-71A makes Calm Reset interactive with guided breathing steps.
+// Notes: BW-71A makes Calm Reset interactive.
+// Notes: BW-71B guides Calm Reset through three automatic breathing rounds.
 // ------------------------------------------------------------
 
 import 'dart:async';
@@ -18,6 +19,8 @@ class CalmResetCard extends StatefulWidget {
 }
 
 class _CalmResetCardState extends State<CalmResetCard> {
+  static const int _targetRounds = 3;
+
   static const List<_ResetStep> _steps = <_ResetStep>[
     _ResetStep(
       label: 'Inhale through the nose for 4 seconds.',
@@ -55,6 +58,7 @@ class _CalmResetCardState extends State<CalmResetCard> {
       _isRunning = true;
       _activeStep = 0;
       _remainingSeconds = _steps.first.seconds;
+      _completedRounds = 0;
     });
 
     ScaffoldMessenger.of(context).showSnackBar(
@@ -77,32 +81,70 @@ class _CalmResetCardState extends State<CalmResetCard> {
       }
 
       final int nextStep = _activeStep + 1;
-      if (nextStep >= _steps.length) {
+
+      if (nextStep < _steps.length) {
+        setState(() {
+          _activeStep = nextStep;
+          _remainingSeconds = _steps[nextStep].seconds;
+        });
+        return;
+      }
+
+      final int nextRoundCount = _completedRounds + 1;
+
+      if (nextRoundCount >= _targetRounds) {
         timer.cancel();
         setState(() {
           _isRunning = false;
           _activeStep = -1;
           _remainingSeconds = 0;
-          _completedRounds += 1;
+          _completedRounds = nextRoundCount;
         });
 
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('One calm reset round completed. Choose the next right action.'),
+            content: Text('Three calm reset rounds completed. Choose the next right action.'),
           ),
         );
         return;
       }
 
       setState(() {
-        _activeStep = nextStep;
-        _remainingSeconds = _steps[nextStep].seconds;
+        _completedRounds = nextRoundCount;
+        _activeStep = 0;
+        _remainingSeconds = _steps.first.seconds;
       });
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('One calm reset round completed. Starting the next round.'),
+        ),
+      );
     });
   }
 
+  void _stopReset() {
+    _timer?.cancel();
+
+    setState(() {
+      _isRunning = false;
+      _activeStep = -1;
+      _remainingSeconds = 0;
+    });
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Calm reset stopped. Choose the next right action when ready.'),
+      ),
+    );
+  }
+
   bool _isCompleted(int index) {
-    return !_isRunning && _completedRounds > 0 || _isRunning && index < _activeStep;
+    if (!_isRunning) {
+      return _completedRounds >= _targetRounds;
+    }
+
+    return index < _activeStep;
   }
 
   @override
@@ -127,7 +169,7 @@ class _CalmResetCardState extends State<CalmResetCard> {
             if (_isRunning) ...<Widget>[
               const SizedBox(height: 10),
               Text(
-                '${_steps[_activeStep].verb} • $_remainingSeconds seconds',
+                'Round ${_completedRounds + 1} of $_targetRounds • ${_steps[_activeStep].verb} • $_remainingSeconds seconds',
                 style: theme.textTheme.titleMedium?.copyWith(
                   color: theme.colorScheme.primary,
                   fontWeight: FontWeight.w800,
@@ -137,7 +179,7 @@ class _CalmResetCardState extends State<CalmResetCard> {
             if (_completedRounds > 0 && !_isRunning) ...<Widget>[
               const SizedBox(height: 10),
               Text(
-                'Completed $_completedRounds calm reset round${_completedRounds == 1 ? '' : 's'}.',
+                'Completed $_completedRounds of $_targetRounds calm reset rounds.',
                 style: theme.textTheme.bodyMedium?.copyWith(
                   fontWeight: FontWeight.w700,
                 ),
@@ -155,9 +197,9 @@ class _CalmResetCardState extends State<CalmResetCard> {
             ],
             const SizedBox(height: 16),
             OutlinedButton.icon(
-              onPressed: _startReset,
+              onPressed: _isRunning ? _stopReset : _startReset,
               icon: const Icon(Icons.self_improvement_outlined),
-              label: Text(_isRunning ? 'Restart reset' : 'Start reset'),
+              label: Text(_isRunning ? 'Stop reset' : 'Start reset'),
             ),
           ],
         ),

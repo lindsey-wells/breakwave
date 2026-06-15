@@ -3,7 +3,7 @@
 // Project: BreakWave
 // File: remember_why_card.dart
 // Purpose: BW-39 remember why reminder card.
-// Notes: Shows the user's saved why inside Rescue when available.
+// Notes: BW-71B keeps Remember Why visible in Rescue even before setup.
 // ------------------------------------------------------------
 
 import 'dart:io';
@@ -15,7 +15,12 @@ import '../../../../core/why/custom_why_fullscreen_image_viewer.dart';
 import '../../../../core/why/custom_why_store.dart';
 
 class RememberWhyCard extends StatefulWidget {
-  const RememberWhyCard({super.key});
+  const RememberWhyCard({
+    super.key,
+    this.onOpenSupport,
+  });
+
+  final VoidCallback? onOpenSupport;
 
   @override
   State<RememberWhyCard> createState() => _RememberWhyCardState();
@@ -54,12 +59,47 @@ class _RememberWhyCardState extends State<RememberWhyCard> {
 
   @override
   Widget build(BuildContext context) {
-    if (_loading || !_entry.hasAnyContent) {
+    if (_loading) {
       return const SizedBox.shrink();
     }
 
     final ThemeData theme = Theme.of(context);
     final ColorScheme colorScheme = theme.colorScheme;
+
+    if (!_entry.hasAnyContent) {
+      return Container(
+        padding: const EdgeInsets.all(18),
+        decoration: BoxDecoration(
+          color: colorScheme.surfaceContainerHighest.withOpacity(0.45),
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(color: colorScheme.outlineVariant),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            Text(
+              'Remember why',
+              style: theme.textTheme.titleMedium?.copyWith(
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+            const SizedBox(height: 10),
+            Text(
+              'Your saved why will appear here during Rescue. Add one in Support so your reason is ready when the wave rises.',
+              style: theme.textTheme.bodyMedium,
+            ),
+            if (widget.onOpenSupport != null) ...<Widget>[
+              const SizedBox(height: 14),
+              OutlinedButton.icon(
+                onPressed: widget.onOpenSupport,
+                icon: const Icon(Icons.favorite_border),
+                label: const Text('Add your why in Support'),
+              ),
+            ],
+          ],
+        ),
+      );
+    }
 
     return Container(
       padding: const EdgeInsets.all(18),
@@ -95,7 +135,6 @@ class _RememberWhyCardState extends State<RememberWhyCard> {
     );
   }
 }
-
 
 class _WhyImagePreview extends StatelessWidget {
   const _WhyImagePreview({
