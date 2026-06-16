@@ -35,6 +35,8 @@ class LogScreen extends StatefulWidget {
 class _LogScreenState extends State<LogScreen> {
   final LogRepository _repository = const LogRepository();
 
+  late final ScrollController _scrollController;
+
   String _entryType = 'Urge';
   int _intensity = 3;
   final Set<String> _selectedTriggers = <String>{};
@@ -71,6 +73,7 @@ class _LogScreenState extends State<LogScreen> {
   @override
   void initState() {
     super.initState();
+    _scrollController = ScrollController();
     _thoughtController = TextEditingController();
     _actionTakenController = TextEditingController();
     _consequenceController = TextEditingController();
@@ -81,6 +84,7 @@ class _LogScreenState extends State<LogScreen> {
 
   @override
   void dispose() {
+    _scrollController.dispose();
     _thoughtController.dispose();
     _actionTakenController.dispose();
     _consequenceController.dispose();
@@ -144,6 +148,15 @@ class _LogScreenState extends State<LogScreen> {
       _consequenceController.text = entry.consequence;
       _betterPlanController.text = entry.betterPlan;
       _notesController.text = entry.notes;
+    });
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted || !_scrollController.hasClients) return;
+      _scrollController.animateTo(
+        0,
+        duration: const Duration(milliseconds: 260),
+        curve: Curves.easeOutCubic,
+      );
     });
   }
 
@@ -259,7 +272,8 @@ class _LogScreenState extends State<LogScreen> {
       appBar: const BreakWaveAppBar(sectionTitle: 'Log'),
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.all(20),
+          controller: _scrollController,
+          padding: const EdgeInsets.fromLTRB(20, 20, 20, 150),
           child: Center(
             child: ConstrainedBox(
               constraints: const BoxConstraints(maxWidth: 720),
@@ -305,12 +319,6 @@ class _LogScreenState extends State<LogScreen> {
                     ),
                   ],
                   const SizedBox(height: 16),
-                  RecentLogEntriesCard(
-                    entries: _recentEntries,
-                    onEdit: _populateDraftFromEntry,
-                    onDelete: _deleteEntry,
-                  ),
-                  const SizedBox(height: 16),
                   LogEntryTypeSection(
                     selectedType: _entryType,
                     onSelected: _setEntryType,
@@ -348,6 +356,12 @@ class _LogScreenState extends State<LogScreen> {
                     savedEntryCount: _savedEntryCount,
                     isSaving: _isSaving,
                     onSave: _saveEntry,
+                  ),
+                  const SizedBox(height: 16),
+                  RecentLogEntriesCard(
+                    entries: _recentEntries,
+                    onEdit: _populateDraftFromEntry,
+                    onDelete: _deleteEntry,
                   ),
                 ],
               ),
