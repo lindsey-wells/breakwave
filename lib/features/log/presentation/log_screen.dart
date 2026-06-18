@@ -3,7 +3,7 @@
 // Project: BreakWave
 // File: log_screen.dart
 // Purpose: BW-04 log foundation screen for BreakWave.
-// Notes: BW-10 edit/delete recent log entries.
+// Notes: BW-72B declutters Log capture and adds lightweight Other inputs.
 // ------------------------------------------------------------
 
 import 'package:flutter/material.dart';
@@ -41,7 +41,10 @@ class _LogScreenState extends State<LogScreen> {
   int _intensity = 3;
   final Set<String> _selectedTriggers = <String>{};
   String? _selectedReplacementAction;
+
+  late final TextEditingController _otherTriggerController;
   late final TextEditingController _thoughtController;
+  late final TextEditingController _otherReplacementActionController;
   late final TextEditingController _actionTakenController;
   late final TextEditingController _consequenceController;
   late final TextEditingController _betterPlanController;
@@ -52,6 +55,8 @@ class _LogScreenState extends State<LogScreen> {
   List<LogEntry> _recentEntries = const <LogEntry>[];
   String? _editingEntryId;
 
+  static const String _otherLabel = 'Other';
+
   static const List<String> _availableTriggers = <String>[
     'Stress',
     'Boredom',
@@ -59,6 +64,7 @@ class _LogScreenState extends State<LogScreen> {
     'Habit',
     'Tired',
     'Environment',
+    _otherLabel,
   ];
 
   static const List<String> _healthyReplacementActions = <String>[
@@ -68,13 +74,20 @@ class _LogScreenState extends State<LogScreen> {
     'Take a short walk',
     'Cold water reset',
     'Put the phone down',
+    'Move to public space',
+    'Charge phone away from bed',
+    'Journal one line',
+    'Pray for one minute',
+    _otherLabel,
   ];
 
   @override
   void initState() {
     super.initState();
     _scrollController = ScrollController();
+    _otherTriggerController = TextEditingController();
     _thoughtController = TextEditingController();
+    _otherReplacementActionController = TextEditingController();
     _actionTakenController = TextEditingController();
     _consequenceController = TextEditingController();
     _betterPlanController = TextEditingController();
@@ -85,7 +98,9 @@ class _LogScreenState extends State<LogScreen> {
   @override
   void dispose() {
     _scrollController.dispose();
+    _otherTriggerController.dispose();
     _thoughtController.dispose();
+    _otherReplacementActionController.dispose();
     _actionTakenController.dispose();
     _consequenceController.dispose();
     _betterPlanController.dispose();
@@ -120,6 +135,9 @@ class _LogScreenState extends State<LogScreen> {
     setState(() {
       if (_selectedTriggers.contains(value)) {
         _selectedTriggers.remove(value);
+        if (value == _otherLabel) {
+          _otherTriggerController.clear();
+        }
       } else {
         _selectedTriggers.add(value);
       }
@@ -129,7 +147,32 @@ class _LogScreenState extends State<LogScreen> {
   void _setReplacementAction(String? value) {
     setState(() {
       _selectedReplacementAction = value;
+      if (value != _otherLabel) {
+        _otherReplacementActionController.clear();
+      }
     });
+  }
+
+  List<String> _resolvedTriggers() {
+    final List<String> triggers = _selectedTriggers
+        .where((String trigger) => trigger != _otherLabel)
+        .toList();
+
+    if (_selectedTriggers.contains(_otherLabel)) {
+      final String customTrigger = _otherTriggerController.text.trim();
+      triggers.add(customTrigger.isEmpty ? _otherLabel : 'Other: $customTrigger');
+    }
+
+    return triggers;
+  }
+
+  String _resolvedReplacementAction() {
+    if (_selectedReplacementAction == _otherLabel) {
+      final String customAction = _otherReplacementActionController.text.trim();
+      return customAction.isEmpty ? _otherLabel : customAction;
+    }
+
+    return _selectedReplacementAction ?? '';
   }
 
   void _populateDraftFromEntry(LogEntry entry) {
@@ -137,12 +180,34 @@ class _LogScreenState extends State<LogScreen> {
       _editingEntryId = entry.id;
       _entryType = entry.entryType;
       _intensity = entry.intensity;
-      _selectedTriggers
-        ..clear()
-        ..addAll(entry.triggers);
-      _selectedReplacementAction = entry.replacementAction.trim().isEmpty
-          ? null
-          : entry.replacementAction;
+
+      _selectedTriggers.clear();
+      _otherTriggerController.clear();
+      for (final String trigger in entry.triggers) {
+        if (trigger.startsWith('Other: ')) {
+          _selectedTriggers.add(_otherLabel);
+          _otherTriggerController.text = trigger.substring('Other: '.length);
+        } else if (_availableTriggers.contains(trigger)) {
+          _selectedTriggers.add(trigger);
+        } else if (trigger.trim().isNotEmpty) {
+          _selectedTriggers.add(_otherLabel);
+          _otherTriggerController.text = trigger;
+        }
+      }
+
+      final String replacementAction = entry.replacementAction.trim();
+      _otherReplacementActionController.clear();
+      if (replacementAction.isEmpty) {
+        _selectedReplacementAction = null;
+      } else if (_healthyReplacementActions.contains(replacementAction) &&
+          replacementAction != _otherLabel) {
+        _selectedReplacementAction = replacementAction;
+      } else {
+        _selectedReplacementAction = _otherLabel;
+        _otherReplacementActionController.text =
+            replacementAction == _otherLabel ? '' : replacementAction;
+      }
+
       _thoughtController.text = entry.thought;
       _actionTakenController.text = entry.actionTaken;
       _consequenceController.text = entry.consequence;
@@ -160,22 +225,26 @@ class _LogScreenState extends State<LogScreen> {
     });
   }
 
+  void _clearDraft() {
+    _editingEntryId = null;
+    _entryType = 'Urge';
+    _intensity = 3;
+    _selectedTriggers.clear();
+    _selectedReplacementAction = null;
+    _otherTriggerController.clear();
+    _thoughtController.clear();
+    _otherReplacementActionController.clear();
+    _actionTakenController.clear();
+    _consequenceController.clear();
+    _betterPlanController.clear();
+    _notesController.clear();
+  }
+
   Future<void> _deleteEntry(LogEntry entry) async {
     await _repository.deleteEntry(entry.id);
 
     if (_editingEntryId == entry.id) {
-      setState(() {
-        _editingEntryId = null;
-        _entryType = 'Urge';
-        _intensity = 3;
-        _selectedTriggers.clear();
-        _selectedReplacementAction = null;
-        _thoughtController.clear();
-        _actionTakenController.clear();
-        _consequenceController.clear();
-        _betterPlanController.clear();
-        _notesController.clear();
-      });
+      setState(_clearDraft);
     }
 
     await _refreshFromStorage();
@@ -197,17 +266,19 @@ class _LogScreenState extends State<LogScreen> {
     try {
       final String savedType = _entryType;
       final String? editingId = _editingEntryId;
+      final List<String> resolvedTriggers = _resolvedTriggers();
+      final String replacementActionForSave = _resolvedReplacementAction();
 
       final LogEntry entry = LogEntry(
         id: editingId ?? DateTime.now().microsecondsSinceEpoch.toString(),
         entryType: savedType,
         intensity: _intensity,
-        triggers: _selectedTriggers.toList(),
+        triggers: resolvedTriggers,
         thought: _thoughtController.text.trim(),
         actionTaken: _actionTakenController.text.trim(),
         consequence: _consequenceController.text.trim(),
         betterPlan: _betterPlanController.text.trim(),
-        replacementAction: _selectedReplacementAction ?? '',
+        replacementAction: replacementActionForSave,
         notes: _notesController.text.trim(),
         createdAtIso: DateTime.now().toIso8601String(),
       );
@@ -225,16 +296,7 @@ class _LogScreenState extends State<LogScreen> {
       setState(() {
         _savedEntryCount = entries.length;
         _recentEntries = entries.take(5).toList();
-        _editingEntryId = null;
-        _entryType = 'Urge';
-        _intensity = 3;
-        _selectedTriggers.clear();
-        _selectedReplacementAction = null;
-        _thoughtController.clear();
-        _actionTakenController.clear();
-        _consequenceController.clear();
-        _betterPlanController.clear();
-        _notesController.clear();
+        _clearDraft();
         _isSaving = false;
       });
 
@@ -333,6 +395,9 @@ class _LogScreenState extends State<LogScreen> {
                     availableTriggers: _availableTriggers,
                     selectedTriggers: _selectedTriggers,
                     onToggle: _toggleTrigger,
+                    otherTriggerController: _otherTriggerController,
+                    showOtherTriggerField:
+                        _selectedTriggers.contains(_otherLabel),
                   ),
                   const SizedBox(height: 16),
                   LogCbtReflectionCard(
@@ -343,6 +408,10 @@ class _LogScreenState extends State<LogScreen> {
                     replacementActions: _healthyReplacementActions,
                     selectedReplacementAction: _selectedReplacementAction,
                     onReplacementSelected: _setReplacementAction,
+                    otherReplacementActionController:
+                        _otherReplacementActionController,
+                    showOtherReplacementField:
+                        _selectedReplacementAction == _otherLabel,
                   ),
                   const SizedBox(height: 16),
                   LogNotesCard(
@@ -352,7 +421,7 @@ class _LogScreenState extends State<LogScreen> {
                   LogSaveCard(
                     entryType: _entryType,
                     intensity: _intensity,
-                    triggerCount: _selectedTriggers.length,
+                    triggerCount: _resolvedTriggers().length,
                     savedEntryCount: _savedEntryCount,
                     isSaving: _isSaving,
                     onSave: _saveEntry,

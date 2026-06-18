@@ -42,7 +42,7 @@ checks = [
         "actionTaken: _actionTakenController.text.trim()",
         "consequence: _consequenceController.text.trim()",
         "betterPlan: _betterPlanController.text.trim()",
-        "replacementAction: _selectedReplacementAction ?? ''",
+        "replacementAction: replacementActionForSave",
     ]),
     ("lib/features/log/presentation/widgets/recent_log_entries_card.dart", [
         "Thought: ${entry.thought.trim()}",

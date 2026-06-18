@@ -3,7 +3,7 @@
 // Project: BreakWave
 // File: log_cbt_reflection_card.dart
 // Purpose: BW-63 CBT-informed log reflection card.
-// Notes: Keeps CBT logging lightweight, practical, and non-clinical.
+// Notes: BW-72B keeps CBT logging lightweight while allowing Other actions.
 // ------------------------------------------------------------
 
 import 'package:flutter/material.dart';
@@ -18,6 +18,8 @@ class LogCbtReflectionCard extends StatelessWidget {
     required this.replacementActions,
     required this.selectedReplacementAction,
     required this.onReplacementSelected,
+    required this.otherReplacementActionController,
+    required this.showOtherReplacementField,
   });
 
   final TextEditingController thoughtController;
@@ -27,6 +29,8 @@ class LogCbtReflectionCard extends StatelessWidget {
   final List<String> replacementActions;
   final String? selectedReplacementAction;
   final ValueChanged<String?> onReplacementSelected;
+  final TextEditingController otherReplacementActionController;
+  final bool showOtherReplacementField;
 
   @override
   Widget build(BuildContext context) {
@@ -45,7 +49,7 @@ class LogCbtReflectionCard extends StatelessWidget {
             ),
             const SizedBox(height: 8),
             const Text(
-              'Use this as a quick CBT-informed check. Name the pattern, then choose the next healthier response.',
+              'Name the thought, then choose the next better move.',
             ),
             const SizedBox(height: 16),
             TextField(
@@ -92,6 +96,18 @@ class LogCbtReflectionCard extends StatelessWidget {
                 );
               }).toList(),
             ),
+            if (showOtherReplacementField) ...<Widget>[
+              const SizedBox(height: 14),
+              TextField(
+                controller: otherReplacementActionController,
+                minLines: 1,
+                maxLines: 2,
+                decoration: const InputDecoration(
+                  labelText: 'Other replacement action',
+                  hintText: 'Example: call sponsor, do pushups, sit outside.',
+                ),
+              ),
+            ],
             const SizedBox(height: 14),
             TextField(
               controller: actionTakenController,

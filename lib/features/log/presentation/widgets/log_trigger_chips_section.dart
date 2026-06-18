@@ -3,7 +3,7 @@
 // Project: BreakWave
 // File: log_trigger_chips_section.dart
 // Purpose: Trigger chip selector for the BW-04 log flow.
-// Notes: Neutral logging scaffold for BW-06A.
+// Notes: BW-72B adds lightweight Other trigger capture.
 // ------------------------------------------------------------
 
 import 'package:flutter/material.dart';
@@ -14,12 +14,16 @@ class LogTriggerChipsSection extends StatelessWidget {
   final List<String> availableTriggers;
   final Set<String> selectedTriggers;
   final ValueChanged<String> onToggle;
+  final TextEditingController otherTriggerController;
+  final bool showOtherTriggerField;
 
   const LogTriggerChipsSection({
     super.key,
     required this.availableTriggers,
     required this.selectedTriggers,
     required this.onToggle,
+    required this.otherTriggerController,
+    required this.showOtherTriggerField,
   });
 
   @override
@@ -36,7 +40,7 @@ class LogTriggerChipsSection extends StatelessWidget {
             ),
             const SizedBox(height: 8),
             Text(
-              'Tap the trigger signals that best match what was happening.',
+              'What was happening?',
               style: Theme.of(context).textTheme.bodyMedium,
             ),
             const SizedBox(height: 16),
@@ -68,6 +72,18 @@ class LogTriggerChipsSection extends StatelessWidget {
                 );
               }).toList(),
             ),
+            if (showOtherTriggerField) ...<Widget>[
+              const SizedBox(height: 14),
+              TextField(
+                controller: otherTriggerController,
+                minLines: 1,
+                maxLines: 2,
+                decoration: const InputDecoration(
+                  labelText: 'Other trigger',
+                  hintText: 'Example: argument, social media, being alone.',
+                ),
+              ),
+            ],
           ],
         ),
       ),

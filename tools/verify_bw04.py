@@ -27,7 +27,7 @@ EXPECTED_PATTERNS = {
     ],
     "lib/features/log/presentation/widgets/log_entry_type_section.dart": [
         "class LogEntryTypeSection",
-        "Entry Type",
+        "What happened?",
         "Urge",
         "Slip",
         "Victory",

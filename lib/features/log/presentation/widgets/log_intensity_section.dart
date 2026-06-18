@@ -3,7 +3,7 @@
 // Project: BreakWave
 // File: log_intensity_section.dart
 // Purpose: Intensity selector for the BW-04 log flow.
-// Notes: Neutral logging scaffold for BW-06A.
+// Notes: BW-72B shortens intensity copy for faster honesty.
 // ------------------------------------------------------------
 
 import 'package:flutter/material.dart';
@@ -42,7 +42,7 @@ class LogIntensitySection extends StatelessWidget {
             ),
             const SizedBox(height: 8),
             Text(
-              'Rate how strong the moment felt. Fast honesty beats perfect detail.',
+              'How strong was it?',
               style: Theme.of(context).textTheme.bodyMedium,
             ),
             const SizedBox(height: 16),

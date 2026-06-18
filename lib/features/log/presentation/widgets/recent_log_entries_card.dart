@@ -3,7 +3,7 @@
 // Project: BreakWave
 // File: recent_log_entries_card.dart
 // Purpose: Recent log history surface for the BW-08 log flow.
-// Notes: BW-10 edit/delete actions.
+// Notes: BW-72B makes recent entries compact with expandable details.
 // ------------------------------------------------------------
 
 import 'package:flutter/material.dart';
@@ -36,7 +36,7 @@ class RecentLogEntriesCard extends StatelessWidget {
             ),
             const SizedBox(height: 8),
             Text(
-              'Your newest saved entries appear here so patterns stop feeling invisible.',
+              'Newest saved moments. Open details only when you need them.',
               style: Theme.of(context).textTheme.bodyMedium,
             ),
             const SizedBox(height: 16),
@@ -110,11 +110,59 @@ class _RecentEntryRow extends StatelessWidget {
     }
   }
 
+  bool get _hasDetails {
+    return entry.thought.trim().isNotEmpty ||
+        entry.actionTaken.trim().isNotEmpty ||
+        entry.consequence.trim().isNotEmpty ||
+        entry.betterPlan.trim().isNotEmpty ||
+        entry.notes.trim().isNotEmpty;
+  }
+
   @override
   Widget build(BuildContext context) {
+    final ThemeData theme = Theme.of(context);
+
     final String triggerText = entry.triggers.isEmpty
         ? 'No triggers tagged'
         : entry.triggers.join(', ');
+
+    final List<Widget> detailChildren = <Widget>[
+      if (entry.thought.trim().isNotEmpty) ...<Widget>[
+        const SizedBox(height: 8),
+        Text(
+          'Thought: ${entry.thought.trim()}',
+          style: theme.textTheme.bodyMedium,
+        ),
+      ],
+      if (entry.actionTaken.trim().isNotEmpty) ...<Widget>[
+        const SizedBox(height: 8),
+        Text(
+          'Action: ${entry.actionTaken.trim()}',
+          style: theme.textTheme.bodyMedium,
+        ),
+      ],
+      if (entry.consequence.trim().isNotEmpty) ...<Widget>[
+        const SizedBox(height: 8),
+        Text(
+          'Consequence: ${entry.consequence.trim()}',
+          style: theme.textTheme.bodyMedium,
+        ),
+      ],
+      if (entry.betterPlan.trim().isNotEmpty) ...<Widget>[
+        const SizedBox(height: 8),
+        Text(
+          'Better plan: ${entry.betterPlan.trim()}',
+          style: theme.textTheme.bodyMedium,
+        ),
+      ],
+      if (entry.notes.trim().isNotEmpty) ...<Widget>[
+        const SizedBox(height: 8),
+        Text(
+          entry.notes.trim(),
+          style: theme.textTheme.bodyMedium,
+        ),
+      ],
+    ];
 
     return Container(
       width: double.infinity,
@@ -133,71 +181,58 @@ class _RecentEntryRow extends StatelessWidget {
             children: <Widget>[
               Text(
                 entry.entryType,
-                style: Theme.of(context).textTheme.titleMedium,
+                style: theme.textTheme.titleMedium,
               ),
               Text(
                 '•',
-                style: Theme.of(context).textTheme.titleMedium,
+                style: theme.textTheme.titleMedium,
               ),
               Text(
                 'Intensity ${entry.intensity}',
-                style: Theme.of(context).textTheme.bodyMedium,
+                style: theme.textTheme.bodyMedium,
               ),
               Text(
                 '•',
-                style: Theme.of(context).textTheme.titleMedium,
+                style: theme.textTheme.titleMedium,
               ),
               Text(
                 _formatTimestamp(entry.createdAtIso),
-                style: Theme.of(context).textTheme.bodySmall,
+                style: theme.textTheme.bodySmall,
               ),
             ],
           ),
           const SizedBox(height: 8),
           Text(
             'Triggers: $triggerText',
-            style: Theme.of(context).textTheme.bodyMedium,
+            style: theme.textTheme.bodyMedium,
           ),
-          if (entry.thought.trim().isNotEmpty) ...<Widget>[
-            const SizedBox(height: 8),
-            Text(
-              'Thought: ${entry.thought.trim()}',
-              style: Theme.of(context).textTheme.bodyMedium,
-            ),
-          ],
           if (entry.replacementAction.trim().isNotEmpty) ...<Widget>[
             const SizedBox(height: 8),
             Text(
               'Replacement action: ${entry.replacementAction.trim()}',
-              style: Theme.of(context).textTheme.bodyMedium,
+              style: theme.textTheme.bodyMedium,
             ),
           ],
-          if (entry.actionTaken.trim().isNotEmpty) ...<Widget>[
+          if (_hasDetails) ...<Widget>[
             const SizedBox(height: 8),
-            Text(
-              'Action: ${entry.actionTaken.trim()}',
-              style: Theme.of(context).textTheme.bodyMedium,
-            ),
-          ],
-          if (entry.consequence.trim().isNotEmpty) ...<Widget>[
-            const SizedBox(height: 8),
-            Text(
-              'Consequence: ${entry.consequence.trim()}',
-              style: Theme.of(context).textTheme.bodyMedium,
-            ),
-          ],
-          if (entry.betterPlan.trim().isNotEmpty) ...<Widget>[
-            const SizedBox(height: 8),
-            Text(
-              'Better plan: ${entry.betterPlan.trim()}',
-              style: Theme.of(context).textTheme.bodyMedium,
-            ),
-          ],
-          if (entry.notes.trim().isNotEmpty) ...<Widget>[
-            const SizedBox(height: 8),
-            Text(
-              entry.notes.trim(),
-              style: Theme.of(context).textTheme.bodyMedium,
+            ExpansionTile(
+              tilePadding: EdgeInsets.zero,
+              childrenPadding: EdgeInsets.zero,
+              title: Text(
+                'Show details',
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+              children: <Widget>[
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: detailChildren,
+                  ),
+                ),
+              ],
             ),
           ],
           const SizedBox(height: 12),

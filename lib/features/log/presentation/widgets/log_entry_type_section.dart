@@ -3,7 +3,7 @@
 // Project: BreakWave
 // File: log_entry_type_section.dart
 // Purpose: Entry type selector for the BW-04 log flow.
-// Notes: Neutral logging scaffold for BW-06A.
+// Notes: BW-72B shortens Log copy for faster capture.
 // ------------------------------------------------------------
 
 import 'package:flutter/material.dart';
@@ -35,12 +35,12 @@ class LogEntryTypeSection extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
             Text(
-              'Entry Type',
+              'What happened?',
               style: Theme.of(context).textTheme.titleLarge,
             ),
             const SizedBox(height: 8),
             Text(
-              'Choose the kind of moment you are logging right now.',
+              'Pick the closest match.',
               style: Theme.of(context).textTheme.bodyMedium,
             ),
             const SizedBox(height: 16),
