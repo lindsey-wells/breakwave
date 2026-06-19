@@ -26,7 +26,7 @@ checks = [
         "Mark what happened and get support",
     ]),
     ("lib/features/support/presentation/support_screen.dart", [
-        "SectionHeader",
+        "_SupportGroup",
     ]),
 ]
 

@@ -3,13 +3,12 @@
 // Project: BreakWave
 // File: support_screen.dart
 // Purpose: BW-55 grouped Support tab cleanup.
-// Notes: Organizes Support into launch-ready sections instead of one long settings stack.
+// Notes: BW-73A declutters Support with collapsible launch-ready groups.
 // ------------------------------------------------------------
 
 import 'package:flutter/material.dart';
 
 import '../../../core/ui/wave_surface.dart';
-import '../../../core/ui/section_header.dart';
 import '../../../core/ui/breakwave_app_bar.dart';
 import '../../faith/presentation/faith_depth_pack_screen.dart';
 import '../../premium/presentation/breakwave_plus_screen.dart';
@@ -42,7 +41,7 @@ class SupportScreen extends StatelessWidget {
       appBar: const BreakWaveAppBar(sectionTitle: 'Support'),
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.fromLTRB(20, 20, 20, 120),
+          padding: const EdgeInsets.fromLTRB(20, 20, 20, 150),
           child: Center(
             child: ConstrainedBox(
               constraints: const BoxConstraints(maxWidth: 720),
@@ -76,106 +75,205 @@ class SupportScreen extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 20),
-                  const SectionHeader(
+
+                  const _SupportGroup(
                     eyebrow: 'Recovery model',
                     title: 'Use CBT-informed tools, not shame',
+                    subtitle:
+                        'Understand the recovery approach behind BreakWave before the support tools.',
+                    icon: Icons.psychology_alt_outlined,
+                    initiallyExpanded: true,
+                    children: <Widget>[
+                      CbtInformedSupportCard(),
+                      ProfessionalHelpCard(),
+                    ],
                   ),
-                  const CbtInformedSupportCard(),
-                  const SizedBox(height: 16),
-                  const ProfessionalHelpCard(),
-                  const SizedBox(height: 20),
 
-                  const SectionHeader(
+                  const SizedBox(height: 16),
+                  const _SupportGroup(
                     eyebrow: 'Get help now',
                     title: 'Reduce isolation fast',
+                    subtitle:
+                        'Reach a trusted person, open emergency options, or copy a support message.',
+                    icon: Icons.support_agent_outlined,
+                    initiallyExpanded: false,
+                    children: <Widget>[
+                      EmergencyHelpCard(),
+                      SupportContactCard(),
+                      SupportQuickActionsCard(),
+                      TrustedAccountabilityCard(),
+                    ],
                   ),
-                  const SupportContactCard(),
-                  const SizedBox(height: 16),
-                  const SupportQuickActionsCard(),
-                  const SizedBox(height: 16),
-                  const EmergencyHelpCard(),
-                  const SizedBox(height: 16),
-                  const TrustedAccountabilityCard(),
 
-                  const SizedBox(height: 24),
-                  const SectionHeader(
+                  const SizedBox(height: 16),
+                  const _SupportGroup(
                     eyebrow: 'Your recovery setup',
                     title: 'Personalize how BreakWave supports you',
+                    subtitle:
+                        'Choose your recovery mode, save your why, and set reminders.',
+                    icon: Icons.tune_outlined,
+                    initiallyExpanded: false,
+                    children: <Widget>[
+                      RecoveryModeSettingsCard(),
+                      CustomWhySettingsCard(),
+                      ReminderSettingsCard(),
+                    ],
                   ),
-                  const RecoveryModeSettingsCard(),
-                  const SizedBox(height: 16),
-                  const CustomWhySettingsCard(),
-                  const SizedBox(height: 16),
-                  const EducateMeEntryCard(),
 
-                  const SizedBox(height: 24),
-                  const SectionHeader(
+                  const SizedBox(height: 16),
+                  _SupportGroup(
                     eyebrow: 'BreakWave Plus',
                     title: 'Go deeper than emergency interruption',
-                  ),
-                  const _BreakWavePlusPreviewCard(),
-                  const SizedBox(height: 16),
-                  const PremiumGateTile(
-                    title: 'Deeper insights and exports',
-                    description:
-                        'Explore longer recovery history, deeper insight surfaces, advanced charts, and export tools in BreakWave Plus.',
-                  ),
-                  const SizedBox(height: 16),
-                  PremiumGateTile(
-                    title: 'Faith depth pack',
-                    description:
-                        'Unlock grace-forward Christian depth on shame, secrecy, loneliness, and rebuilding integrity.',
-                    onUnlockedTap: () {
-                      Navigator.of(context).push(
-                        MaterialPageRoute(
-                          builder: (_) => const FaithDepthPackScreen(),
-                        ),
-                      );
-                    },
+                    subtitle:
+                        'Preview longer-term insight, guided tools, and premium depth.',
+                    icon: Icons.workspace_premium_outlined,
+                    initiallyExpanded: false,
+                    children: <Widget>[
+                      const _BreakWavePlusPreviewCard(),
+                      const PremiumGateTile(
+                        title: 'Deeper insights and exports',
+                        description:
+                            'Explore longer recovery history, deeper insight surfaces, advanced charts, and export tools in BreakWave Plus.',
+                      ),
+                      PremiumGateTile(
+                        title: 'Faith depth pack',
+                        description:
+                            'Unlock grace-forward Christian depth on shame, secrecy, loneliness, and rebuilding integrity.',
+                        onUnlockedTap: () {
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (_) => const FaithDepthPackScreen(),
+                            ),
+                          );
+                        },
+                      ),
+                    ],
                   ),
 
-                  const SizedBox(height: 24),
-                  const SectionHeader(
+                  const SizedBox(height: 16),
+                  const _SupportGroup(
                     eyebrow: 'Privacy and safety',
                     title: 'Protect sensitive recovery details',
+                    subtitle:
+                        'Control app lock, notification privacy, Home visibility, and screen privacy.',
+                    icon: Icons.lock_outline,
+                    initiallyExpanded: false,
+                    children: <Widget>[
+                      PrivacyLockSettingsCard(),
+                      PrivacySettingsCard(),
+                    ],
                   ),
-                  const PrivacyLockSettingsCard(),
-                  const SizedBox(height: 16),
-                  const PrivacySettingsCard(),
-                  const SizedBox(height: 16),
-                  const ReminderSettingsCard(),
 
-                  const SizedBox(height: 24),
-                  const SectionHeader(
+                  const SizedBox(height: 16),
+                  const _SupportGroup(
                     eyebrow: 'Learn and resources',
                     title: 'Understand the pattern and choose next steps',
+                    subtitle:
+                        'Education resources and next-step learning surfaces.',
+                    icon: Icons.menu_book_outlined,
+                    initiallyExpanded: false,
+                    children: <Widget>[
+                      SupportCategoriesCard(),
+                      EducationResourcesCard(),
+                      EducateMeEntryCard(),
+                    ],
                   ),
-                  const SupportCategoriesCard(),
-                  const SizedBox(height: 16),
-                  const EducationResourcesCard(),
 
-                  const SizedBox(height: 24),
-                  const SectionHeader(
+
+                  const SizedBox(height: 16),
+                  const _SupportGroup(
                     eyebrow: 'Contact BreakWave',
                     title: 'Send feedback or stay connected',
+                    subtitle:
+                        'Email preferences, manual feedback handoff, and public links.',
+                    icon: Icons.email_outlined,
+                    initiallyExpanded: false,
+                    children: <Widget>[
+                      EmailCaptureSettingsCard(),
+                      EmailAppHandoffCard(),
+                      BreakWaveContactLinksCard(),
+                    ],
                   ),
-                  const EmailCaptureSettingsCard(),
-                  const SizedBox(height: 16),
-                  const EmailAppHandoffCard(),
-                  const SizedBox(height: 16),
-                  const BreakWaveContactLinksCard(),
 
-                  const SizedBox(height: 24),
-                  const SectionHeader(
+                  const SizedBox(height: 16),
+                  const _SupportGroup(
                     eyebrow: 'Advanced',
                     title: 'Data export tools',
+                    subtitle:
+                        'Manual export tools for saved email-consent data.',
+                    icon: Icons.ios_share_outlined,
+                    initiallyExpanded: false,
+                    children: <Widget>[
+                      EmailExportCard(),
+                    ],
                   ),
-                  const EmailExportCard(),
                 ],
               ),
             ),
           ),
         ),
+      ),
+    );
+  }
+}
+
+class _SupportGroup extends StatelessWidget {
+  final String eyebrow;
+  final String title;
+  final String subtitle;
+  final IconData icon;
+  final bool initiallyExpanded;
+  final List<Widget> children;
+
+  const _SupportGroup({
+    required this.eyebrow,
+    required this.title,
+    required this.subtitle,
+    required this.icon,
+    required this.initiallyExpanded,
+    required this.children,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final ThemeData theme = Theme.of(context);
+    final ColorScheme colorScheme = theme.colorScheme;
+
+    return Card(
+      child: ExpansionTile(
+        initiallyExpanded: initiallyExpanded,
+        tilePadding: const EdgeInsets.fromLTRB(18, 12, 18, 12),
+        childrenPadding: const EdgeInsets.fromLTRB(18, 0, 18, 18),
+        leading: Icon(icon),
+        title: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            Text(
+              eyebrow,
+              style: theme.textTheme.labelLarge?.copyWith(
+                color: colorScheme.primary,
+                fontWeight: FontWeight.w800,
+              ),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              title,
+              style: theme.textTheme.titleMedium?.copyWith(
+                fontWeight: FontWeight.w800,
+              ),
+            ),
+          ],
+        ),
+        subtitle: Padding(
+          padding: const EdgeInsets.only(top: 8),
+          child: Text(subtitle),
+        ),
+        children: <Widget>[
+          for (int index = 0; index < children.length; index++) ...<Widget>[
+            children[index],
+            if (index != children.length - 1) const SizedBox(height: 12),
+          ],
+        ],
       ),
     );
   }
