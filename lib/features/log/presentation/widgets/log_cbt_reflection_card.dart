@@ -4,6 +4,7 @@
 // File: log_cbt_reflection_card.dart
 // Purpose: BW-63 CBT-informed log reflection card.
 // Notes: BW-72B keeps CBT logging lightweight while allowing Other actions.
+// Notes: BW-72C keeps the replacement action visible and collapses optional reflection details.
 // ------------------------------------------------------------
 
 import 'package:flutter/material.dart';
@@ -44,24 +45,14 @@ class LogCbtReflectionCard extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
             Text(
-              'Trigger → Thought → Urge → Action',
+              'Next better move',
               style: theme.textTheme.titleLarge,
             ),
             const SizedBox(height: 8),
             const Text(
-              'Name the thought, then choose the next better move.',
+              'Choose the clean action you want to take next.',
             ),
             const SizedBox(height: 16),
-            TextField(
-              controller: thoughtController,
-              minLines: 1,
-              maxLines: 3,
-              decoration: const InputDecoration(
-                labelText: 'Thought before the urge',
-                hintText: 'Example: I need this to calm down.',
-              ),
-            ),
-            const SizedBox(height: 14),
             Text(
               'Healthy replacement action',
               style: theme.textTheme.titleMedium?.copyWith(
@@ -108,35 +99,67 @@ class LogCbtReflectionCard extends StatelessWidget {
                 ),
               ),
             ],
-            const SizedBox(height: 14),
-            TextField(
-              controller: actionTakenController,
-              minLines: 1,
-              maxLines: 3,
-              decoration: const InputDecoration(
-                labelText: 'Action taken',
-                hintText: 'Example: opened Rescue, left the room, texted Alex.',
+            const SizedBox(height: 12),
+            ExpansionTile(
+              tilePadding: EdgeInsets.zero,
+              childrenPadding: EdgeInsets.zero,
+              title: Text(
+                'Add reflection details',
+                style: theme.textTheme.titleMedium?.copyWith(
+                  fontWeight: FontWeight.w700,
+                ),
               ),
-            ),
-            const SizedBox(height: 14),
-            TextField(
-              controller: consequenceController,
-              minLines: 1,
-              maxLines: 3,
-              decoration: const InputDecoration(
-                labelText: 'Consequence / what happened next',
-                hintText: 'Example: the urge dropped after ten minutes.',
+              subtitle: const Text(
+                'Optional: Trigger → Thought → Urge → Action',
               ),
-            ),
-            const SizedBox(height: 14),
-            TextField(
-              controller: betterPlanController,
-              minLines: 1,
-              maxLines: 3,
-              decoration: const InputDecoration(
-                labelText: 'Better plan for next time',
-                hintText: 'Example: charge phone outside the bedroom.',
-              ),
+              children: <Widget>[
+                const Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    'Name the thought, then choose the next better move.',
+                  ),
+                ),
+                const SizedBox(height: 16),
+                TextField(
+                  controller: thoughtController,
+                  minLines: 1,
+                  maxLines: 3,
+                  decoration: const InputDecoration(
+                    labelText: 'Thought before the urge',
+                    hintText: 'Example: I need this to calm down.',
+                  ),
+                ),
+                const SizedBox(height: 14),
+                TextField(
+                  controller: actionTakenController,
+                  minLines: 1,
+                  maxLines: 3,
+                  decoration: const InputDecoration(
+                    labelText: 'Action taken',
+                    hintText: 'Example: opened Rescue, left the room, texted Alex.',
+                  ),
+                ),
+                const SizedBox(height: 14),
+                TextField(
+                  controller: consequenceController,
+                  minLines: 1,
+                  maxLines: 3,
+                  decoration: const InputDecoration(
+                    labelText: 'Consequence / what happened next',
+                    hintText: 'Example: the urge dropped after ten minutes.',
+                  ),
+                ),
+                const SizedBox(height: 14),
+                TextField(
+                  controller: betterPlanController,
+                  minLines: 1,
+                  maxLines: 3,
+                  decoration: const InputDecoration(
+                    labelText: 'Better plan for next time',
+                    hintText: 'Example: charge phone outside the bedroom.',
+                  ),
+                ),
+              ],
             ),
           ],
         ),

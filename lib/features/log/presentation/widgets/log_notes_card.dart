@@ -3,7 +3,7 @@
 // Project: BreakWave
 // File: log_notes_card.dart
 // Purpose: Notes entry card for the BW-04 log flow.
-// Notes: Neutral logging scaffold for BW-04.
+// Notes: BW-72C collapses optional notes so Log stays fast.
 // ------------------------------------------------------------
 
 import 'package:flutter/material.dart';
@@ -18,20 +18,27 @@ class LogNotesCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final ThemeData theme = Theme.of(context);
+
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+        child: ExpansionTile(
+          tilePadding: EdgeInsets.zero,
+          childrenPadding: EdgeInsets.zero,
+          title: Text(
+            'Optional notes',
+            style: theme.textTheme.titleLarge,
+          ),
+          subtitle: const Text(
+            'Add a few honest words only if they help.',
+          ),
           children: <Widget>[
-            Text(
-              'Notes',
-              style: Theme.of(context).textTheme.titleLarge,
-            ),
-            const SizedBox(height: 8),
-            Text(
-              'Add a few honest words about what happened, what you were feeling, or what helped.',
-              style: Theme.of(context).textTheme.bodyMedium,
+            const Align(
+              alignment: Alignment.centerLeft,
+              child: Text(
+                'Add a few honest words about what happened, what you were feeling, or what helped.',
+              ),
             ),
             const SizedBox(height: 16),
             TextField(
