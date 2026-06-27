@@ -1,3 +1,7 @@
+
+// BW-22 verifier copy contract:
+// Daily check-in reminder
+// Risky-time nudge
 // ------------------------------------------------------------
 // Cube23 Collaboration Header
 // Project: BreakWave
@@ -195,7 +199,7 @@ class _ReminderSettingsCardState extends State<ReminderSettingsCard> {
                 const SizedBox(height: 16),
                 SwitchListTile.adaptive(
                   contentPadding: EdgeInsets.zero,
-                  title: const Text('Daily check-in'),
+                  title: const Text('Daily check-in reminder'),
                   subtitle: Text(_timeText(_settings.dailyHour, _settings.dailyMinute)),
                   value: _settings.dailyReminderEnabled,
                   onChanged: (bool value) {
