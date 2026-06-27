@@ -189,13 +189,13 @@ class _ReminderSettingsCardState extends State<ReminderSettingsCard> {
                 ),
                 const SizedBox(height: 10),
                 Text(
-                  'Use a daily check-in reminder and one watch-for nudge time to get help before the wave gets louder.',
+                  'Use a daily check-in and one watch-for nudge around the times you choose.',
                   style: theme.textTheme.bodyMedium,
                 ),
                 const SizedBox(height: 16),
                 SwitchListTile.adaptive(
                   contentPadding: EdgeInsets.zero,
-                  title: const Text('Daily check-in reminder'),
+                  title: const Text('Daily check-in'),
                   subtitle: Text(_timeText(_settings.dailyHour, _settings.dailyMinute)),
                   value: _settings.dailyReminderEnabled,
                   onChanged: (bool value) {
@@ -208,13 +208,13 @@ class _ReminderSettingsCardState extends State<ReminderSettingsCard> {
                   alignment: Alignment.centerLeft,
                   child: OutlinedButton(
                     onPressed: _pickDailyTime,
-                    child: const Text('Choose daily reminder time'),
+                    child: const Text('Choose daily check-in time'),
                   ),
                 ),
                 const SizedBox(height: 12),
                 SwitchListTile.adaptive(
                   contentPadding: EdgeInsets.zero,
-                  title: const Text('Risky-time nudge'),
+                  title: const Text('Watch-for nudge'),
                   subtitle: Text(_timeText(_settings.riskyHour, _settings.riskyMinute)),
                   value: _settings.riskyNudgeEnabled,
                   onChanged: (bool value) {

@@ -3,7 +3,8 @@
 // Project: BreakWave
 // File: breakwave_notifications.dart
 // Purpose: BW-22/BW-24 local reminders and risky-time nudges.
-// Notes: BW-34 adds safe wrappers so init/permission failures never break core flows.
+// Notes: BW-75A hardens local notification permissions, timezone handling,
+// and neutral reminder copy without making reminders exact alarms.
 // ------------------------------------------------------------
 
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
@@ -24,18 +25,13 @@ class BreakWaveNotifications {
   static const int riskyNudgeId = 2202;
 
   static bool _initialized = false;
+  static bool _timeZoneReady = false;
 
   static Future<void> initialize() async {
     if (_initialized) return;
 
     tz.initializeTimeZones();
-
-    try {
-      final currentTimeZone = await FlutterTimezone.getLocalTimezone();
-      tz.setLocalLocation(tz.getLocation(currentTimeZone.identifier));
-    } catch (_) {
-      // Leave tz.local as-is if timezone lookup fails.
-    }
+    await _configureLocalTimeZone();
 
     const AndroidInitializationSettings androidSettings =
         AndroidInitializationSettings('@mipmap/ic_launcher');
@@ -50,6 +46,16 @@ class BreakWaveNotifications {
     _initialized = true;
   }
 
+  static Future<void> _configureLocalTimeZone() async {
+    try {
+      final currentTimeZone = await FlutterTimezone.getLocalTimezone();
+      tz.setLocalLocation(tz.getLocation(currentTimeZone.identifier));
+      _timeZoneReady = true;
+    } catch (_) {
+      _timeZoneReady = false;
+    }
+  }
+
   static Future<bool> safeInitialize() async {
     try {
       await initialize();
@@ -60,6 +66,8 @@ class BreakWaveNotifications {
   }
 
   static Future<void> requestPermissions() async {
+    await initialize();
+
     final android = _plugin.resolvePlatformSpecificImplementation<
         AndroidFlutterLocalNotificationsPlugin>();
     await android?.requestNotificationsPermission();
@@ -67,6 +75,8 @@ class BreakWaveNotifications {
 
   static Future<bool> safeRequestPermissions() async {
     try {
+      await initialize();
+
       final android = _plugin.resolvePlatformSpecificImplementation<
           AndroidFlutterLocalNotificationsPlugin>();
 
@@ -98,6 +108,14 @@ class BreakWaveNotifications {
   }) async {
     await initialize();
 
+    if (!_timeZoneReady) {
+      await _configureLocalTimeZone();
+    }
+
+    if (!_timeZoneReady) {
+      throw StateError('Unable to read device timezone for reminders.');
+    }
+
     final PrivacySettings privacy = await PrivacySettingsStore.load();
 
     await _plugin.cancel(id: dailyReminderId);
@@ -106,12 +124,11 @@ class BreakWaveNotifications {
     if (settings.dailyReminderEnabled) {
       await _plugin.zonedSchedule(
         id: dailyReminderId,
-        title: privacy.discreetNotifications
-            ? 'Daily reminder'
-            : 'BreakWave check-in',
+        title:
+            privacy.discreetNotifications ? 'Check-in' : 'BreakWave check-in',
         body: privacy.discreetNotifications
-            ? 'Take a brief moment to check in.'
-            : 'Take 20 seconds to name today honestly.',
+            ? 'Take a brief pause.'
+            : 'Pause for 20 seconds and choose one clean next step.',
         scheduledDate: _nextInstance(settings.dailyHour, settings.dailyMinute),
         notificationDetails: _details(),
         androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
@@ -132,17 +149,13 @@ class BreakWaveNotifications {
       }
 
       final String fullBody = preview.isEmpty
-          ? 'Protect the next stretch before the wave rises.'
-          : 'Watch for ${preview.join(' • ')}. Protect the next stretch early.';
+          ? 'Pause early and choose one clean next step.'
+          : 'Watch for ${preview.join(' • ')}. Pause early and choose one clean next step.';
 
       await _plugin.zonedSchedule(
         id: riskyNudgeId,
-        title: privacy.discreetNotifications
-            ? 'Evening nudge'
-            : 'BreakWave watch-for nudge',
-        body: privacy.discreetNotifications
-            ? 'Protect the next stretch early.'
-            : fullBody,
+        title: privacy.discreetNotifications ? 'Nudge' : 'BreakWave nudge',
+        body: privacy.discreetNotifications ? 'Pause early.' : fullBody,
         scheduledDate: _nextInstance(settings.riskyHour, settings.riskyMinute),
         notificationDetails: _details(),
         androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
@@ -156,7 +169,7 @@ class BreakWaveNotifications {
       android: AndroidNotificationDetails(
         'breakwave_reminders',
         'BreakWave Reminders',
-        channelDescription: 'Daily check-ins and risky-time nudges',
+        channelDescription: 'Daily check-ins and neutral recovery nudges',
         importance: Importance.defaultImportance,
         priority: Priority.defaultPriority,
       ),
