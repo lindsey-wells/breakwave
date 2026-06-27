@@ -3,7 +3,7 @@
 // Project: BreakWave
 // File: rescue_screen.dart
 // Purpose: BW-03 rescue foundation screen for BreakWave.
-// Notes: BW-71A makes Rescue more active with earlier action and honest outcomes.
+// Notes: BW-76A keeps Rescue active after a still-strong outcome.
 // ------------------------------------------------------------
 
 import 'package:flutter/material.dart';
@@ -38,9 +38,13 @@ class RescueScreen extends StatefulWidget {
 
 class _RescueScreenState extends State<RescueScreen> {
   final LogRepository _repository = const LogRepository();
+  final ScrollController _scrollController = ScrollController();
+  final GlobalKey _redirectActionsKey = GlobalKey();
+  final GlobalKey _calmResetKey = GlobalKey();
 
   int _selectedIntensity = 3;
   String? _selectedNextAction;
+  bool _showStillStrongFollowUp = false;
 
   void _setIntensity(int value) {
     setState(() {
@@ -52,6 +56,24 @@ class _RescueScreenState extends State<RescueScreen> {
     setState(() {
       _selectedNextAction = value;
     });
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _scrollTo(GlobalKey key) async {
+    final BuildContext? targetContext = key.currentContext;
+    if (targetContext == null) return;
+
+    await Scrollable.ensureVisible(
+      targetContext,
+      duration: const Duration(milliseconds: 350),
+      curve: Curves.easeOutCubic,
+      alignment: 0.08,
+    );
   }
 
   String get _intensityLabel {
@@ -110,6 +132,15 @@ class _RescueScreenState extends State<RescueScreen> {
       if (entryType == 'Victory') {
         setState(() {
           _selectedNextAction = null;
+          _showStillStrongFollowUp = false;
+        });
+      } else if (entryType == 'Urge') {
+        setState(() {
+          _showStillStrongFollowUp = true;
+        });
+      } else if (entryType == 'Slip') {
+        setState(() {
+          _showStillStrongFollowUp = false;
         });
       }
 
@@ -174,12 +205,55 @@ class _RescueScreenState extends State<RescueScreen> {
     );
   }
 
+  Widget _buildStillStrongFollowUpCard(BuildContext context) {
+    final ThemeData theme = Theme.of(context);
+
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            Text(
+              'The wave is still here',
+              style: theme.textTheme.titleLarge,
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'Stay with Rescue. Choose one clean next move before you go back to the same setup.',
+              style: theme.textTheme.bodyMedium,
+            ),
+            const SizedBox(height: 16),
+            FilledButton.icon(
+              onPressed: () => _scrollTo(_calmResetKey),
+              icon: const Icon(Icons.self_improvement_outlined),
+              label: const Text('Return to Calm Reset'),
+            ),
+            const SizedBox(height: 10),
+            FilledButton.tonalIcon(
+              onPressed: () => _scrollTo(_redirectActionsKey),
+              icon: const Icon(Icons.directions_walk_outlined),
+              label: const Text('Choose a redirect action'),
+            ),
+            const SizedBox(height: 10),
+            OutlinedButton.icon(
+              onPressed: widget.onOpenSupport,
+              icon: const Icon(Icons.support_agent_outlined),
+              label: const Text('Open Support'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: const BreakWaveAppBar(sectionTitle: 'Rescue'),
       body: SafeArea(
         child: SingleChildScrollView(
+          controller: _scrollController,
           padding: const EdgeInsets.fromLTRB(20, 20, 20, 150),
           child: Center(
             child: ConstrainedBox(
@@ -233,9 +307,12 @@ class _RescueScreenState extends State<RescueScreen> {
                     eyebrow: 'Interrupt now',
                     title: 'Use one immediate redirect',
                   ),
-                  RedirectActionsCard(
-                    selectedAction: _selectedNextAction,
-                    onActionSelected: _setNextAction,
+                  KeyedSubtree(
+                    key: _redirectActionsKey,
+                    child: RedirectActionsCard(
+                      selectedAction: _selectedNextAction,
+                      onActionSelected: _setNextAction,
+                    ),
                   ),
                   const SizedBox(height: 20),
                   const SectionHeader(
@@ -246,7 +323,10 @@ class _RescueScreenState extends State<RescueScreen> {
                     onReturnHome: widget.onReturnHome,
                   ),
                   const SizedBox(height: 16),
-                  const CalmResetCard(),
+                  KeyedSubtree(
+                    key: _calmResetKey,
+                    child: const CalmResetCard(),
+                  ),
                   const SizedBox(height: 16),
                   const RescueCardEngine(),
                   const SizedBox(height: 20),
@@ -259,6 +339,10 @@ class _RescueScreenState extends State<RescueScreen> {
                     onStillStrong: _logStillStrong,
                     onSlipped: _logSlip,
                   ),
+                  if (_showStillStrongFollowUp) ...<Widget>[
+                    const SizedBox(height: 16),
+                    _buildStillStrongFollowUpCard(context),
+                  ],
                   const SizedBox(height: 16),
                   SupportEscalationCard(
                     onOpenSupport: widget.onOpenSupport,
