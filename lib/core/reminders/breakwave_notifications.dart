@@ -137,20 +137,7 @@ class BreakWaveNotifications {
     }
 
     if (settings.riskyNudgeEnabled) {
-      final List<String> preview = <String>[];
-      for (final String item in <String>[
-        ...triggersSelection.selectedTriggers,
-        ...triggersSelection.selectedRiskyTimes,
-      ]) {
-        if (!preview.contains(item)) {
-          preview.add(item);
-        }
-        if (preview.length == 2) break;
-      }
-
-      final String fullBody = preview.isEmpty
-          ? 'Pause early and choose one clean next step.'
-          : 'Watch for ${preview.join(' • ')}. Pause early and choose one clean next step.';
+      const String fullBody = 'Pause early and choose one clean next step.';
 
       await _plugin.zonedSchedule(
         id: riskyNudgeId,
