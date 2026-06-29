@@ -62,4 +62,21 @@ for rel_path, needle in blocked:
 if failed:
     sys.exit(1)
 
+
+extra_lock_card_checks = [
+    "_currentPasscodeController",
+    "Current PIN",
+    "Required to change or clear",
+    "Enter your current PIN to change privacy lock settings.",
+    "Enter your current PIN to clear the privacy lock.",
+    "Leave blank to keep current PIN",
+]
+
+lock_card_text = Path("lib/features/support/presentation/widgets/privacy_lock_settings_card.dart").read_text(encoding="utf-8")
+
+for expected in extra_lock_card_checks:
+    if expected not in lock_card_text:
+        print(f"FAIL privacy lock settings card missing: {expected}")
+        sys.exit(1)
+
 print("PASS: BW-49C 6-digit PIN and failed-attempt cooldown verified.")

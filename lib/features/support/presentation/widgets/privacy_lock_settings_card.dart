@@ -21,6 +21,7 @@ class PrivacyLockSettingsCard extends StatefulWidget {
 }
 
 class _PrivacyLockSettingsCardState extends State<PrivacyLockSettingsCard> {
+  late final TextEditingController _currentPasscodeController;
   late final TextEditingController _passcodeController;
   late final TextEditingController _confirmController;
 
@@ -32,6 +33,7 @@ class _PrivacyLockSettingsCardState extends State<PrivacyLockSettingsCard> {
   @override
   void initState() {
     super.initState();
+    _currentPasscodeController = TextEditingController();
     _passcodeController = TextEditingController();
     _confirmController = TextEditingController();
     _load();
@@ -39,6 +41,7 @@ class _PrivacyLockSettingsCardState extends State<PrivacyLockSettingsCard> {
 
   @override
   void dispose() {
+    _currentPasscodeController.dispose();
     _passcodeController.dispose();
     _confirmController.dispose();
     super.dispose();
@@ -58,8 +61,18 @@ class _PrivacyLockSettingsCardState extends State<PrivacyLockSettingsCard> {
   Future<void> _save() async {
     if (_saving) return;
 
+    final String currentPasscode = _currentPasscodeController.text.trim();
     final String passcode = _passcodeController.text.trim();
     final String confirm = _confirmController.text.trim();
+
+    if (_savedPasscode.isNotEmpty && currentPasscode != _savedPasscode) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Enter your current PIN to change privacy lock settings.'),
+        ),
+      );
+      return;
+    }
 
     if (_mode == PrivacyLockMode.none) {
       setState(() {
@@ -75,6 +88,7 @@ class _PrivacyLockSettingsCardState extends State<PrivacyLockSettingsCard> {
         );
 
         _savedPasscode = '';
+        _currentPasscodeController.clear();
         _passcodeController.clear();
         _confirmController.clear();
 
@@ -137,6 +151,7 @@ class _PrivacyLockSettingsCardState extends State<PrivacyLockSettingsCard> {
       );
 
       _savedPasscode = effectivePasscode;
+      _currentPasscodeController.clear();
       _passcodeController.clear();
       _confirmController.clear();
 
@@ -165,6 +180,16 @@ class _PrivacyLockSettingsCardState extends State<PrivacyLockSettingsCard> {
   Future<void> _clearLock() async {
     if (_saving) return;
 
+    final String currentPasscode = _currentPasscodeController.text.trim();
+    if (_savedPasscode.isNotEmpty && currentPasscode != _savedPasscode) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Enter your current PIN to clear the privacy lock.'),
+        ),
+      );
+      return;
+    }
+
     setState(() {
       _saving = true;
     });
@@ -172,6 +197,7 @@ class _PrivacyLockSettingsCardState extends State<PrivacyLockSettingsCard> {
     try {
       await PrivacyLockStore.clear();
       _savedPasscode = '';
+      _currentPasscodeController.clear();
       _passcodeController.clear();
       _confirmController.clear();
 
@@ -246,24 +272,44 @@ class _PrivacyLockSettingsCardState extends State<PrivacyLockSettingsCard> {
                   }).toList(),
                 ),
                 const SizedBox(height: 12),
-                Text(
-                  _mode.description,
-                  style: theme.textTheme.bodyMedium,
-                ),
-                const SizedBox(height: 16),
-                TextField(
-                  controller: _passcodeController,
-                  keyboardType: TextInputType.number,
-                  obscureText: true,
-                  maxLength: 6,
-                  inputFormatters: <TextInputFormatter>[
-                    FilteringTextInputFormatter.digitsOnly,
-                  ],
-                  decoration: const InputDecoration(
-                    labelText: 'Set 6-digit PIN',
-                    hintText: 'Example: 123456',
+                  Text(
+                    _mode.description,
+                    style: theme.textTheme.bodyMedium,
                   ),
-                ),
+                  if (_savedPasscode.isNotEmpty) ...<Widget>[
+                    const SizedBox(height: 16),
+                    TextField(
+                      controller: _currentPasscodeController,
+                      keyboardType: TextInputType.number,
+                      obscureText: true,
+                      maxLength: 6,
+                      inputFormatters: <TextInputFormatter>[
+                        FilteringTextInputFormatter.digitsOnly,
+                      ],
+                      decoration: const InputDecoration(
+                        labelText: 'Current PIN',
+                        hintText: 'Required to change or clear',
+                      ),
+                    ),
+                  ],
+                  const SizedBox(height: 16),
+                  TextField(
+                    controller: _passcodeController,
+                    keyboardType: TextInputType.number,
+                    obscureText: true,
+                    maxLength: 6,
+                    inputFormatters: <TextInputFormatter>[
+                      FilteringTextInputFormatter.digitsOnly,
+                    ],
+                    decoration: InputDecoration(
+                      labelText: _savedPasscode.isEmpty
+                          ? 'Set 6-digit PIN'
+                          : 'New 6-digit PIN',
+                      hintText: _savedPasscode.isEmpty
+                          ? 'Example: 123456'
+                          : 'Leave blank to keep current PIN',
+                    ),
+                  ),
                 const SizedBox(height: 12),
                 TextField(
                   controller: _confirmController,

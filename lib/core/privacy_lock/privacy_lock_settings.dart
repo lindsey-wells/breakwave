@@ -3,7 +3,7 @@
 // Project: BreakWave
 // File: privacy_lock_settings.dart
 // Purpose: BW-41 privacy lock settings model.
-// Notes: Stores lock mode and a 4-digit passcode.
+// Notes: Stores lock mode and a 6-digit PIN.
 // ------------------------------------------------------------
 
 import 'privacy_lock_mode.dart';
