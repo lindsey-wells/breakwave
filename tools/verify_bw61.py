@@ -6,11 +6,14 @@ text = path.read_text(encoding="utf-8")
 
 checks = [
     "FastUrgeEntryCard",
+    "title: 'Your why and risk signals'",
+    "ReasonsFocusCard",
+    "TriggersWatchCard",
     "DailyEncouragementCard",
     "eyebrow: 'Today'",
+    "title: 'Check in'",
     "DailyCheckInCard",
     "BedtimeDangerModeCard",
-    "eyebrow: 'Your setup'",
     "RecoverySnapshotCard",
     "SimpleInsightsCard",
     "RecoveryCyclePreviewCard",
@@ -35,11 +38,14 @@ for needle in blocked:
 
 order = [
     "FastUrgeEntryCard",
+    "title: 'Your why and risk signals'",
+    "ReasonsFocusCard",
+    "TriggersWatchCard",
     "DailyEncouragementCard",
     "eyebrow: 'Today'",
+    "title: 'Check in'",
     "DailyCheckInCard",
     "BedtimeDangerModeCard",
-    "eyebrow: 'Your setup'",
     "if (hasRecoveryData) ...<Widget>",
     "RecoverySnapshotCard",
     "Pattern awareness",
