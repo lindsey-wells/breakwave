@@ -5,6 +5,7 @@
 // Purpose: BW-04 log foundation screen for BreakWave.
 // Notes: BW-72B declutters Log capture and adds lightweight Other inputs.
 // Notes: BW-76B keeps Log save/update confirmation on the Log tab.
+// Notes: BW-76C adds undo for accidental recent-log deletion.
 // ------------------------------------------------------------
 
 import 'package:flutter/material.dart';
@@ -243,8 +244,23 @@ class _LogScreenState extends State<LogScreen> {
     _notesController.clear();
   }
 
+  Future<void> _undoDeleteEntry(LogEntry entry) async {
+    await _repository.saveEntry(entry);
+    await _refreshFromStorage();
+
+    if (!mounted) return;
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Restored log entry.'),
+      ),
+    );
+  }
+
   Future<void> _deleteEntry(LogEntry entry) async {
     await _repository.deleteEntry(entry.id);
+
+    if (!mounted) return;
 
     if (_editingEntryId == entry.id) {
       setState(_clearDraft);
@@ -254,11 +270,18 @@ class _LogScreenState extends State<LogScreen> {
 
     if (!mounted) return;
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Deleted log entry.'),
-      ),
-    );
+    ScaffoldMessenger.of(context)
+      ..hideCurrentSnackBar()
+      ..showSnackBar(
+        SnackBar(
+          content: const Text('Deleted log entry.'),
+          duration: const Duration(seconds: 5),
+          action: SnackBarAction(
+            label: 'Undo',
+            onPressed: () => _undoDeleteEntry(entry),
+          ),
+        ),
+      );
   }
 
   Future<void> _saveEntry() async {
