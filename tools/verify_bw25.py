@@ -23,9 +23,9 @@ checks = [
         "Free immediate relief. Paid ongoing transformation.",
         "$59.99/year",
         "$8.99/month",
-        "Preview annual no-trial",
-        "Preview annual 7-day trial",
-        "Preview BreakWave Plus",
+        "Select annual no-trial",
+        "Select annual 7-day trial",
+        "Explore BreakWave Plus",
     ]),
     ("lib/features/premium/presentation/premium_gate_tile.dart", [
         "class PremiumGateTile",

@@ -125,7 +125,7 @@ class SupportScreen extends StatelessWidget {
                     eyebrow: 'BreakWave Plus',
                     title: 'Go deeper than emergency interruption',
                     subtitle:
-                        'Preview longer-term insight, guided tools, and premium depth.',
+                        'Explore longer-term insight, guided tools, and premium depth.',
                     icon: Icons.workspace_premium_outlined,
                     initiallyExpanded: false,
                     children: <Widget>[
@@ -306,7 +306,7 @@ class _BreakWavePlusPreviewCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
           Text(
-            'BreakWave Plus Preview',
+            'BreakWave Plus',
             style: theme.textTheme.titleMedium?.copyWith(
               fontWeight: FontWeight.w800,
             ),

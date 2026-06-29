@@ -3,7 +3,7 @@
 // Project: BreakWave
 // File: breakwave_plus_screen.dart
 // Purpose: BW-54 BreakWave Plus value wall.
-// Notes: Plus preview screen only. Real billing waits for Play account/Billing setup.
+// Notes: Plus value screen for planned upgrade access.
 // ------------------------------------------------------------
 
 import 'package:flutter/material.dart';
@@ -36,8 +36,8 @@ class _BreakWavePlusScreenState extends State<BreakWavePlusScreen> {
         SnackBar(
           content: Text(
             variant == 'annual_trial'
-                ? 'Saved Plus offer preview: annual with 7-day trial.'
-                : 'Saved Plus offer preview: annual without trial.',
+                ? 'Saved Plus offer: annual with 7-day trial.'
+                : 'Saved Plus offer: annual without trial.',
           ),
         ),
       );
@@ -64,7 +64,7 @@ class _BreakWavePlusScreenState extends State<BreakWavePlusScreen> {
 
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('BreakWave Plus preview enabled.'),
+          content: Text('BreakWave Plus unlocked.'),
         ),
       );
 
@@ -109,7 +109,7 @@ class _BreakWavePlusScreenState extends State<BreakWavePlusScreen> {
                     onPressed: _saving ? null : _enablePlusPreview,
                     child: const Padding(
                       padding: EdgeInsets.symmetric(vertical: 14),
-                      child: Text('Preview BreakWave Plus'),
+                      child: Text('Explore BreakWave Plus'),
                     ),
                   ),
                 ],
@@ -217,7 +217,7 @@ class _BreakWavePlusScreenState extends State<BreakWavePlusScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
                   Text(
-                    'Offer preview',
+                    'Planned launch offer',
                     style: theme.textTheme.titleLarge?.copyWith(
                       fontWeight: FontWeight.w800,
                     ),
@@ -233,7 +233,7 @@ class _BreakWavePlusScreenState extends State<BreakWavePlusScreen> {
                         : () => _setVariant('annual_no_trial'),
                     child: const Padding(
                       padding: EdgeInsets.symmetric(vertical: 14),
-                      child: Text('Preview annual no-trial'),
+                      child: Text('Select annual no-trial'),
                     ),
                   ),
                   const SizedBox(height: 10),
@@ -243,7 +243,7 @@ class _BreakWavePlusScreenState extends State<BreakWavePlusScreen> {
                         : () => _setVariant('annual_trial'),
                     child: const Padding(
                       padding: EdgeInsets.symmetric(vertical: 14),
-                      child: Text('Preview annual 7-day trial'),
+                      child: Text('Select annual 7-day trial'),
                     ),
                   ),
                 ],
@@ -263,7 +263,7 @@ class _BreakWavePlusScreenState extends State<BreakWavePlusScreen> {
                   ),
                   SizedBox(height: 10),
                   Text(
-                    'BreakWave Plus is preview-only in this build. Paid access will be activated only after Google Play Billing, product setup, and entitlement checks are ready.',
+                    'BreakWave Plus purchasing is not active yet. Immediate support tools remain free while paid upgrade access is finalized.',
                   ),
                 ],
               ),
