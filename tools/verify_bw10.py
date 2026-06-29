@@ -7,6 +7,7 @@ EXPECTED_FILES = [
     "lib/features/shell/presentation/breakwave_shell.dart",
     "lib/features/log/data/log_repository.dart",
     "lib/features/log/presentation/log_screen.dart",
+    "lib/features/log/presentation/widgets/log_save_card.dart",
     "lib/features/log/presentation/widgets/recent_log_entries_card.dart",
     "lib/features/rescue/presentation/rescue_screen.dart",
     "lib/features/rescue/presentation/widgets/wave_completion_card.dart",
@@ -26,11 +27,22 @@ EXPECTED_PATTERNS = {
     "lib/features/log/presentation/log_screen.dart": [
         "final VoidCallback onReturnHome;",
         "String? _editingEntryId;",
+        "String? _lastSaveMessage;",
         "void _populateDraftFromEntry(LogEntry entry)",
         "await _repository.updateEntry(entry);",
         "await _repository.deleteEntry(entry.id);",
-        "widget.onReturnHome();",
+        "You can review it below.",
+        "lastSaveMessage: _lastSaveMessage",
+        "isEditing: isEditing",
         "Editing a saved entry",
+    ],
+    "lib/features/log/presentation/widgets/log_save_card.dart": [
+        "final bool isEditing;",
+        "final String? lastSaveMessage;",
+        "isEditing ? 'Update Entry' : 'Save Entry'",
+        "Update log entry",
+        "Save log entry",
+        "Icons.check_circle_outline",
     ],
     "lib/features/log/presentation/widgets/recent_log_entries_card.dart": [
         "final ValueChanged<LogEntry> onEdit;",
@@ -75,7 +87,7 @@ def main() -> None:
             if pattern not in content:
                 fail(f"missing pattern in {rel_path}: {pattern}")
 
-    print("PASS: BW-10 edit/delete logs and return-home flow verified.")
+    print("PASS: BW-10 edit/delete logs and stay-on-log save flow verified.")
 
 
 if __name__ == "__main__":
