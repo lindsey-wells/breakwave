@@ -3,7 +3,7 @@ import sys
 
 checks = [
     ("lib/features/rescue/presentation/rescue_screen.dart", [
-        "BW-71A makes Rescue more active",
+        "BW-76A keeps Rescue active after a still-strong outcome.",
         "Use one immediate redirect",
         "RedirectActionsCard",
         "WaveCompletionCard(",
@@ -14,6 +14,12 @@ checks = [
         "entryType: 'Slip'",
         "widget.onOpenSupport();",
         "EdgeInsets.fromLTRB(20, 20, 20, 150)",
+        "_showStillStrongFollowUp",
+        "_buildStillStrongFollowUpCard",
+        "The wave is still here",
+        "Return to Calm Reset",
+        "Choose a redirect action",
+        "Open Support",
     ]),
     ("lib/features/rescue/presentation/widgets/wave_completion_card.dart", [
         "BW-71A adds honest Rescue outcomes",
@@ -73,8 +79,15 @@ for rel_path, needles in checks:
 rescue_text = Path("lib/features/rescue/presentation/rescue_screen.dart").read_text(encoding="utf-8")
 redirect_index = rescue_text.find("RedirectActionsCard(")
 timer_index = rescue_text.find("WaveTimerCard(")
+followup_index = rescue_text.find("_buildStillStrongFollowUpCard(context)")
+completion_index = rescue_text.find("WaveCompletionCard(")
+
 if redirect_index == -1 or timer_index == -1 or redirect_index > timer_index:
     print("FAIL RedirectActionsCard should appear before WaveTimerCard in Rescue flow")
+    failed = True
+
+if completion_index == -1 or followup_index == -1 or completion_index > followup_index:
+    print("FAIL Still-strong follow-up should appear after WaveCompletionCard in Rescue flow")
     failed = True
 
 calm_text = Path("lib/features/rescue/presentation/widgets/calm_reset_card.dart").read_text(encoding="utf-8")
@@ -85,4 +98,4 @@ if "onPressed: () {}" in calm_text:
 if failed:
     sys.exit(1)
 
-print("PASS: BW-71A Rescue interaction polish verified.")
+print("PASS: BW-71A Rescue interaction polish and still-strong follow-up verified.")
