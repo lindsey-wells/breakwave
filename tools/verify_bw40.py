@@ -9,12 +9,12 @@ checks = [
     ]),
     ("lib/features/home/presentation/home_screen.dart", [
         "SectionHeader",
-        "Current snapshot",
+        "Progress",
         "Today",
         "Pattern awareness",
-        "See where you are right now",
-        "Check in and prepare for risk windows",
-        "Learn what keeps the wave going",
+        "Your recent pattern",
+        "Check in",
+        "Learn the pattern",
     ]),
     ("lib/features/rescue/presentation/rescue_screen.dart", [
         "SectionHeader",
