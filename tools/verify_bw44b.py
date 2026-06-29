@@ -28,7 +28,7 @@ checks = [
         "BreakWave recipient email",
         "Save recipient email",
         "Use default email",
-        "Send saved data now",
+        "Open email draft",
     ]),
     ("lib/features/support/presentation/support_screen.dart", [
         "EmailAppHandoffCard",
