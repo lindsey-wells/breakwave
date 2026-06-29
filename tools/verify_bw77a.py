@@ -22,7 +22,7 @@ checks = [
     ]),
     ("lib/features/support/presentation/widgets/email_app_handoff_card.dart", [
         "BreakWave opens your email app with a draft.",
-        "You can review, edit, send, or delete it before anything leaves your device.",
+        "You can review, edit, or delete the draft before choosing whether to send.",
         "Opened email draft.",
         "Open email draft",
     ]),

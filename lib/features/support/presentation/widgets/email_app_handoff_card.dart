@@ -216,7 +216,7 @@ class _EmailAppHandoffCardState extends State<EmailAppHandoffCard> {
                 ),
                 const SizedBox(height: 10),
                 Text(
-                  'BreakWave opens your email app with a draft. You can review, edit, send, or delete it before anything leaves your device.',
+                  'BreakWave opens your email app with a draft. You can review, edit, or delete the draft before choosing whether to send.',
                   style: theme.textTheme.bodyMedium,
                 ),
                 const SizedBox(height: 16),
