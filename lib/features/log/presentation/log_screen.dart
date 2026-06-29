@@ -3,7 +3,7 @@
 // Project: BreakWave
 // File: log_screen.dart
 // Purpose: BW-04 log foundation screen for BreakWave.
-// Notes: BW-72B declutters Log capture and adds lightweight Other inputs.
+// Notes: BW-76B keeps Log save/update confirmation on the Log tab.
 // ------------------------------------------------------------
 
 import 'package:flutter/material.dart';
@@ -54,6 +54,7 @@ class _LogScreenState extends State<LogScreen> {
   bool _isSaving = false;
   List<LogEntry> _recentEntries = const <LogEntry>[];
   String? _editingEntryId;
+  String? _lastSaveMessage;
 
   static const String _otherLabel = 'Other';
 
@@ -177,6 +178,7 @@ class _LogScreenState extends State<LogScreen> {
 
   void _populateDraftFromEntry(LogEntry entry) {
     setState(() {
+      _lastSaveMessage = null;
       _editingEntryId = entry.id;
       _entryType = entry.entryType;
       _intensity = entry.intensity;
@@ -293,24 +295,23 @@ class _LogScreenState extends State<LogScreen> {
 
       if (!mounted) return;
 
+      final String saveMessage = editingId == null
+          ? '$savedType entry saved. You can review it below.'
+          : '$savedType entry updated. You can review it below.';
+
       setState(() {
         _savedEntryCount = entries.length;
         _recentEntries = entries.take(5).toList();
         _clearDraft();
+        _lastSaveMessage = saveMessage;
         _isSaving = false;
       });
 
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(
-            editingId == null
-                ? 'Saved $savedType entry locally • ${entries.length} total on this device'
-                : 'Updated $savedType entry locally • ${entries.length} total on this device',
-          ),
+          content: Text(saveMessage),
         ),
       );
-
-      widget.onReturnHome();
     } catch (_) {
       if (!mounted) return;
 
@@ -424,6 +425,8 @@ class _LogScreenState extends State<LogScreen> {
                     triggerCount: _resolvedTriggers().length,
                     savedEntryCount: _savedEntryCount,
                     isSaving: _isSaving,
+                    isEditing: isEditing,
+                    lastSaveMessage: _lastSaveMessage,
                     onSave: _saveEntry,
                   ),
                   const SizedBox(height: 16),
