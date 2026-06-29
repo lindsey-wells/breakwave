@@ -6,6 +6,7 @@
 // Notes: BW-72B declutters Log capture and adds lightweight Other inputs.
 // Notes: BW-76B keeps Log save/update confirmation on the Log tab.
 // Notes: BW-76C adds undo for accidental recent-log deletion.
+// Notes: BW-76D turns key replacement choices into real navigation actions.
 // ------------------------------------------------------------
 
 import 'package:flutter/material.dart';
@@ -24,10 +25,14 @@ import 'widgets/recent_log_entries_card.dart';
 
 class LogScreen extends StatefulWidget {
   final VoidCallback onReturnHome;
+  final VoidCallback onOpenRescue;
+  final VoidCallback onOpenSupport;
 
   const LogScreen({
     super.key,
     required this.onReturnHome,
+    required this.onOpenRescue,
+    required this.onOpenSupport,
   });
 
   @override
@@ -437,6 +442,8 @@ class _LogScreenState extends State<LogScreen> {
                         _otherReplacementActionController,
                     showOtherReplacementField:
                         _selectedReplacementAction == _otherLabel,
+                    onOpenRescue: widget.onOpenRescue,
+                    onOpenSupport: widget.onOpenSupport,
                   ),
                   const SizedBox(height: 16),
                   LogNotesCard(

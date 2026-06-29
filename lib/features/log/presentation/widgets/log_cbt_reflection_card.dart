@@ -5,6 +5,7 @@
 // Purpose: BW-63 CBT-informed log reflection card.
 // Notes: BW-72B keeps CBT logging lightweight while allowing Other actions.
 // Notes: BW-72C keeps the replacement action visible and collapses optional reflection details.
+// Notes: BW-76D adds real actions for Open Rescue and trusted support choices.
 // ------------------------------------------------------------
 
 import 'package:flutter/material.dart';
@@ -21,6 +22,8 @@ class LogCbtReflectionCard extends StatelessWidget {
     required this.onReplacementSelected,
     required this.otherReplacementActionController,
     required this.showOtherReplacementField,
+    required this.onOpenRescue,
+    required this.onOpenSupport,
   });
 
   final TextEditingController thoughtController;
@@ -32,6 +35,8 @@ class LogCbtReflectionCard extends StatelessWidget {
   final ValueChanged<String?> onReplacementSelected;
   final TextEditingController otherReplacementActionController;
   final bool showOtherReplacementField;
+  final VoidCallback onOpenRescue;
+  final VoidCallback onOpenSupport;
 
   @override
   Widget build(BuildContext context) {
@@ -87,6 +92,26 @@ class LogCbtReflectionCard extends StatelessWidget {
                 );
               }).toList(),
             ),
+            if (selectedReplacementAction == 'Open Rescue') ...<Widget>[
+              const SizedBox(height: 14),
+              FilledButton.icon(
+                onPressed: onOpenRescue,
+                icon: const Icon(Icons.waves_outlined),
+                label: const Text('Open Rescue now'),
+              ),
+            ],
+            if (selectedReplacementAction == 'Text someone safe') ...<Widget>[
+              const SizedBox(height: 14),
+              OutlinedButton.icon(
+                onPressed: onOpenSupport,
+                icon: const Icon(Icons.support_agent_outlined),
+                label: const Text('Open trusted support'),
+              ),
+              const SizedBox(height: 8),
+              const Text(
+                'Use your saved trusted contact or support message from the Support tab.',
+              ),
+            ],
             if (showOtherReplacementField) ...<Widget>[
               const SizedBox(height: 14),
               TextField(
