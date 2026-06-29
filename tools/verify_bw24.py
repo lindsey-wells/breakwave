@@ -25,7 +25,6 @@ checks = [
         "Discreet notifications",
         "Hide Home insights",
         "Hide latest logged moment",
-        "Prefer Rescue as safe visible path",
         "Save privacy settings",
     ]),
 ]

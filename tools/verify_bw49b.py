@@ -10,10 +10,9 @@ checks = [
         "Lock Log & Support keeps Home and Rescue reachable while protecting the most sensitive screens.",
     ]),
     ("lib/features/support/presentation/widgets/privacy_settings_card.dart", [
-        "Reduce visible detail on Home, make notifications more discreet, and keep Rescue easy to reach when you need fast help.",
+        "Reduce visible detail on Home, use neutral notification text, and add screenshot protection when your device supports it.",
         "Recommended when using Lock Log & Support so Home reveals less recovery detail.",
         "Prevents recent log details from appearing on Home while the app is unlocked.",
-        "Keeps urgent help easy to find while other screens reveal less detail.",
     ]),
 ]
 

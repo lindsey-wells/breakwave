@@ -120,7 +120,7 @@ class _PrivacySettingsCardState extends State<PrivacySettingsCard> {
                 ),
                 const SizedBox(height: 10),
                 Text(
-                  'Reduce visible detail on Home, make notifications more discreet, and keep Rescue easy to reach when you need fast help.',
+                  'Reduce visible detail on Home, use neutral notification text, and add screenshot protection when your device supports it.',
                   style: theme.textTheme.bodyMedium,
                 ),
                 const SizedBox(height: 12),
@@ -159,19 +159,6 @@ class _PrivacySettingsCardState extends State<PrivacySettingsCard> {
                     setState(() {
                       _settings = _settings.copyWith(
                         hideLatestLoggedMoment: value,
-                      );
-                    });
-                  },
-                ),
-                SwitchListTile.adaptive(
-                  contentPadding: EdgeInsets.zero,
-                  title: const Text('Prefer Rescue as safe visible path'),
-                  subtitle: const Text('Keeps urgent help easy to find while other screens reveal less detail.'),
-                  value: _settings.preferRescueAsSafePath,
-                  onChanged: (bool value) {
-                    setState(() {
-                      _settings = _settings.copyWith(
-                        preferRescueAsSafePath: value,
                       );
                     });
                   },
