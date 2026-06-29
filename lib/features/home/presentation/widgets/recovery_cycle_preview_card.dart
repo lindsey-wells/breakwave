@@ -75,18 +75,18 @@ class RecoveryCyclePreviewCard extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
                   Text(
-                    'Recovery cycle wheel',
+                    'The recovery pattern',
                     style: theme.textTheme.titleMedium?.copyWith(
                       fontWeight: FontWeight.w700,
                     ),
                   ),
                   const SizedBox(height: 8),
                   const Text(
-                    'Trigger → Urge → Escalation → Action → Regret / Recovery',
+                    'Trigger → Urge → Pressure → Choice → Reset',
                   ),
                   const SizedBox(height: 6),
                   Text(
-                    'Tap to see where to interrupt the wave earlier.',
+                    'Tap to learn where to interrupt the wave sooner.',
                     style: theme.textTheme.bodyMedium,
                   ),
                 ],

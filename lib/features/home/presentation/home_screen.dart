@@ -4,6 +4,7 @@
 // File: home_screen.dart
 // Purpose: BW-57 home dashboard cleanup for BreakWave.
 // Notes: Reduces empty-state clutter and keeps Rescue/action paths obvious.
+// Notes: BW-78A simplifies Home for launch and moves the user's why higher.
 // ------------------------------------------------------------
 
 import 'package:flutter/material.dart';
@@ -122,7 +123,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: <Widget>[
                             Text(
-                              'Home Current',
+                              'Today',
                               style: TextStyle(
                                 fontSize: 13,
                                 fontWeight: FontWeight.w700,
@@ -130,7 +131,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             ),
                             SizedBox(height: 8),
                             Text(
-                              'Steady water, clear direction.',
+                              'Start here',
                               style: TextStyle(
                                 fontSize: 22,
                                 fontWeight: FontWeight.w800,
@@ -138,7 +139,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             ),
                             SizedBox(height: 8),
                             Text(
-                              'When the wave rises, start with Rescue. When something happens, log it fast and keep moving.',
+                              'Open Rescue when the wave rises. Log what happened when you are ready.',
                             ),
                           ],
                         ),
@@ -148,30 +149,30 @@ class _HomeScreenState extends State<HomeScreen> {
                         onOpenRescue: widget.onOpenRescue,
                       ),
                       const SizedBox(height: 12),
+                      const SectionHeader(
+                        eyebrow: 'Your setup',
+                        title: 'Your why and risk signals',
+                      ),
+                      const ReasonsFocusCard(),
+                      const SizedBox(height: 12),
+                      const TriggersWatchCard(),
+                      const SizedBox(height: 16),
                       const DailyEncouragementCard(),
                       const SizedBox(height: 16),
                       const SectionHeader(
                         eyebrow: 'Today',
-                        title: 'Check in and prepare for risk windows',
+                        title: 'Check in',
                       ),
                       const DailyCheckInCard(),
                       const SizedBox(height: 12),
                       BedtimeDangerModeCard(
                         onOpenRescue: widget.onOpenRescue,
                       ),
-                      const SizedBox(height: 16),
-                      const SectionHeader(
-                        eyebrow: 'Your setup',
-                        title: 'Keep your reasons and triggers visible',
-                      ),
-                      const ReasonsFocusCard(),
-                      const SizedBox(height: 12),
-                      const TriggersWatchCard(),
                       if (hasRecoveryData) ...<Widget>[
                         const SizedBox(height: 20),
                         const SectionHeader(
-                          eyebrow: 'Current snapshot',
-                          title: 'See where you are right now',
+                          eyebrow: 'Progress',
+                          title: 'Your recent pattern',
                         ),
                         RecoverySnapshotCard(
                           totalEntries: summary.totalEntries,
@@ -193,7 +194,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       const SizedBox(height: 16),
                       const SectionHeader(
                         eyebrow: 'Pattern awareness',
-                        title: 'Learn what keeps the wave going',
+                        title: 'Learn the pattern',
                       ),
                       const RecoveryCyclePreviewCard(),
                     ],

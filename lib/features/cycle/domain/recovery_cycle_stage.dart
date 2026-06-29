@@ -41,7 +41,7 @@ class RecoveryCycleStages {
     RecoveryCycleStage(
       id: 'escalation',
       title: 'Escalation',
-      summary: 'The wave gets louder and more persuasive.',
+      summary: 'The wave gets stronger and more persuasive.',
       pattern: 'You start drifting toward secrecy, rationalizing, isolating, or staying too close to the setup.',
       interruptMove: 'Change rooms, change posture, and make the setup less private immediately.',
     ),
