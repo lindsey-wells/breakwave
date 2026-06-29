@@ -3,6 +3,7 @@
 // Project: BreakWave
 // File: log_screen.dart
 // Purpose: BW-04 log foundation screen for BreakWave.
+// Notes: BW-72B declutters Log capture and adds lightweight Other inputs.
 // Notes: BW-76B keeps Log save/update confirmation on the Log tab.
 // ------------------------------------------------------------
 
