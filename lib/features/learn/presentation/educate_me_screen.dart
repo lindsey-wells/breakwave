@@ -4,6 +4,7 @@
 // File: educate_me_screen.dart
 // Purpose: BW-28 Educate Me learning surface v1.
 // Notes: Short practical lessons plus a premium bridge to deeper guided learning.
+// Notes: BW-77B replaces wrapping lesson chips with stable full-width lesson rows.
 // ------------------------------------------------------------
 
 import 'package:flutter/material.dart';
@@ -21,6 +22,12 @@ class EducateMeScreen extends StatefulWidget {
 
 class _EducateMeScreenState extends State<EducateMeScreen> {
   int _selectedIndex = 0;
+
+  void _selectLesson(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -60,24 +67,9 @@ class _EducateMeScreenState extends State<EducateMeScreen> {
               ),
             ),
             const SizedBox(height: 16),
-            Wrap(
-              spacing: 10,
-              runSpacing: 10,
-              children: List<Widget>.generate(
-                LearningCardPack.starter.length,
-                (int index) {
-                  final LearningCardContent item = LearningCardPack.starter[index];
-                  return ChoiceChip(
-                    label: Text(item.title),
-                    selected: _selectedIndex == index,
-                    onSelected: (_) {
-                      setState(() {
-                        _selectedIndex = index;
-                      });
-                    },
-                  );
-                },
-              ),
+            _LessonSelectorList(
+              selectedIndex: _selectedIndex,
+              onSelected: _selectLesson,
             ),
             const SizedBox(height: 16),
             Container(
@@ -127,6 +119,96 @@ class _EducateMeScreenState extends State<EducateMeScreen> {
               },
             ),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+class _LessonSelectorList extends StatelessWidget {
+  const _LessonSelectorList({
+    required this.selectedIndex,
+    required this.onSelected,
+  });
+
+  final int selectedIndex;
+  final ValueChanged<int> onSelected;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: <Widget>[
+        for (int index = 0; index < LearningCardPack.starter.length; index++)
+          Padding(
+            padding: EdgeInsets.only(
+              bottom: index == LearningCardPack.starter.length - 1 ? 0 : 10,
+            ),
+            child: _LessonSelectorTile(
+              title: LearningCardPack.starter[index].title,
+              isSelected: selectedIndex == index,
+              onTap: () => onSelected(index),
+            ),
+          ),
+      ],
+    );
+  }
+}
+
+class _LessonSelectorTile extends StatelessWidget {
+  const _LessonSelectorTile({
+    required this.title,
+    required this.isSelected,
+    required this.onTap,
+  });
+
+  final String title;
+  final bool isSelected;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final ThemeData theme = Theme.of(context);
+    final ColorScheme colorScheme = theme.colorScheme;
+
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        borderRadius: BorderRadius.circular(16),
+        onTap: onTap,
+        child: Container(
+          width: double.infinity,
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 13),
+          decoration: BoxDecoration(
+            color: isSelected
+                ? colorScheme.primaryContainer.withOpacity(0.36)
+                : colorScheme.surfaceContainerHighest.withOpacity(0.45),
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(
+              color: isSelected ? colorScheme.primary : colorScheme.outlineVariant,
+              width: isSelected ? 1.4 : 1,
+            ),
+          ),
+          child: Row(
+            children: <Widget>[
+              SizedBox(
+                width: 24,
+                child: Icon(
+                  isSelected ? Icons.check_circle_outline : Icons.radio_button_unchecked,
+                  size: 20,
+                  color: isSelected ? colorScheme.primary : colorScheme.onSurfaceVariant,
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Text(
+                  title,
+                  style: theme.textTheme.bodyLarge?.copyWith(
+                    fontWeight: isSelected ? FontWeight.w800 : FontWeight.w600,
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
