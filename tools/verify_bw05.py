@@ -5,7 +5,7 @@ checks = [
     ("lib/features/support/presentation/support_screen.dart", [
         "class SupportScreen",
         "Support Harbor",
-        "Get support before the wave gets louder.",
+        "Get support before the wave gets stronger.",
     ]),
     ("lib/features/support/presentation/widgets/support_categories_card.dart", [
         "class SupportCategoriesCard",

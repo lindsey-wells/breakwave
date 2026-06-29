@@ -172,7 +172,7 @@ class _EmailExportCardState extends State<EmailExportCard> {
                 const SizedBox(height: 10),
                 Text(
                   hasData
-                      ? 'Manual export only. Create a CSV or JSON file from the saved email-consent data and share it yourself.'
+                      ? 'Exports stay on your device unless you choose to share them. Create a CSV or JSON file from saved email-consent data when needed.'
                       : 'No saved email-consent data yet. Save optional email preferences above first.',
                   style: theme.textTheme.bodyMedium,
                 ),

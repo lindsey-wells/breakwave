@@ -167,7 +167,7 @@ class _EmailAppHandoffCardState extends State<EmailAppHandoffCard> {
         SnackBar(
           content: Text(
             ok
-                ? 'Opened email draft handoff.'
+                ? 'Opened email draft.'
                 : 'Unable to open the email app right now.',
           ),
         ),
@@ -216,7 +216,7 @@ class _EmailAppHandoffCardState extends State<EmailAppHandoffCard> {
                 ),
                 const SizedBox(height: 10),
                 Text(
-                  'Manual only. BreakWave opens a prefilled email draft so you can review, edit, send, or cancel before anything leaves your device.',
+                  'BreakWave opens your email app with a draft. You can review, edit, send, or delete it before anything leaves your device.',
                   style: theme.textTheme.bodyMedium,
                 ),
                 const SizedBox(height: 16),
@@ -257,7 +257,7 @@ class _EmailAppHandoffCardState extends State<EmailAppHandoffCard> {
                     ),
                     FilledButton(
                       onPressed: (!_working && hasData) ? _openDraft : null,
-                      child: Text(_working ? 'Opening...' : 'Send saved data now'),
+                      child: Text(_working ? 'Opening...' : 'Open email draft'),
                     ),
                   ],
                 ),

@@ -16,7 +16,7 @@ class CbtRecoveryFoundation {
       'BreakWave helps you interrupt urges, understand your triggers, build healthier responses, and stay connected to your reasons for recovery — one moment at a time.';
 
   static const String safeDescription =
-      'BreakWave uses CBT-informed recovery tools to help users identify triggers, interrupt urges, reframe thoughts, choose healthier actions, and build a relapse-prevention plan.';
+      'BreakWave uses CBT-informed recovery tools to help users identify triggers, interrupt urges, change unhelpful thoughts, choose healthier actions, and build a relapse-prevention plan.';
 
   static const String notTherapyDisclaimer =
       'BreakWave is a support tool. It does not provide therapy, diagnosis, medical advice, emergency care, or a cure, and it is not a replacement for a licensed professional.';

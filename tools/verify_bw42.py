@@ -19,7 +19,7 @@ checks = [
     ("lib/features/support/presentation/widgets/email_capture_settings_card.dart", [
         "class EmailCaptureSettingsCard",
         "Stay in touch",
-        "BreakWave help works without email.",
+        "BreakWave works without email.",
         "Email address",
         "Send me product updates",
         "Invite me to research or feedback",

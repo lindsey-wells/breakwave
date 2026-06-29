@@ -58,7 +58,7 @@ class ProfessionalHelpCard extends StatelessWidget {
           ),
           const SizedBox(height: 8),
           const Text(
-            'If you may harm yourself or someone else, seek emergency help immediately through local emergency services.',
+            'If you feel like harming yourself or someone else, seek emergency help immediately through local emergency services.',
           ),
         ],
       ),

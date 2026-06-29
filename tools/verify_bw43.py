@@ -23,7 +23,7 @@ checks = [
         "Export CSV",
         "Export JSON",
         "Share export bundle",
-        "Manual export only.",
+        "Exports stay on your device unless you choose to share them.",
     ]),
     ("lib/features/support/presentation/support_screen.dart", [
         "EmailExportCard",

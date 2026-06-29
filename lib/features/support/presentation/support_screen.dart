@@ -61,7 +61,7 @@ class SupportScreen extends StatelessWidget {
                         ),
                         SizedBox(height: 8),
                         Text(
-                          'Get support before the wave gets louder.',
+                          'Get support before the wave gets stronger.',
                           style: TextStyle(
                             fontSize: 24,
                             fontWeight: FontWeight.w700,

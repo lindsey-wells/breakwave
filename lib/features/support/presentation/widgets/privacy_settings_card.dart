@@ -127,7 +127,7 @@ class _PrivacySettingsCardState extends State<PrivacySettingsCard> {
                 SwitchListTile.adaptive(
                   contentPadding: EdgeInsets.zero,
                   title: const Text('Discreet notifications'),
-                  subtitle: const Text('Use more neutral notification titles and body text.'),
+                  subtitle: const Text('Use neutral notification text so BreakWave does not reveal recovery details on your lock screen.'),
                   value: _settings.discreetNotifications,
                   onChanged: (bool value) {
                     setState(() {
@@ -178,9 +178,9 @@ class _PrivacySettingsCardState extends State<PrivacySettingsCard> {
                 ),
                 SwitchListTile.adaptive(
                   contentPadding: EdgeInsets.zero,
-                  title: const Text('Block screenshots and screen recording'),
+                  title: const Text('Prevent screenshots while BreakWave is open'),
                   subtitle: const Text(
-                    'Asks Android to block normal screenshots and screen recordings while BreakWave is open. This reduces casual exposure but is not absolute protection.',
+                    'Adds extra privacy by asking Android to block normal screenshots and screen recordings while BreakWave is open. This reduces casual exposure but is not absolute protection.',
                   ),
                   value: _settings.blockScreenshotsAndScreenRecording,
                   onChanged: (bool value) {

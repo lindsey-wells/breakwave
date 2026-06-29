@@ -26,8 +26,8 @@ checks = [
         "best-effort shield",
     ]),
     ("lib/features/support/presentation/widgets/privacy_settings_card.dart", [
-        "Block screenshots and screen recording",
-        "Asks Android to block normal screenshots and screen recordings",
+        "Prevent screenshots while BreakWave is open",
+        "Adds extra privacy by asking Android to block normal screenshots and screen recordings",
         "reduces casual exposure but is not absolute protection",
         "ScreenPrivacyService.setScreenPrivacyEnabled",
     ]),

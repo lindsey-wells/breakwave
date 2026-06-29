@@ -181,7 +181,7 @@ class _EmailCaptureSettingsCardState extends State<EmailCaptureSettingsCard> {
                 ),
                 const SizedBox(height: 10),
                 Text(
-                  'Optional only. BreakWave help works without email.',
+                  'Optional. BreakWave works without email.',
                   style: theme.textTheme.bodyMedium,
                 ),
                 const SizedBox(height: 16),
@@ -214,7 +214,7 @@ class _EmailCaptureSettingsCardState extends State<EmailCaptureSettingsCard> {
                     });
                   },
                   title: const Text('Invite me to research or feedback'),
-                  subtitle: const Text('Optional product interviews, surveys, or beta feedback.'),
+                  subtitle: const Text('Optional product interviews, surveys, beta testing, or feedback.'),
                 ),
                 const SizedBox(height: 12),
                 FilledButton(
