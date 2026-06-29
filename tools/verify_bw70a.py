@@ -10,7 +10,7 @@ checks = [
         "ReasonsFocusCard",
         "TriggersWatchCard",
         "RecoveryCyclePreviewCard",
-        "Learn what keeps the wave going",
+        "Learn the pattern",
     ]),
     ("lib/features/home/presentation/widgets/fast_urge_entry_card.dart", [
         "BW-70A keeps the urgent CTA prominent",
@@ -31,8 +31,8 @@ checks = [
     ]),
     ("lib/features/home/presentation/widgets/recovery_cycle_preview_card.dart", [
         "BW-70A compacts the cycle preview",
-        "Trigger → Urge → Escalation → Action → Regret / Recovery",
-        "Tap to see where to interrupt the wave earlier.",
+        "Trigger → Urge → Pressure → Choice → Reset",
+        "Tap to learn where to interrupt the wave sooner.",
         "EdgeInsets.fromLTRB(16, 15, 16, 16)",
     ]),
     ("launch/home_layout_polish.md", [

@@ -16,8 +16,8 @@ checks = [
     ]),
     ("lib/features/home/presentation/widgets/recovery_cycle_preview_card.dart", [
         "class RecoveryCyclePreviewCard",
-        "Recovery cycle wheel",
-        "Trigger → Urge → Escalation → Action → Regret / Recovery",
+        "The recovery pattern",
+        "Trigger → Urge → Pressure → Choice → Reset",
         "RecoveryCycleWheelScreen",
     ]),
 ]
