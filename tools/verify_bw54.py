@@ -18,8 +18,8 @@ checks = [
         "BreakWave Plus Monthly",
         "$8.99/month",
         "No weekly plan. No lifetime plan at launch.",
-        "Enable Plus preview for testing",
-        "Real purchases require the Google Play Developer account",
+        "Preview BreakWave Plus",
+        "Paid access will be activated only after Google Play Billing",
     ]),
     ("launch/breakwave_plus_value_wall.md", [
         "BreakWave Plus — Value Wall and Feature Map",
@@ -33,7 +33,7 @@ checks = [
         "Do not charge for BreakWave Plus until the paid section contains enough real value",
     ]),
     ("tools/verify_bw25.py", [
-        "Enable Plus preview for testing",
+        "Preview BreakWave Plus",
     ]),
 ]
 

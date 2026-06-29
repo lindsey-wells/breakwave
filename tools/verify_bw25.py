@@ -25,7 +25,7 @@ checks = [
         "$8.99/month",
         "Preview annual no-trial",
         "Preview annual 7-day trial",
-        "Enable Plus preview for testing",
+        "Preview BreakWave Plus",
     ]),
     ("lib/features/premium/presentation/premium_gate_tile.dart", [
         "class PremiumGateTile",
