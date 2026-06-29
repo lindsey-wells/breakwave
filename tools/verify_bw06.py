@@ -42,8 +42,8 @@ EXPECTED_PATTERNS = {
     ],
     "lib/features/home/presentation/home_screen.dart": [
         "WaveSurface(",
-        "Home Current",
-        "Steady water, clear direction.",
+        "Today",
+        "Start here",
     ],
     "lib/features/rescue/presentation/rescue_screen.dart": [
         "WaveSurface(",
