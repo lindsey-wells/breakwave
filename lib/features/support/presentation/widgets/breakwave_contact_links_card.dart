@@ -21,6 +21,10 @@ class BreakWaveContactLinksCard extends StatelessWidget {
   static const String xHandle = '@BreakWaveapp';
   static const String tikTokUrl = 'https://www.tiktok.com/@BreakWaveapp';
   static const String xUrl = 'https://x.com/BreakWaveapp';
+  static const String tikTokBrowserUrl =
+      'https://duckduckgo.com/?q=BreakWaveapp%20TikTok%20%40BreakWaveapp';
+  static const String xBrowserUrl =
+      'https://duckduckgo.com/?q=BreakWaveapp%20X%20%40BreakWaveapp';
   static const String chromePackage = 'com.android.chrome';
   static const String duckDuckGoPackage = 'com.duckduckgo.mobile.android';
 
@@ -54,8 +58,10 @@ class BreakWaveContactLinksCard extends StatelessWidget {
     required String label,
     required String handle,
     required String url,
+    required String browserUrl,
   }) async {
     final Uri webUri = Uri.parse(url);
+    final Uri browserUri = Uri.parse(browserUrl);
 
     await showModalBottomSheet<void>(
       context: context,
@@ -84,10 +90,10 @@ class BreakWaveContactLinksCard extends StatelessWidget {
                 ListTile(
                   leading: const Icon(Icons.language),
                   title: const Text('Open in browser'),
-                  subtitle: const Text('Uses your default browser when available.'),
+                  subtitle: const Text('Uses a browser-safe web page when apps intercept direct links.'),
                   onTap: () async {
                     Navigator.of(sheetContext).pop();
-                    await _openSocialInDefaultBrowser(context, webUri);
+                    await _openSocialInDefaultBrowser(context, browserUri);
                   },
                 ),
                 ListTile(
@@ -271,6 +277,7 @@ class BreakWaveContactLinksCard extends StatelessWidget {
       label: 'TikTok',
       handle: tikTokHandle,
       url: tikTokUrl,
+      browserUrl: tikTokBrowserUrl,
     );
   }
 
@@ -280,6 +287,7 @@ class BreakWaveContactLinksCard extends StatelessWidget {
       label: 'X',
       handle: xHandle,
       url: xUrl,
+      browserUrl: xBrowserUrl,
     );
   }
 

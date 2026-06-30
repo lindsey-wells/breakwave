@@ -11,7 +11,7 @@ required = [
     "Open in app",
     "Open in browser",
     "Copy link",
-    "Uses your default browser when available.",
+    "Uses a browser-safe web page when apps intercept direct links.",
     "Choose browser",
     "Open in Chrome",
     "Open in DuckDuckGo",
@@ -27,7 +27,7 @@ required = [
 
 for needle in required:
     if needle not in text:
-        print(f"FAIL: missing BW-80E social chooser behavior: {needle}")
+        print(f"FAIL: missing BW-80F social chooser behavior: {needle}")
         sys.exit(1)
 
-print("PASS: BW-80E social link default-browser chooser verified.")
+print("PASS: BW-80F social link default-browser chooser verified.")
