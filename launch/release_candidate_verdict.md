@@ -1,8 +1,8 @@
-# BreakWave — BW-69 Release Candidate Verdict
+# BreakWave — Release Candidate Verdict
 
 ## Verdict
 
-BreakWave is ready for Play Store internal testing after CI passes.
+BreakWave is ready for Play Store internal testing after current CI passes.
 
 ## Confirmed
 
@@ -14,11 +14,14 @@ BreakWave is ready for Play Store internal testing after CI passes.
 - If signing secrets are missing, CI falls back to debug signing for verification builds only.
 - Privacy/security copy avoids compliance, anonymity, security, cure, and therapy overclaims.
 - BreakWave is positioned as a support tool, not therapy, diagnosis, medical advice, emergency care, or a cure.
+- Privacy lock changes require the current PIN when a PIN already exists.
+- Risky notification bodies remain neutral and do not expose saved trigger/risky-time details.
+- BreakWave Plus copy avoids unfinished testing/build language.
 - Rescue, Log, Support, privacy lock, email handoff, and AAB pipeline are present.
 
 ## Not ready for public paid subscription launch
 
-BreakWave Plus is a value-wall and local preview scaffold. Public paid launch still requires:
+BreakWave Plus is a planned upgrade value screen. Public paid subscription launch still requires:
 
 - Google Play Billing setup
 - Real product IDs
@@ -29,7 +32,7 @@ BreakWave Plus is a value-wall and local preview scaffold. Public paid launch st
 
 ## Internal-test recommendation
 
-Proceed to internal testing with the current MVP once BW-69 CI is green.
+Proceed to internal testing with the current MVP once the latest CI run is green.
 
 Use internal testing to verify:
 
@@ -38,5 +41,7 @@ Use internal testing to verify:
 - Log save/edit/delete
 - Support links and email handoff
 - privacy lock behavior
+- neutral notification copy
+- BreakWave Plus planned-upgrade copy
 - signed AAB availability
 - screenshot readiness

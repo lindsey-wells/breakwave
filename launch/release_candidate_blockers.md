@@ -20,3 +20,8 @@ Use this file only for real launch blockers found during BW-36 smoke testing.
 Privacy/security copy reviewed in BW-49D. No blocker logged.
 
 Do not claim HIPAA compliance, medical-grade security, guaranteed anonymity, account MFA, or clone prevention for MVP.
+
+
+## BW-79 QA sweep note
+
+No blocker logged after final QA hardening. Privacy lock current-PIN protection, neutral notification bodies, safe Plus copy, and launch-trust copy cleanup are complete.

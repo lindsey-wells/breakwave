@@ -49,3 +49,15 @@ Next handoff step:
 - Roll out the internal test release.
 - Send tester opt-in link.
 - Verify install through Google Play.
+
+
+## BW-79 QA hardening sweep
+
+Final internal-testing trust fixes completed:
+- removed cosmetic privacy toggle that did not change behavior
+- required current PIN before changing or clearing privacy lock
+- cleaned unfinished BreakWave Plus preview/testing copy
+- kept risky notification details neutral so saved triggers stay inside the app
+- removed unfinished Plus preview/build wording from app-facing copy
+
+No P0 launch blockers are currently logged after the BW-79 sweep.
