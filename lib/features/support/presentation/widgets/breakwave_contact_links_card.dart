@@ -3,10 +3,11 @@
 // Project: BreakWave
 // File: breakwave_contact_links_card.dart
 // Purpose: BW-48B BreakWave contact and social links.
-// Notes: Adds simple launch-ready email, TikTok, and X contact links.
+// Notes: BW-80A adds app/browser/copy chooser for social links.
 // ------------------------------------------------------------
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class BreakWaveContactLinksCard extends StatelessWidget {
@@ -43,12 +44,124 @@ class BreakWaveContactLinksCard extends StatelessWidget {
     return _openUri(context, uri);
   }
 
+  Future<void> _showSocialLinkOptions(
+    BuildContext context, {
+    required String label,
+    required String handle,
+    required String url,
+  }) async {
+    final Uri webUri = Uri.parse(url);
+
+    await showModalBottomSheet<void>(
+      context: context,
+      showDragHandle: true,
+      builder: (BuildContext sheetContext) {
+        return SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(20, 8, 20, 20),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                ListTile(
+                  contentPadding: EdgeInsets.zero,
+                  title: Text(label),
+                  subtitle: Text(handle),
+                ),
+                ListTile(
+                  leading: const Icon(Icons.open_in_new),
+                  title: const Text('Open in app'),
+                  subtitle: const Text('Uses the installed app when your device supports it.'),
+                  onTap: () async {
+                    Navigator.of(sheetContext).pop();
+                    await _openSocialInApp(context, webUri);
+                  },
+                ),
+                ListTile(
+                  leading: const Icon(Icons.language),
+                  title: const Text('Open in browser'),
+                  subtitle: const Text('Open the web profile instead.'),
+                  onTap: () async {
+                    Navigator.of(sheetContext).pop();
+                    await _openSocialInBrowser(context, webUri);
+                  },
+                ),
+                ListTile(
+                  leading: const Icon(Icons.copy),
+                  title: const Text('Copy link'),
+                  subtitle: Text(url),
+                  onTap: () async {
+                    Navigator.of(sheetContext).pop();
+                    await Clipboard.setData(ClipboardData(text: url));
+
+                    if (!context.mounted) return;
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text('$label link copied.'),
+                      ),
+                    );
+                  },
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Future<void> _openSocialInApp(BuildContext context, Uri webUri) async {
+    final bool opened = await launchUrl(
+      webUri,
+      mode: LaunchMode.externalNonBrowserApplication,
+    );
+
+    if (!opened && context.mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('App not available. Choose browser or copy link instead.'),
+        ),
+      );
+    }
+  }
+
+  Future<void> _openSocialInBrowser(BuildContext context, Uri webUri) async {
+    final bool openedInBrowser = await launchUrl(
+      webUri,
+      mode: LaunchMode.inAppBrowserView,
+    );
+
+    if (openedInBrowser) return;
+
+    final bool openedExternally = await launchUrl(
+      webUri,
+      mode: LaunchMode.externalApplication,
+    );
+
+    if (!openedExternally && context.mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Unable to open this link right now.'),
+        ),
+      );
+    }
+  }
+
   Future<void> _openTikTok(BuildContext context) {
-    return _openUri(context, Uri.parse(tikTokUrl));
+    return _showSocialLinkOptions(
+      context,
+      label: 'TikTok',
+      handle: tikTokHandle,
+      url: tikTokUrl,
+    );
   }
 
   Future<void> _openX(BuildContext context) {
-    return _openUri(context, Uri.parse(xUrl));
+    return _showSocialLinkOptions(
+      context,
+      label: 'X',
+      handle: xHandle,
+      url: xUrl,
+    );
   }
 
   @override
