@@ -78,8 +78,8 @@ class BreakWaveContactLinksCard extends StatelessWidget {
                 ),
                 ListTile(
                   leading: const Icon(Icons.language),
-                  title: const Text('Open in browser'),
-                  subtitle: const Text('Open the web profile instead.'),
+                  title: const Text('Open web link'),
+                  subtitle: const Text('Open the website view instead of the social app.'),
                   onTap: () async {
                     Navigator.of(sheetContext).pop();
                     await _openSocialInBrowser(context, webUri);
@@ -132,18 +132,14 @@ class BreakWaveContactLinksCard extends StatelessWidget {
 
     if (openedInBrowser) return;
 
-    final bool openedExternally = await launchUrl(
-      webUri,
-      mode: LaunchMode.externalApplication,
-    );
+    await Clipboard.setData(ClipboardData(text: webUri.toString()));
 
-    if (!openedExternally && context.mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Unable to open this link right now.'),
-        ),
-      );
-    }
+    if (!context.mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Web link copied. Paste it into your browser.'),
+      ),
+    );
   }
 
   Future<void> _openTikTok(BuildContext context) {
