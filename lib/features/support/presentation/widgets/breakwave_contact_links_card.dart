@@ -3,7 +3,7 @@
 // Project: BreakWave
 // File: breakwave_contact_links_card.dart
 // Purpose: BW-48B BreakWave contact and social links.
-// Notes: BW-80A adds app/browser/copy chooser for social links.
+// Notes: BW-80D adds app/browser-specific/copy options for social links.
 // ------------------------------------------------------------
 
 import 'package:flutter/material.dart';
@@ -21,6 +21,8 @@ class BreakWaveContactLinksCard extends StatelessWidget {
   static const String xHandle = '@BreakWaveapp';
   static const String tikTokUrl = 'https://www.tiktok.com/@BreakWaveapp';
   static const String xUrl = 'https://x.com/BreakWaveapp';
+  static const String chromePackage = 'com.android.chrome';
+  static const String duckDuckGoPackage = 'com.duckduckgo.mobile.android';
 
   Future<void> _openUri(BuildContext context, Uri uri) async {
     final bool opened = await launchUrl(
@@ -73,7 +75,7 @@ class BreakWaveContactLinksCard extends StatelessWidget {
                 ListTile(
                   leading: const Icon(Icons.open_in_new),
                   title: const Text('Open in app'),
-                  subtitle: const Text('Uses the installed app when your device supports it.'),
+                  subtitle: const Text('Uses the installed social app when available.'),
                   onTap: () async {
                     Navigator.of(sheetContext).pop();
                     await _openSocialInApp(context, webUri);
@@ -81,27 +83,39 @@ class BreakWaveContactLinksCard extends StatelessWidget {
                 ),
                 ListTile(
                   leading: const Icon(Icons.language),
-                  title: const Text('Open web link'),
-                  subtitle: const Text('Open the website view instead of the social app.'),
+                  title: const Text('Open in Chrome'),
+                  subtitle: const Text('Open the web profile in Chrome.'),
                   onTap: () async {
                     Navigator.of(sheetContext).pop();
-                    await _openSocialInBrowser(context, webUri);
+                    await _openSocialInBrowserPackage(
+                      context,
+                      webUri,
+                      browserName: 'Chrome',
+                      packageName: chromePackage,
+                    );
+                  },
+                ),
+                ListTile(
+                  leading: const Icon(Icons.travel_explore),
+                  title: const Text('Open in DuckDuckGo'),
+                  subtitle: const Text('Open the web profile in DuckDuckGo Browser.'),
+                  onTap: () async {
+                    Navigator.of(sheetContext).pop();
+                    await _openSocialInBrowserPackage(
+                      context,
+                      webUri,
+                      browserName: 'DuckDuckGo',
+                      packageName: duckDuckGoPackage,
+                    );
                   },
                 ),
                 ListTile(
                   leading: const Icon(Icons.copy),
                   title: const Text('Copy link'),
-                  subtitle: Text(url),
+                  subtitle: const Text('Copy the web profile link.'),
                   onTap: () async {
                     Navigator.of(sheetContext).pop();
-                    await Clipboard.setData(ClipboardData(text: url));
-
-                    if (!context.mounted) return;
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text('$label link copied.'),
-                      ),
-                    );
+                    await _copySocialLink(context, label: label, url: url);
                   },
                 ),
               ],
@@ -121,33 +135,56 @@ class BreakWaveContactLinksCard extends StatelessWidget {
     if (!opened && context.mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('App not available. Choose browser or copy link instead.'),
+          content: Text('App not available. Choose a browser or copy link instead.'),
         ),
       );
     }
   }
 
-  Future<void> _openSocialInBrowser(BuildContext context, Uri webUri) async {
-    bool openedChooser = false;
+  Future<void> _openSocialInBrowserPackage(
+    BuildContext context,
+    Uri webUri, {
+    required String browserName,
+    required String packageName,
+  }) async {
+    bool opened = false;
 
     try {
-      openedChooser = await _socialLinksChannel.invokeMethod<bool>(
-            'openBrowserChooser',
-            <String, String>{'url': webUri.toString()},
+      opened = await _socialLinksChannel.invokeMethod<bool>(
+            'openUrlInPackage',
+            <String, String>{
+              'url': webUri.toString(),
+              'packageName': packageName,
+            },
           ) ??
           false;
     } catch (_) {
-      openedChooser = false;
+      opened = false;
     }
 
-    if (openedChooser) return;
+    if (opened) return;
 
     await Clipboard.setData(ClipboardData(text: webUri.toString()));
 
     if (!context.mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Web link copied. Paste it into your browser.'),
+      SnackBar(
+        content: Text('$browserName was not available. Web link copied.'),
+      ),
+    );
+  }
+
+  Future<void> _copySocialLink(
+    BuildContext context, {
+    required String label,
+    required String url,
+  }) async {
+    await Clipboard.setData(ClipboardData(text: url));
+
+    if (!context.mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('$label link copied.'),
       ),
     );
   }

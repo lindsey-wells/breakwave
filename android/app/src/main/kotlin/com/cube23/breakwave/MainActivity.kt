@@ -30,6 +30,15 @@ class MainActivity : FlutterActivity() {
             SOCIAL_LINKS_CHANNEL
         ).setMethodCallHandler { call, result ->
             when (call.method) {
+                "openUrlInPackage" -> {
+                    val url = call.argument<String>("url")
+                    val packageName = call.argument<String>("packageName")
+                    if (url.isNullOrBlank() || packageName.isNullOrBlank()) {
+                        result.success(false)
+                    } else {
+                        result.success(openUrlInPackage(url, packageName))
+                    }
+                }
                 "openBrowserChooser" -> {
                     val url = call.argument<String>("url")
                     if (url.isNullOrBlank()) {
@@ -51,6 +60,19 @@ class MainActivity : FlutterActivity() {
             )
         } else {
             window.clearFlags(WindowManager.LayoutParams.FLAG_SECURE)
+        }
+    }
+
+    private fun openUrlInPackage(url: String, packageName: String): Boolean {
+        return try {
+            val browserIntent = Intent(Intent.ACTION_VIEW, Uri.parse(url)).apply {
+                addCategory(Intent.CATEGORY_BROWSABLE)
+                setPackage(packageName)
+            }
+            startActivity(browserIntent)
+            true
+        } catch (_: Exception) {
+            false
         }
     }
 

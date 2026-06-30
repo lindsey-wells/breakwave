@@ -11,9 +11,10 @@ kt = kt_path.read_text(encoding="utf-8")
 
 dart_required = [
     "MethodChannel('breakwave/social_links')",
-    "openBrowserChooser",
-    "<String, String>{'url': webUri.toString()}",
-    "Web link copied. Paste it into your browser.",
+    "openUrlInPackage",
+    "'packageName': packageName",
+    "Open in Chrome",
+    "Open in DuckDuckGo",
     "LaunchMode.externalNonBrowserApplication",
 ]
 
@@ -22,20 +23,20 @@ kt_required = [
     "import android.net.Uri",
     "SOCIAL_LINKS_CHANNEL",
     "breakwave/social_links",
-    "openBrowserChooser",
-    "Intent.createChooser(webIntent, \"Open web link\")",
+    "openUrlInPackage",
+    "setPackage(packageName)",
     "Intent.ACTION_VIEW",
     "Intent.CATEGORY_BROWSABLE",
 ]
 
 for needle in dart_required:
     if needle not in dart:
-        print(f"FAIL BW-80C Dart missing: {needle}")
+        print(f"FAIL BW-80D Dart missing: {needle}")
         sys.exit(1)
 
 for needle in kt_required:
     if needle not in kt:
-        print(f"FAIL BW-80C Android missing: {needle}")
+        print(f"FAIL BW-80D Android missing: {needle}")
         sys.exit(1)
 
-print("PASS: BW-80C Android browser chooser verified.")
+print("PASS: BW-80D browser-specific social links verified.")
