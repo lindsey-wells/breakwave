@@ -9,11 +9,15 @@ required = [
     "import 'package:flutter/services.dart';",
     "showModalBottomSheet<void>",
     "Open in app",
+    "Open in browser",
+    "Copy link",
+    "Uses your default browser when available.",
+    "Choose browser",
     "Open in Chrome",
     "Open in DuckDuckGo",
-    "Copy link",
     "Clipboard.setData",
     "LaunchMode.externalNonBrowserApplication",
+    "openDefaultBrowser",
     "openUrlInPackage",
     "com.android.chrome",
     "com.duckduckgo.mobile.android",
@@ -23,7 +27,7 @@ required = [
 
 for needle in required:
     if needle not in text:
-        print(f"FAIL: missing BW-80A/B/D social chooser behavior: {needle}")
+        print(f"FAIL: missing BW-80E social chooser behavior: {needle}")
         sys.exit(1)
 
-print("PASS: BW-80A/B/D social link chooser verified.")
+print("PASS: BW-80E social link default-browser chooser verified.")

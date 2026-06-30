@@ -3,7 +3,7 @@
 // Project: BreakWave
 // File: breakwave_contact_links_card.dart
 // Purpose: BW-48B BreakWave contact and social links.
-// Notes: BW-80D adds app/browser-specific/copy options for social links.
+// Notes: BW-80E uses default browser first, with browser fallback choices.
 // ------------------------------------------------------------
 
 import 'package:flutter/material.dart';
@@ -83,30 +83,11 @@ class BreakWaveContactLinksCard extends StatelessWidget {
                 ),
                 ListTile(
                   leading: const Icon(Icons.language),
-                  title: const Text('Open in Chrome'),
-                  subtitle: const Text('Open the web profile in Chrome.'),
+                  title: const Text('Open in browser'),
+                  subtitle: const Text('Uses your default browser when available.'),
                   onTap: () async {
                     Navigator.of(sheetContext).pop();
-                    await _openSocialInBrowserPackage(
-                      context,
-                      webUri,
-                      browserName: 'Chrome',
-                      packageName: chromePackage,
-                    );
-                  },
-                ),
-                ListTile(
-                  leading: const Icon(Icons.travel_explore),
-                  title: const Text('Open in DuckDuckGo'),
-                  subtitle: const Text('Open the web profile in DuckDuckGo Browser.'),
-                  onTap: () async {
-                    Navigator.of(sheetContext).pop();
-                    await _openSocialInBrowserPackage(
-                      context,
-                      webUri,
-                      browserName: 'DuckDuckGo',
-                      packageName: duckDuckGoPackage,
-                    );
+                    await _openSocialInDefaultBrowser(context, webUri);
                   },
                 ),
                 ListTile(
@@ -135,10 +116,105 @@ class BreakWaveContactLinksCard extends StatelessWidget {
     if (!opened && context.mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('App not available. Choose a browser or copy link instead.'),
+          content: Text('App not available. Choose browser or copy link instead.'),
         ),
       );
     }
+  }
+
+  Future<void> _openSocialInDefaultBrowser(
+    BuildContext context,
+    Uri webUri,
+  ) async {
+    bool opened = false;
+
+    try {
+      opened = await _socialLinksChannel.invokeMethod<bool>(
+            'openDefaultBrowser',
+            <String, String>{'url': webUri.toString()},
+          ) ??
+          false;
+    } catch (_) {
+      opened = false;
+    }
+
+    if (opened) return;
+
+    if (!context.mounted) return;
+    await _showBrowserFallbackOptions(context, webUri);
+  }
+
+  Future<void> _showBrowserFallbackOptions(
+    BuildContext context,
+    Uri webUri,
+  ) async {
+    await showModalBottomSheet<void>(
+      context: context,
+      showDragHandle: true,
+      builder: (BuildContext sheetContext) {
+        return SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(20, 8, 20, 20),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                const ListTile(
+                  contentPadding: EdgeInsets.zero,
+                  title: Text('Choose browser'),
+                  subtitle: Text('No default browser was available.'),
+                ),
+                ListTile(
+                  leading: const Icon(Icons.language),
+                  title: const Text('Open in Chrome'),
+                  subtitle: const Text('Most Android devices include Chrome.'),
+                  onTap: () async {
+                    Navigator.of(sheetContext).pop();
+                    await _openSocialInBrowserPackage(
+                      context,
+                      webUri,
+                      browserName: 'Chrome',
+                      packageName: chromePackage,
+                    );
+                  },
+                ),
+                ListTile(
+                  leading: const Icon(Icons.travel_explore),
+                  title: const Text('Open in DuckDuckGo'),
+                  subtitle: const Text('Use DuckDuckGo Browser if installed.'),
+                  onTap: () async {
+                    Navigator.of(sheetContext).pop();
+                    await _openSocialInBrowserPackage(
+                      context,
+                      webUri,
+                      browserName: 'DuckDuckGo',
+                      packageName: duckDuckGoPackage,
+                    );
+                  },
+                ),
+                ListTile(
+                  leading: const Icon(Icons.copy),
+                  title: const Text('Copy link'),
+                  subtitle: const Text('Copy the web profile link.'),
+                  onTap: () async {
+                    Navigator.of(sheetContext).pop();
+                    await Clipboard.setData(
+                      ClipboardData(text: webUri.toString()),
+                    );
+
+                    if (!context.mounted) return;
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('Web link copied.'),
+                      ),
+                    );
+                  },
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
   }
 
   Future<void> _openSocialInBrowserPackage(

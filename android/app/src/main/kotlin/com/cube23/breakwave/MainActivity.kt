@@ -1,6 +1,7 @@
 package com.cube23.breakwave
 
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.net.Uri
 import android.view.WindowManager
 import io.flutter.embedding.android.FlutterActivity
@@ -30,6 +31,14 @@ class MainActivity : FlutterActivity() {
             SOCIAL_LINKS_CHANNEL
         ).setMethodCallHandler { call, result ->
             when (call.method) {
+                "openDefaultBrowser" -> {
+                    val url = call.argument<String>("url")
+                    if (url.isNullOrBlank()) {
+                        result.success(false)
+                    } else {
+                        result.success(openDefaultBrowser(url))
+                    }
+                }
                 "openUrlInPackage" -> {
                     val url = call.argument<String>("url")
                     val packageName = call.argument<String>("packageName")
@@ -60,6 +69,30 @@ class MainActivity : FlutterActivity() {
             )
         } else {
             window.clearFlags(WindowManager.LayoutParams.FLAG_SECURE)
+        }
+    }
+
+    private fun openDefaultBrowser(url: String): Boolean {
+        return try {
+            val defaultBrowserProbe = Intent(
+                Intent.ACTION_VIEW,
+                Uri.parse("https://www.example.com")
+            ).apply {
+                addCategory(Intent.CATEGORY_BROWSABLE)
+            }
+
+            val defaultPackage = packageManager
+                .resolveActivity(defaultBrowserProbe, PackageManager.MATCH_DEFAULT_ONLY)
+                ?.activityInfo
+                ?.packageName
+
+            if (defaultPackage.isNullOrBlank() || defaultPackage == "android") {
+                false
+            } else {
+                openUrlInPackage(url, defaultPackage)
+            }
+        } catch (_: Exception) {
+            false
         }
     }
 
