@@ -14,7 +14,7 @@ required = [
     "Clipboard.setData",
     "ClipboardData(text: url)",
     "LaunchMode.externalNonBrowserApplication",
-    "LaunchMode.inAppBrowserView",
+    "openBrowserChooser",
     "Web link copied. Paste it into your browser.",
     "App not available. Choose browser or copy link instead.",
     "https://www.tiktok.com/@BreakWaveapp",

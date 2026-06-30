@@ -13,6 +13,9 @@ import 'package:url_launcher/url_launcher.dart';
 class BreakWaveContactLinksCard extends StatelessWidget {
   const BreakWaveContactLinksCard({super.key});
 
+  static const MethodChannel _socialLinksChannel =
+      MethodChannel('breakwave/social_links');
+
   static const String emailAddress = 'BreakWaveapp@proton.me';
   static const String tikTokHandle = '@BreakWaveapp';
   static const String xHandle = '@BreakWaveapp';
@@ -125,12 +128,19 @@ class BreakWaveContactLinksCard extends StatelessWidget {
   }
 
   Future<void> _openSocialInBrowser(BuildContext context, Uri webUri) async {
-    final bool openedInBrowser = await launchUrl(
-      webUri,
-      mode: LaunchMode.inAppBrowserView,
-    );
+    bool openedChooser = false;
 
-    if (openedInBrowser) return;
+    try {
+      openedChooser = await _socialLinksChannel.invokeMethod<bool>(
+            'openBrowserChooser',
+            <String, String>{'url': webUri.toString()},
+          ) ??
+          false;
+    } catch (_) {
+      openedChooser = false;
+    }
+
+    if (openedChooser) return;
 
     await Clipboard.setData(ClipboardData(text: webUri.toString()));
 

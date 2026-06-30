@@ -1,5 +1,7 @@
 package com.cube23.breakwave
 
+import android.content.Intent
+import android.net.Uri
 import android.view.WindowManager
 import io.flutter.embedding.android.FlutterActivity
 import io.flutter.embedding.engine.FlutterEngine
@@ -22,6 +24,23 @@ class MainActivity : FlutterActivity() {
                 else -> result.notImplemented()
             }
         }
+
+        MethodChannel(
+            flutterEngine.dartExecutor.binaryMessenger,
+            SOCIAL_LINKS_CHANNEL
+        ).setMethodCallHandler { call, result ->
+            when (call.method) {
+                "openBrowserChooser" -> {
+                    val url = call.argument<String>("url")
+                    if (url.isNullOrBlank()) {
+                        result.success(false)
+                    } else {
+                        result.success(openBrowserChooser(url))
+                    }
+                }
+                else -> result.notImplemented()
+            }
+        }
     }
 
     private fun setScreenPrivacyEnabled(enabled: Boolean) {
@@ -35,7 +54,21 @@ class MainActivity : FlutterActivity() {
         }
     }
 
+    private fun openBrowserChooser(url: String): Boolean {
+        return try {
+            val webIntent = Intent(Intent.ACTION_VIEW, Uri.parse(url)).apply {
+                addCategory(Intent.CATEGORY_BROWSABLE)
+            }
+            val chooser = Intent.createChooser(webIntent, "Open web link")
+            startActivity(chooser)
+            true
+        } catch (_: Exception) {
+            false
+        }
+    }
+
     companion object {
         private const val SCREEN_PRIVACY_CHANNEL = "breakwave/screen_privacy"
+        private const val SOCIAL_LINKS_CHANNEL = "breakwave/social_links"
     }
 }
