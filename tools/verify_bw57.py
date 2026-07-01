@@ -5,7 +5,7 @@ path = Path("lib/features/home/presentation/home_screen.dart")
 text = path.read_text(encoding="utf-8")
 
 checks = [
-    "Open Rescue when the wave rises.",
+    "If the wave is rising, open Rescue.",
     "FastUrgeEntryCard(",
     "title: 'Your why and risk signals'",
     "const ReasonsFocusCard()",
