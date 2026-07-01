@@ -22,9 +22,8 @@ class BreakWaveContactLinksCard extends StatelessWidget {
   static const String tikTokUrl = 'https://www.tiktok.com/@BreakWaveapp';
   static const String xUrl = 'https://x.com/BreakWaveapp';
   static const String tikTokBrowserUrl =
-      'https://duckduckgo.com/?q=BreakWaveapp%20TikTok%20%40BreakWaveapp';
-  static const String xBrowserUrl =
-      'https://duckduckgo.com/?q=BreakWaveapp%20X%20%40BreakWaveapp';
+      'https://www.tiktok.com/@BreakWaveapp?is_from_webapp=1&sender_device=pc';
+  static const String xBrowserUrl = 'https://x.com/BreakWaveapp';
   static const String chromePackage = 'com.android.chrome';
   static const String duckDuckGoPackage = 'com.duckduckgo.mobile.android';
 
@@ -90,7 +89,7 @@ class BreakWaveContactLinksCard extends StatelessWidget {
                 ListTile(
                   leading: const Icon(Icons.language),
                   title: const Text('Open in browser'),
-                  subtitle: const Text('Uses a browser-safe web page when apps intercept direct links.'),
+                  subtitle: const Text('Tries the web profile in your browser. Copy link is the fallback.'),
                   onTap: () async {
                     Navigator.of(sheetContext).pop();
                     await _openSocialInDefaultBrowser(context, browserUri);

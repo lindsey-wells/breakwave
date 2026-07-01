@@ -8,10 +8,11 @@ card = card_path.read_text(encoding="utf-8")
 required = [
     "tikTokBrowserUrl",
     "xBrowserUrl",
-    "duckduckgo.com",
+    "is_from_webapp=1",
+    "sender_device=pc",
     "required String browserUrl",
     "final Uri browserUri = Uri.parse(browserUrl);",
-    "Uses a browser-safe web page when apps intercept direct links.",
+    "Tries the web profile in your browser. Copy link is the fallback.",
     "await _openSocialInDefaultBrowser(context, browserUri);",
     "browserUrl: tikTokBrowserUrl",
     "browserUrl: xBrowserUrl",
@@ -21,7 +22,7 @@ required = [
 
 for needle in required:
     if needle not in card:
-        print(f"FAIL BW-80F missing browser-safe social link behavior: {needle}")
+        print(f"FAIL BW-80G missing direct web-mode social link behavior: {needle}")
         sys.exit(1)
 
-print("PASS: BW-80F browser-safe social web links verified.")
+print("PASS: BW-80G direct web-mode social links verified.")

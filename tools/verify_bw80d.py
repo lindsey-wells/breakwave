@@ -7,7 +7,7 @@ card = (root / "lib/features/support/presentation/widgets/breakwave_contact_link
 required = [
     "Open in app",
     "Open in browser",
-    "Uses a browser-safe web page when apps intercept direct links.",
+    "Tries the web profile in your browser. Copy link is the fallback.",
     "Choose browser",
     "No default browser was available.",
     "Open in Chrome",
@@ -22,7 +22,7 @@ required = [
 
 for needle in required:
     if needle not in card:
-        print(f"FAIL BW-80F missing default-browser UX copy: {needle}")
+        print(f"FAIL BW-80G missing default-browser UX copy: {needle}")
         sys.exit(1)
 
-print("PASS: BW-80F default-browser social UX copy verified.")
+print("PASS: BW-80G default-browser social UX copy verified.")
