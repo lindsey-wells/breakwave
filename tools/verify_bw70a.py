@@ -13,10 +13,10 @@ checks = [
         "Learn the pattern",
     ]),
     ("lib/features/home/presentation/widgets/fast_urge_entry_card.dart", [
-        "BW-70A keeps the urgent CTA prominent",
+        "BW-81A keeps the urgent CTA prominent",
         "I feel the wave now",
         "Log urge and open Rescue",
-        "padding: const EdgeInsets.symmetric(vertical: 12)",
+        "minimumSize: const Size.fromHeight(56)",
     ]),
     ("lib/features/home/presentation/widgets/daily_encouragement_card.dart", [
         "BW-70A tightens Home layout",
@@ -70,4 +70,4 @@ for path in Path("lib/features/home").rglob("*.dart"):
 if failed:
     sys.exit(1)
 
-print("PASS: BW-70A Home layout polish verified.")
+print("PASS: BW-70A/BW-81A Home layout polish verified.")

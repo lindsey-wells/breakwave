@@ -3,7 +3,7 @@
 // Project: BreakWave
 // File: fast_urge_entry_card.dart
 // Purpose: BW-14 fast urge entry from Home.
-// Notes: BW-70A keeps the urgent CTA prominent while tightening Home layout.
+// Notes: BW-81A keeps the urgent CTA prominent with Home theme styling.
 // ------------------------------------------------------------
 
 import 'package:flutter/material.dart';
@@ -51,7 +51,9 @@ class _FastUrgeEntryCardState extends State<FastUrgeEntryCard> {
           id: DateTime.now().microsecondsSinceEpoch.toString(),
           entryType: 'Urge',
           intensity: result.intensity,
-          triggers: result.trigger == null ? const <String>[] : <String>[result.trigger!],
+          triggers: result.trigger == null
+              ? const <String>[]
+              : <String>[result.trigger!],
           notes: 'Quick urge entry from Home.',
           createdAtIso: DateTime.now().toIso8601String(),
         ),
@@ -110,11 +112,33 @@ class _FastUrgeEntryCardState extends State<FastUrgeEntryCard> {
             'Use this when the wave is rising and you do not want extra steps.',
           ),
           const SizedBox(height: 14),
-          FilledButton(
-            onPressed: _isSaving ? null : _openQuickEntry,
-            child: Padding(
-              padding: const EdgeInsets.symmetric(vertical: 12),
-              child: Text(_isSaving ? 'Saving...' : 'I feel the wave now'),
+          SizedBox(
+            width: double.infinity,
+            child: FilledButton(
+              style: FilledButton.styleFrom(
+                minimumSize: const Size.fromHeight(56),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 18,
+                  vertical: 16,
+                ),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(18),
+                ),
+                textStyle: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w800,
+                ),
+              ),
+              onPressed: _isSaving ? null : _openQuickEntry,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                mainAxisSize: MainAxisSize.min,
+                children: <Widget>[
+                  const Icon(Icons.waves),
+                  const SizedBox(width: 10),
+                  Text(_isSaving ? 'Saving...' : 'I feel the wave now'),
+                ],
+              ),
             ),
           ),
         ],
@@ -140,11 +164,12 @@ class _QuickUrgeSheetState extends State<_QuickUrgeSheet> {
     'Lonely',
     'Scrolling',
     'Late night',
+    'Other',
   ];
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
+    final ThemeData theme = Theme.of(context);
 
     return Padding(
       padding: EdgeInsets.only(
@@ -198,7 +223,7 @@ class _QuickUrgeSheetState extends State<_QuickUrgeSheet> {
           Wrap(
             spacing: 10,
             runSpacing: 10,
-            children: [
+            children: <Widget>[
               for (final String trigger in _quickTriggers)
                 FilterChip(
                   label: Text(trigger),

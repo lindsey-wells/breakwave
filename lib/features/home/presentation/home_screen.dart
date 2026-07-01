@@ -139,7 +139,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             ),
                             SizedBox(height: 8),
                             Text(
-                              'Open Rescue when the wave rises. Log what happened when you are ready.',
+                              'Check in each day. If the wave is rising, open Rescue. Afterward, use Log to honestly record what happened.',
                             ),
                           ],
                         ),

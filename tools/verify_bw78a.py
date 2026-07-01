@@ -6,7 +6,7 @@ checks = [
         "BW-78A simplifies Home for launch and moves the user's why higher.",
         "'Today'",
         "'Start here'",
-        "Open Rescue when the wave rises. Log what happened when you are ready.",
+        "Check in each day. If the wave is rising, open Rescue. Afterward, use Log to honestly record what happened.",
         "title: 'Your why and risk signals'",
         "title: 'Check in'",
         "eyebrow: 'Progress'",
@@ -77,4 +77,4 @@ for rel_path in [
 if failed:
     sys.exit(1)
 
-print("PASS: BW-78A Home simplification and launch polish verified.")
+print("PASS: BW-78A/BW-81A Home simplification and launch polish verified.")
