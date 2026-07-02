@@ -5,6 +5,7 @@
 // Purpose: BW-57 home dashboard cleanup for BreakWave.
 // Notes: Reduces empty-state clutter and keeps Rescue/action paths obvious.
 // Notes: BW-78A simplifies Home for launch and moves the user's why higher.
+// Notes: BW-81B adds clear Start here actions for check-in, Rescue, and Log.
 // ------------------------------------------------------------
 
 import 'package:flutter/material.dart';
@@ -44,6 +45,7 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   late final ValueNotifier<int> _privacyNotifier;
+  final GlobalKey _checkInSectionKey = GlobalKey();
 
   @override
   void initState() {
@@ -62,6 +64,19 @@ class _HomeScreenState extends State<HomeScreen> {
   void _handlePrivacyChanged() {
     if (!mounted) return;
     setState(() {});
+  }
+
+
+  void _scrollToDailyCheckIn() {
+    final BuildContext? checkInContext = _checkInSectionKey.currentContext;
+    if (checkInContext == null) return;
+
+    Scrollable.ensureVisible(
+      checkInContext,
+      duration: const Duration(milliseconds: 350),
+      curve: Curves.easeOutCubic,
+      alignment: 0.08,
+    );
   }
 
   Future<_HomeSummaryData> _loadSummary() async {
@@ -118,32 +133,54 @@ class _HomeScreenState extends State<HomeScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: <Widget>[
-                      const WaveSurface(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: <Widget>[
-                            Text(
-                              'Today',
-                              style: TextStyle(
-                                fontSize: 13,
-                                fontWeight: FontWeight.w700,
+                        WaveSurface(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: <Widget>[
+                              const Text(
+                                'Today',
+                                style: TextStyle(
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w700,
+                                ),
                               ),
-                            ),
-                            SizedBox(height: 8),
-                            Text(
-                              'Start here',
-                              style: TextStyle(
-                                fontSize: 22,
-                                fontWeight: FontWeight.w800,
+                              const SizedBox(height: 8),
+                              const Text(
+                                'Start here',
+                                style: TextStyle(
+                                  fontSize: 22,
+                                  fontWeight: FontWeight.w800,
+                                ),
                               ),
-                            ),
-                            SizedBox(height: 8),
-                            Text(
-                              'Check in each day. If the wave is rising, open Rescue. Afterward, use Log to honestly record what happened.',
-                            ),
-                          ],
+                              const SizedBox(height: 8),
+                              const Text(
+                                'Check in each day. If the wave is rising, open Rescue. Afterward, use Log to honestly record what happened.',
+                              ),
+                              const SizedBox(height: 14),
+                              Wrap(
+                                spacing: 10,
+                                runSpacing: 10,
+                                children: <Widget>[
+                                  FilledButton.tonalIcon(
+                                    onPressed: _scrollToDailyCheckIn,
+                                    icon: const Icon(Icons.check_circle_outline),
+                                    label: const Text('Check in'),
+                                  ),
+                                  OutlinedButton.icon(
+                                    onPressed: widget.onOpenRescue,
+                                    icon: const Icon(Icons.waves),
+                                    label: const Text('Open Rescue'),
+                                  ),
+                                  OutlinedButton.icon(
+                                    onPressed: widget.onOpenLog,
+                                    icon: const Icon(Icons.edit_note),
+                                    label: const Text('Open Log'),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
                         ),
-                      ),
                       const SizedBox(height: 12),
                       FastUrgeEntryCard(
                         onOpenRescue: widget.onOpenRescue,
@@ -159,10 +196,13 @@ class _HomeScreenState extends State<HomeScreen> {
                       const SizedBox(height: 16),
                       const DailyEncouragementCard(),
                       const SizedBox(height: 16),
-                      const SectionHeader(
-                        eyebrow: 'Today',
-                        title: 'Check in',
-                      ),
+                        KeyedSubtree(
+                          key: _checkInSectionKey,
+                          child: const SectionHeader(
+                            eyebrow: 'Today',
+                            title: 'Check in',
+                          ),
+                        ),
                       const DailyCheckInCard(),
                       const SizedBox(height: 12),
                       BedtimeDangerModeCard(

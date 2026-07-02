@@ -4,7 +4,7 @@ import sys
 checks = [
     ("lib/features/home/presentation/widgets/fast_urge_entry_card.dart", [
         "class FastUrgeEntryCard",
-        "I feel the wave now",
+        "Break this wave now",
         "Fast urge entry",
         "Log urge and open Rescue",
         "entryType: 'Urge'",

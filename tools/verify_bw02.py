@@ -32,8 +32,8 @@ STRING_PATTERNS = {
     ],
     "lib/features/home/presentation/widgets/fast_urge_entry_card.dart": [
         "class FastUrgeEntryCard",
-        "Log the wave fast and move straight into Rescue.",
-        "I feel the wave now",
+        "Use when the wave is rising and you want a quick rescue.",
+        "Break this wave now",
         "Log urge and open Rescue",
     ],
     "lib/features/home/presentation/widgets/recovery_cycle_preview_card.dart": [

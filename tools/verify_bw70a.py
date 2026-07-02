@@ -14,7 +14,7 @@ checks = [
     ]),
     ("lib/features/home/presentation/widgets/fast_urge_entry_card.dart", [
         "BW-81A keeps the urgent CTA prominent",
-        "I feel the wave now",
+        "Break this wave now",
         "Log urge and open Rescue",
         "minimumSize: const Size.fromHeight(56)",
     ]),
@@ -38,7 +38,7 @@ checks = [
     ("launch/home_layout_polish.md", [
         "BW-70A Home Layout Polish",
         "without adding new features",
-        "I feel the wave now",
+        "Break this wave now",
         "less oversized",
     ]),
 ]

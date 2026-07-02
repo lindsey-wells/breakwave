@@ -4,6 +4,7 @@
 // File: fast_urge_entry_card.dart
 // Purpose: BW-14 fast urge entry from Home.
 // Notes: BW-81A keeps the urgent CTA prominent with Home theme styling.
+// Notes: BW-81B simplifies quick rescue copy and strengthens the CTA label.
 // ------------------------------------------------------------
 
 import 'package:flutter/material.dart';
@@ -100,16 +101,12 @@ class _FastUrgeEntryCardState extends State<FastUrgeEntryCard> {
           ),
           const SizedBox(height: 6),
           const Text(
-            'Log the wave fast and move straight into Rescue.',
+            'Use when the wave is rising and you want a quick rescue.',
             style: TextStyle(
               fontSize: 21,
               fontWeight: FontWeight.w800,
               height: 1.12,
             ),
-          ),
-          const SizedBox(height: 8),
-          const Text(
-            'Use this when the wave is rising and you do not want extra steps.',
           ),
           const SizedBox(height: 14),
           SizedBox(
@@ -136,7 +133,7 @@ class _FastUrgeEntryCardState extends State<FastUrgeEntryCard> {
                 children: <Widget>[
                   const Icon(Icons.waves),
                   const SizedBox(width: 10),
-                  Text(_isSaving ? 'Saving...' : 'I feel the wave now'),
+                  Text(_isSaving ? 'Saving...' : 'Break this wave now'),
                 ],
               ),
             ),

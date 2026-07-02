@@ -8,7 +8,7 @@ BW-70A tightens the Home tab for launch without adding new features.
 
 - Reduced Home screen vertical spacing.
 - Added safer bottom scroll padding above the bottom navigation.
-- Kept the urgent "I feel the wave now" path prominent.
+- Kept the urgent "Break this wave now" path prominent.
 - Compacted Daily Encouragement.
 - Compacted Bedtime danger mode spacing.
 - Compacted the Recovery cycle wheel teaser.

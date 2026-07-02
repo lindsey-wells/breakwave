@@ -14,13 +14,13 @@ home_required = [
 
 card_required = [
     "BW-81A keeps the urgent CTA prominent with Home theme styling.",
-    "Log the wave fast and move straight into Rescue.",
-    "Use this when the wave is rising and you do not want extra steps.",
+    "Use when the wave is rising and you want a quick rescue.",
+    "Use when the wave is rising and you want a quick rescue.",
     "width: double.infinity",
     "FilledButton.styleFrom(",
     "minimumSize: const Size.fromHeight(56)",
     "const Icon(Icons.waves)",
-    "I feel the wave now",
+    "Break this wave now",
     "'Other'",
     "Fast urge entry",
     "Log urge and open Rescue",
