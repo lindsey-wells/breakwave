@@ -6,7 +6,7 @@ card = (root / "lib/features/home/presentation/widgets/daily_encouragement_card.
 
 required = [
     "BW-81C rotates grounded recovery encouragement by day.",
-    "static const DateTime _rotationStartDate = DateTime(2026, 1, 1);",
+    "static final DateTime _rotationStartDate = DateTime(2026, 1, 1);",
     "static const List<_DailyEncouragementLine> _encouragementLines",
     "_DailyEncouragementLine(",
     "An urge is a wave, not a command.",
@@ -34,6 +34,7 @@ if card.count("_DailyEncouragementLine(") < 10:
 for forbidden in [
     "Random(",
     "shuffle(",
+    "static const DateTime _rotationStartDate",
     "http://",
     "https://",
 ]:

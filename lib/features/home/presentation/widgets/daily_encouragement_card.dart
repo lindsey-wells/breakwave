@@ -12,7 +12,7 @@ import 'package:flutter/material.dart';
 class DailyEncouragementCard extends StatelessWidget {
   const DailyEncouragementCard({super.key});
 
-  static const DateTime _rotationStartDate = DateTime(2026, 1, 1);
+  static final DateTime _rotationStartDate = DateTime(2026, 1, 1);
 
   static const List<_DailyEncouragementLine> _encouragementLines =
       <_DailyEncouragementLine>[
