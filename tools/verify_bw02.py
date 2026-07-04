@@ -38,7 +38,7 @@ STRING_PATTERNS = {
     ],
     "lib/features/home/presentation/widgets/recovery_cycle_preview_card.dart": [
         "class RecoveryCyclePreviewCard",
-        "The recovery pattern",
+        "Learn the Wave Pattern",
         "Trigger",
         "Urge",
         "Trigger → Urge → Pressure → Choice → Reset",

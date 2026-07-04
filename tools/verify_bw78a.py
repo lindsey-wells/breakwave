@@ -20,9 +20,9 @@ checks = [
         "This keeps Home anchored to something real.",
     ]),
     ("lib/features/home/presentation/widgets/recovery_cycle_preview_card.dart", [
-        "The recovery pattern",
+        "Learn the Wave Pattern",
         "Trigger → Urge → Pressure → Choice → Reset",
-        "Tap to learn where to interrupt the wave sooner.",
+        "Tap to open the Recovery Cycle Wheel.",
     ]),
     ("lib/features/cycle/domain/recovery_cycle_stage.dart", [
         "The wave gets stronger and more persuasive.",

@@ -4,6 +4,7 @@
 // File: recovery_cycle_preview_card.dart
 // Purpose: BW-27 recovery cycle wheel entry card.
 // Notes: BW-70A compacts the cycle preview into a tighter Home teaser.
+// Notes: BW-81E reframes the teaser as Learn the Wave Pattern.
 // ------------------------------------------------------------
 
 import 'package:flutter/material.dart';
@@ -12,6 +13,25 @@ import '../../../cycle/presentation/recovery_cycle_wheel_screen.dart';
 
 class RecoveryCyclePreviewCard extends StatelessWidget {
   const RecoveryCyclePreviewCard({super.key});
+
+  static const List<_WavePatternStep> _steps = <_WavePatternStep>[
+    _WavePatternStep(
+      title: 'What it feels like',
+      body: 'A trigger turns into pressure, urgency, bargaining, or autopilot.',
+    ),
+    _WavePatternStep(
+      title: 'What to watch for',
+      body: 'Notice isolation, late-night scrolling, secrecy, stress, or fantasy loops.',
+    ),
+    _WavePatternStep(
+      title: 'What BreakWave helps you do',
+      body: 'Name the wave, use Rescue, log honestly, and learn the pattern sooner.',
+    ),
+    _WavePatternStep(
+      title: 'Next right action',
+      body: 'Tap in, learn the cycle, then interrupt the wave before it builds.',
+    ),
+  ];
 
   @override
   Widget build(BuildContext context) {
@@ -75,7 +95,7 @@ class RecoveryCyclePreviewCard extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
                   Text(
-                    'The recovery pattern',
+                    'Learn the Wave Pattern',
                     style: theme.textTheme.titleMedium?.copyWith(
                       fontWeight: FontWeight.w700,
                     ),
@@ -84,10 +104,40 @@ class RecoveryCyclePreviewCard extends StatelessWidget {
                   const Text(
                     'Trigger → Urge → Pressure → Choice → Reset',
                   ),
-                  const SizedBox(height: 6),
+                  const SizedBox(height: 8),
                   Text(
-                    'Tap to learn where to interrupt the wave sooner.',
+                    'Recovery gets easier when you can spot the wave before it takes over.',
                     style: theme.textTheme.bodyMedium,
+                  ),
+                  const SizedBox(height: 14),
+                  for (final _WavePatternStep step in _steps) ...<Widget>[
+                    _WavePatternRow(step: step),
+                    if (step != _steps.last) const SizedBox(height: 10),
+                  ],
+                  const SizedBox(height: 14),
+                  Row(
+                    children: <Widget>[
+                      Icon(
+                        Icons.waves,
+                        size: 18,
+                        color: colorScheme.primary,
+                      ),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          'Tap to open the Recovery Cycle Wheel.',
+                          style: theme.textTheme.bodySmall?.copyWith(
+                            color: colorScheme.primary,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                      ),
+                      Icon(
+                        Icons.chevron_right,
+                        size: 18,
+                        color: colorScheme.primary,
+                      ),
+                    ],
                   ),
                 ],
               ),
@@ -97,6 +147,64 @@ class RecoveryCyclePreviewCard extends StatelessWidget {
       ),
     );
   }
+}
+
+class _WavePatternRow extends StatelessWidget {
+  final _WavePatternStep step;
+
+  const _WavePatternRow({
+    required this.step,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final ThemeData theme = Theme.of(context);
+    final ColorScheme colorScheme = theme.colorScheme;
+
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: <Widget>[
+        Container(
+          width: 7,
+          height: 7,
+          margin: const EdgeInsets.only(top: 7),
+          decoration: BoxDecoration(
+            color: colorScheme.primary.withOpacity(0.82),
+            shape: BoxShape.circle,
+          ),
+        ),
+        const SizedBox(width: 10),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              Text(
+                step.title,
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+              const SizedBox(height: 2),
+              Text(
+                step.body,
+                style: theme.textTheme.bodySmall,
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _WavePatternStep {
+  const _WavePatternStep({
+    required this.title,
+    required this.body,
+  });
+
+  final String title;
+  final String body;
 }
 
 class _PreviewWavePainter extends CustomPainter {

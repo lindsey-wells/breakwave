@@ -32,7 +32,7 @@ checks = [
     ("lib/features/home/presentation/widgets/recovery_cycle_preview_card.dart", [
         "BW-70A compacts the cycle preview",
         "Trigger → Urge → Pressure → Choice → Reset",
-        "Tap to learn where to interrupt the wave sooner.",
+        "Tap to open the Recovery Cycle Wheel.",
         "EdgeInsets.fromLTRB(16, 15, 16, 16)",
     ]),
     ("launch/home_layout_polish.md", [
