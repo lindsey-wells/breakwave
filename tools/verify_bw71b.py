@@ -5,8 +5,8 @@ checks = [
     ("lib/features/rescue/presentation/widgets/remember_why_card.dart", [
         "BW-71B keeps Remember Why visible",
         "Your saved why will appear here during Rescue",
-        "Add your why in Support",
-        "widget.onOpenSupport",
+        "Add your why here",
+        "onAddWhy",
         "Remember why",
         "hasAnyContent",
     ]),
