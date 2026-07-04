@@ -5,6 +5,7 @@
 // Purpose: BW-14 fast urge entry from Home.
 // Notes: BW-81A keeps the urgent CTA prominent with Home theme styling.
 // Notes: BW-81B simplifies quick rescue copy and strengthens the CTA label.
+// Notes: BW-81F adds custom Other trigger capture to Fast Urge.
 // ------------------------------------------------------------
 
 import 'package:flutter/material.dart';
@@ -152,8 +153,13 @@ class _QuickUrgeSheet extends StatefulWidget {
 }
 
 class _QuickUrgeSheetState extends State<_QuickUrgeSheet> {
+  final TextEditingController _otherTriggerController =
+      TextEditingController();
+
   int _intensity = 3;
   String? _selectedTrigger;
+
+  static const String _otherLabel = 'Other';
 
   static const List<String> _quickTriggers = <String>[
     'Stress',
@@ -161,12 +167,48 @@ class _QuickUrgeSheetState extends State<_QuickUrgeSheet> {
     'Lonely',
     'Scrolling',
     'Late night',
-    'Other',
+    _otherLabel,
   ];
+
+  @override
+  void dispose() {
+    _otherTriggerController.dispose();
+    super.dispose();
+  }
+
+  void _setSelectedTrigger(String trigger, bool selected) {
+    setState(() {
+      if (selected) {
+        _selectedTrigger = trigger;
+
+        if (trigger != _otherLabel) {
+          _otherTriggerController.clear();
+        }
+      } else if (_selectedTrigger == trigger) {
+        _selectedTrigger = null;
+
+        if (trigger == _otherLabel) {
+          _otherTriggerController.clear();
+        }
+      }
+    });
+  }
+
+  String? _resolvedTrigger() {
+    if (_selectedTrigger == null) return null;
+
+    if (_selectedTrigger == _otherLabel) {
+      final String customTrigger = _otherTriggerController.text.trim();
+      return customTrigger.isEmpty ? _otherLabel : 'Other: $customTrigger';
+    }
+
+    return _selectedTrigger;
+  }
 
   @override
   Widget build(BuildContext context) {
     final ThemeData theme = Theme.of(context);
+    final bool showOtherTriggerField = _selectedTrigger == _otherLabel;
 
     return Padding(
       padding: EdgeInsets.only(
@@ -226,20 +268,31 @@ class _QuickUrgeSheetState extends State<_QuickUrgeSheet> {
                   label: Text(trigger),
                   selected: _selectedTrigger == trigger,
                   onSelected: (bool selected) {
-                    setState(() {
-                      _selectedTrigger = selected ? trigger : null;
-                    });
+                    _setSelectedTrigger(trigger, selected);
                   },
                 ),
             ],
           ),
+          if (showOtherTriggerField) ...<Widget>[
+            const SizedBox(height: 12),
+            TextField(
+              controller: _otherTriggerController,
+              textInputAction: TextInputAction.done,
+              decoration: const InputDecoration(
+                labelText: 'Name the trigger',
+                hintText: 'Example: Instagram, argument, hotel room',
+                helperText: 'Optional. Blank saves as Other.',
+                border: OutlineInputBorder(),
+              ),
+            ),
+          ],
           const SizedBox(height: 22),
           FilledButton(
             onPressed: () {
               Navigator.of(context).pop(
                 _QuickUrgeResult(
                   intensity: _intensity,
-                  trigger: _selectedTrigger,
+                  trigger: _resolvedTrigger(),
                 ),
               );
             },
