@@ -4,6 +4,7 @@
 // File: recovery_snapshot_card.dart
 // Purpose: Persisted recovery snapshot card for the BW-09 home flow.
 // Notes: BW-09 home summary from persisted data.
+// Notes: BW-81D makes snapshot metrics tappable entry points to Log.
 // ------------------------------------------------------------
 
 import 'package:flutter/material.dart';
@@ -13,6 +14,7 @@ class RecoverySnapshotCard extends StatelessWidget {
   final int urgeCount;
   final int slipCount;
   final int victoryCount;
+  final VoidCallback onOpenLog;
 
   const RecoverySnapshotCard({
     super.key,
@@ -20,6 +22,7 @@ class RecoverySnapshotCard extends StatelessWidget {
     required this.urgeCount,
     required this.slipCount,
     required this.victoryCount,
+    required this.onOpenLog,
   });
 
   @override
@@ -39,7 +42,7 @@ class RecoverySnapshotCard extends StatelessWidget {
             const SizedBox(height: 8),
             Text(
               hasData
-                  ? 'A simple read on what has been logged so far on this device.'
+                  ? 'Tap any snapshot number to open your Log.'
                   : 'No saved data yet. Your home snapshot will fill in as you log moments.',
               style: Theme.of(context).textTheme.bodyMedium,
             ),
@@ -51,18 +54,22 @@ class RecoverySnapshotCard extends StatelessWidget {
                 _MetricPill(
                   label: 'Saved entries',
                   value: '$totalEntries',
+                  onTap: onOpenLog,
                 ),
                 _MetricPill(
                   label: 'Urges',
                   value: '$urgeCount',
+                  onTap: onOpenLog,
                 ),
                 _MetricPill(
                   label: 'Slips',
                   value: '$slipCount',
+                  onTap: onOpenLog,
                 ),
                 _MetricPill(
                   label: 'Victories',
                   value: '$victoryCount',
+                  onTap: onOpenLog,
                 ),
               ],
             ),
@@ -76,34 +83,56 @@ class RecoverySnapshotCard extends StatelessWidget {
 class _MetricPill extends StatelessWidget {
   final String label;
   final String value;
+  final VoidCallback onTap;
 
   const _MetricPill({
     required this.label,
     required this.value,
+    required this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      constraints: const BoxConstraints(minWidth: 130),
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: const Color(0x22FFFFFF)),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget>[
-          Text(
-            label,
-            style: Theme.of(context).textTheme.bodySmall,
+    final BorderRadius borderRadius = BorderRadius.circular(18);
+
+    return Semantics(
+      button: true,
+      label: '$label: $value. Open Log.',
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: borderRadius,
+        child: Container(
+          constraints: const BoxConstraints(minWidth: 130),
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
+          decoration: BoxDecoration(
+            borderRadius: borderRadius,
+            border: Border.all(color: const Color(0x22FFFFFF)),
           ),
-          const SizedBox(height: 6),
-          Text(
-            value,
-            style: Theme.of(context).textTheme.titleLarge,
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    Text(
+                      label,
+                      style: Theme.of(context).textTheme.bodySmall,
+                    ),
+                    const SizedBox(height: 6),
+                    Text(
+                      value,
+                      style: Theme.of(context).textTheme.titleLarge,
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(width: 8),
+              const Icon(Icons.chevron_right, size: 18),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }

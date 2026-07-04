@@ -219,6 +219,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           urgeCount: summary.urgeCount,
                           slipCount: summary.slipCount,
                           victoryCount: summary.victoryCount,
+                          onOpenLog: widget.onOpenLog,
                         ),
                         if (!summary.privacy.hideLatestLoggedMoment) ...<Widget>[
                           const SizedBox(height: 16),
