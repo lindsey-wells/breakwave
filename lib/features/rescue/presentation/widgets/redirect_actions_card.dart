@@ -4,6 +4,7 @@
 // File: redirect_actions_card.dart
 // Purpose: BW-65 Rescue next right action selector.
 // Notes: Keeps one clear replacement action active during Rescue.
+// Notes: BW-82C makes Open your why actionable and adds Other capture.
 // ------------------------------------------------------------
 
 import 'package:flutter/material.dart';
@@ -19,18 +20,24 @@ class RedirectActionsCard extends StatefulWidget {
     super.key,
     required this.selectedAction,
     required this.onActionSelected,
+    required this.onOpenWhy,
   });
 
   final String? selectedAction;
   final ValueChanged<String?> onActionSelected;
+  final VoidCallback onOpenWhy;
 
   @override
   State<RedirectActionsCard> createState() => _RedirectActionsCardState();
 }
 
 class _RedirectActionsCardState extends State<RedirectActionsCard> {
+  final TextEditingController _otherActionController = TextEditingController();
+
   SupportContact? _contact;
   RecoveryMode _mode = RecoveryMode.secular;
+
+  static const String _otherLabel = 'Other';
 
   static const List<String> _baseActions = <String>[
     'Put the phone down',
@@ -39,6 +46,7 @@ class _RedirectActionsCardState extends State<RedirectActionsCard> {
     'Text someone safe',
     'Cold water reset',
     'Take a short walk',
+    _otherLabel,
   ];
 
   @override
@@ -46,14 +54,25 @@ class _RedirectActionsCardState extends State<RedirectActionsCard> {
     super.initState();
     SupportContactStore.changes.addListener(_loadContact);
     RecoveryModeStore.changes.addListener(_loadMode);
+    _syncOtherActionController();
     _loadContact();
     _loadMode();
+  }
+
+  @override
+  void didUpdateWidget(covariant RedirectActionsCard oldWidget) {
+    super.didUpdateWidget(oldWidget);
+
+    if (oldWidget.selectedAction != widget.selectedAction) {
+      _syncOtherActionController();
+    }
   }
 
   @override
   void dispose() {
     SupportContactStore.changes.removeListener(_loadContact);
     RecoveryModeStore.changes.removeListener(_loadMode);
+    _otherActionController.dispose();
     super.dispose();
   }
 
@@ -85,6 +104,41 @@ class _RedirectActionsCardState extends State<RedirectActionsCard> {
     return _baseActions;
   }
 
+  bool _isOtherAction(String? action) {
+    return action == _otherLabel || (action?.startsWith('Other: ') ?? false);
+  }
+
+  bool get _isOtherSelected => _isOtherAction(widget.selectedAction);
+
+  String get _customOtherAction {
+    final String? action = widget.selectedAction;
+
+    if (action != null && action.startsWith('Other: ')) {
+      return action.substring('Other: '.length);
+    }
+
+    return '';
+  }
+
+  void _syncOtherActionController() {
+    if (_isOtherSelected) {
+      final String customAction = _customOtherAction;
+      if (_otherActionController.text != customAction) {
+        _otherActionController.text = customAction;
+      }
+    } else if (_otherActionController.text.isNotEmpty) {
+      _otherActionController.clear();
+    }
+  }
+
+  void _setOtherActionText(String value) {
+    final String customAction = value.trim();
+
+    widget.onActionSelected(
+      customAction.isEmpty ? _otherLabel : 'Other: $customAction',
+    );
+  }
+
   void _showActionNudge(String message) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
@@ -111,16 +165,37 @@ class _RedirectActionsCardState extends State<RedirectActionsCard> {
   }
 
   Future<void> _selectAction(String action) async {
+    final bool isSelected =
+        action == _otherLabel ? _isOtherSelected : widget.selectedAction == action;
+
+    if (action == _otherLabel) {
+      _showActionNudge(_nudgeForAction(action));
+
+      if (isSelected) {
+        _otherActionController.clear();
+        widget.onActionSelected(null);
+      } else {
+        widget.onActionSelected(_otherLabel);
+      }
+
+      return;
+    }
+
     if (action == 'Text someone safe') {
       final bool ok = await _textSomeoneSafe();
       if (!ok) return;
+    } else if (action == 'Open your why') {
+      widget.onOpenWhy();
+      _showActionNudge(_nudgeForAction(action));
     } else {
       _showActionNudge(_nudgeForAction(action));
     }
 
-    widget.onActionSelected(
-      widget.selectedAction == action ? null : action,
-    );
+    if (_otherActionController.text.isNotEmpty) {
+      _otherActionController.clear();
+    }
+
+    widget.onActionSelected(isSelected ? null : action);
   }
 
   String _nudgeForAction(String action) {
@@ -137,6 +212,8 @@ class _RedirectActionsCardState extends State<RedirectActionsCard> {
         return 'Good move. Walk for a minute and interrupt the pattern physically.';
       case 'Pray for one minute':
         return 'Good move. Pray slowly and choose the next faithful step.';
+      case _otherLabel:
+        return 'Good move. Name the clean next action that protects your future self.';
       default:
         return 'Good move. Take the next right action now.';
     }
@@ -180,7 +257,8 @@ class _RedirectActionsCardState extends State<RedirectActionsCard> {
             spacing: 10,
             runSpacing: 10,
             children: _actions.map((String action) {
-              final bool isSelected = widget.selectedAction == action;
+              final bool isSelected =
+                  action == _otherLabel ? _isOtherSelected : widget.selectedAction == action;
 
               return ChoiceChip(
                 label: Text(action),
@@ -188,20 +266,30 @@ class _RedirectActionsCardState extends State<RedirectActionsCard> {
                 showCheckmark: true,
                 selectedColor: colorScheme.primary,
                 labelStyle: TextStyle(
-                  color: isSelected
-                      ? colorScheme.onPrimary
-                      : colorScheme.onSurface,
+                  color: isSelected ? colorScheme.onPrimary : colorScheme.onSurface,
                   fontWeight: FontWeight.w700,
                 ),
                 side: BorderSide(
-                  color: isSelected
-                      ? colorScheme.primary
-                      : colorScheme.outlineVariant,
+                  color: isSelected ? colorScheme.primary : colorScheme.outlineVariant,
                 ),
                 onSelected: (_) => _selectAction(action),
               );
             }).toList(),
           ),
+          if (_isOtherSelected) ...<Widget>[
+            const SizedBox(height: 14),
+            TextField(
+              controller: _otherActionController,
+              textInputAction: TextInputAction.done,
+              onChanged: _setOtherActionText,
+              decoration: const InputDecoration(
+                labelText: 'Name the next right action',
+                hintText: 'Example: call sponsor, go outside, put phone in kitchen',
+                helperText: 'Optional. Blank saves as Other.',
+                border: OutlineInputBorder(),
+              ),
+            ),
+          ],
         ],
       ),
     );

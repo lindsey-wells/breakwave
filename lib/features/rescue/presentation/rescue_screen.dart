@@ -41,6 +41,7 @@ class RescueScreen extends StatefulWidget {
 class _RescueScreenState extends State<RescueScreen> {
   final LogRepository _repository = const LogRepository();
   final ScrollController _scrollController = ScrollController();
+  final GlobalKey _rememberWhyKey = GlobalKey();
   final GlobalKey _redirectActionsKey = GlobalKey();
   final GlobalKey _calmResetKey = GlobalKey();
 
@@ -353,7 +354,10 @@ class _RescueScreenState extends State<RescueScreen> {
                     onSelected: _setIntensity,
                   ),
                   const SizedBox(height: 16),
-                  RememberWhyCard(onOpenSupport: widget.onOpenSupport),
+                  KeyedSubtree(
+                    key: _rememberWhyKey,
+                    child: RememberWhyCard(onOpenSupport: widget.onOpenSupport),
+                  ),
                   const SizedBox(height: 20),
                   const SectionHeader(
                     eyebrow: 'Interrupt now',
@@ -364,6 +368,7 @@ class _RescueScreenState extends State<RescueScreen> {
                     child: RedirectActionsCard(
                       selectedAction: _selectedNextAction,
                       onActionSelected: _setNextAction,
+                      onOpenWhy: () => _scrollTo(_rememberWhyKey),
                     ),
                   ),
                   const SizedBox(height: 20),
