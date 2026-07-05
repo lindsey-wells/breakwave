@@ -5,6 +5,7 @@
 // Purpose: Calm reset guidance card for the BW-03 rescue flow.
 // Notes: BW-71A makes Calm Reset interactive.
 // Notes: BW-71B guides Calm Reset through three automatic breathing rounds.
+// Notes: BW-82D adds a short settle pause after the exhale step.
 // ------------------------------------------------------------
 
 import 'dart:async';
@@ -20,6 +21,7 @@ class CalmResetCard extends StatefulWidget {
 
 class _CalmResetCardState extends State<CalmResetCard> {
   static const int _targetRounds = 3;
+  static const int _postStepPauseSeconds = 2;
 
   static const List<_ResetStep> _steps = <_ResetStep>[
     _ResetStep(
@@ -41,6 +43,7 @@ class _CalmResetCardState extends State<CalmResetCard> {
 
   Timer? _timer;
   bool _isRunning = false;
+  bool _isPostStepPause = false;
   int _activeStep = -1;
   int _remainingSeconds = 0;
   int _completedRounds = 0;
@@ -56,6 +59,7 @@ class _CalmResetCardState extends State<CalmResetCard> {
 
     setState(() {
       _isRunning = true;
+      _isPostStepPause = false;
       _activeStep = 0;
       _remainingSeconds = _steps.first.seconds;
       _completedRounds = 0;
@@ -80,10 +84,19 @@ class _CalmResetCardState extends State<CalmResetCard> {
         return;
       }
 
+      if (_activeStep == _steps.length - 1 && !_isPostStepPause) {
+        setState(() {
+          _isPostStepPause = true;
+          _remainingSeconds = _postStepPauseSeconds;
+        });
+        return;
+      }
+
       final int nextStep = _activeStep + 1;
 
       if (nextStep < _steps.length) {
         setState(() {
+          _isPostStepPause = false;
           _activeStep = nextStep;
           _remainingSeconds = _steps[nextStep].seconds;
         });
@@ -128,6 +141,7 @@ class _CalmResetCardState extends State<CalmResetCard> {
 
     setState(() {
       _isRunning = false;
+      _isPostStepPause = false;
       _activeStep = -1;
       _remainingSeconds = 0;
     });
@@ -169,7 +183,9 @@ class _CalmResetCardState extends State<CalmResetCard> {
             if (_isRunning) ...<Widget>[
               const SizedBox(height: 10),
               Text(
-                'Round ${_completedRounds + 1} of $_targetRounds • ${_steps[_activeStep].verb} • $_remainingSeconds seconds',
+                _isPostStepPause
+                    ? 'Round ${_completedRounds + 1} of $_targetRounds • Let it settle • $_remainingSeconds seconds'
+                    : 'Round ${_completedRounds + 1} of $_targetRounds • ${_steps[_activeStep].verb} • $_remainingSeconds seconds',
                 style: theme.textTheme.titleMedium?.copyWith(
                   color: theme.colorScheme.primary,
                   fontWeight: FontWeight.w800,
