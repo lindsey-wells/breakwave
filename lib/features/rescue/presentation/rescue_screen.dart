@@ -25,11 +25,13 @@ import 'widgets/wave_completion_card.dart';
 class RescueScreen extends StatefulWidget {
   final VoidCallback onReturnHome;
   final VoidCallback onOpenSupport;
+  final VoidCallback onOpenLog;
 
   const RescueScreen({
     super.key,
     required this.onReturnHome,
     required this.onOpenSupport,
+    required this.onOpenLog,
   });
 
   @override
@@ -45,6 +47,7 @@ class _RescueScreenState extends State<RescueScreen> {
   int _selectedIntensity = 3;
   String? _selectedNextAction;
   bool _showStillStrongFollowUp = false;
+  bool _showWaveSavedFollowUp = false;
 
   void _setIntensity(int value) {
     setState(() {
@@ -133,14 +136,17 @@ class _RescueScreenState extends State<RescueScreen> {
         setState(() {
           _selectedNextAction = null;
           _showStillStrongFollowUp = false;
+          _showWaveSavedFollowUp = true;
         });
       } else if (entryType == 'Urge') {
         setState(() {
           _showStillStrongFollowUp = true;
+          _showWaveSavedFollowUp = false;
         });
       } else if (entryType == 'Slip') {
         setState(() {
           _showStillStrongFollowUp = false;
+          _showWaveSavedFollowUp = false;
         });
       }
 
@@ -175,8 +181,8 @@ class _RescueScreenState extends State<RescueScreen> {
       actionTaken: 'Completed Rescue.',
       betterPlan: 'Repeat this Rescue path earlier next time.',
       notes: 'Made it through this wave from Rescue.',
-      snackBarText: 'Nice work. Wave saved with your next right action.',
-      returnHome: true,
+      snackBarText: 'Wave saved. You made it through this wave.',
+      returnHome: false,
       openSupport: false,
     );
   }
@@ -202,6 +208,52 @@ class _RescueScreenState extends State<RescueScreen> {
       snackBarText: 'Slip saved. Opening Support so you can choose the next safe step.',
       returnHome: false,
       openSupport: true,
+    );
+  }
+
+  Widget _buildWaveSavedFollowUpCard(BuildContext context) {
+    final ThemeData theme = Theme.of(context);
+
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            Text(
+              'Wave saved',
+              style: theme.textTheme.titleLarge,
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'You made it through this wave. This victory was saved to your Log.',
+              style: theme.textTheme.bodyMedium,
+            ),
+            const SizedBox(height: 16),
+            FilledButton.icon(
+              onPressed: widget.onOpenLog,
+              icon: const Icon(Icons.edit_note_outlined),
+              label: const Text('Open Log'),
+            ),
+            const SizedBox(height: 10),
+            FilledButton.tonalIcon(
+              onPressed: widget.onReturnHome,
+              icon: const Icon(Icons.home_outlined),
+              label: const Text('Return Home'),
+            ),
+            const SizedBox(height: 10),
+            OutlinedButton.icon(
+              onPressed: () {
+                setState(() {
+                  _showWaveSavedFollowUp = false;
+                });
+              },
+              icon: const Icon(Icons.waves_outlined),
+              label: const Text('Stay in Rescue'),
+            ),
+          ],
+        ),
+      ),
     );
   }
 
@@ -339,6 +391,10 @@ class _RescueScreenState extends State<RescueScreen> {
                     onStillStrong: _logStillStrong,
                     onSlipped: _logSlip,
                   ),
+                    if (_showWaveSavedFollowUp) ...<Widget>[
+                      const SizedBox(height: 16),
+                      _buildWaveSavedFollowUpCard(context),
+                    ],
                   if (_showStillStrongFollowUp) ...<Widget>[
                     const SizedBox(height: 16),
                     _buildStillStrongFollowUpCard(context),

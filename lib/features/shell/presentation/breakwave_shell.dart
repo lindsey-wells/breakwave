@@ -163,6 +163,7 @@ class _BreakWaveShellState extends State<BreakWaveShell>
       RescueScreen(
         onReturnHome: _returnHome,
         onOpenSupport: () => _onDestinationSelected(3),
+        onOpenLog: () => _onDestinationSelected(2),
       ),
       LogScreen(
         key: ValueKey<int>(_logRefreshTick),
