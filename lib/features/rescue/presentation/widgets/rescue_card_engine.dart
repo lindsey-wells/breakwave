@@ -4,6 +4,7 @@
 // File: rescue_card_engine.dart
 // Purpose: BW-16/BW-17/BW-18 rescue card engine.
 // Notes: Renders Christian or secular rescue cards based on recovery mode.
+// Notes: BW-82E adds horizontal swipe navigation while keeping button fallback.
 // ------------------------------------------------------------
 
 import 'package:flutter/material.dart';
@@ -22,6 +23,8 @@ class RescueCardEngine extends StatefulWidget {
 }
 
 class _RescueCardEngineState extends State<RescueCardEngine> {
+  static const double _swipeVelocityThreshold = 180;
+
   List<RescueCardContent> _cards = const <RescueCardContent>[];
   int _currentIndex = 0;
   bool _loading = true;
@@ -30,18 +33,17 @@ class _RescueCardEngineState extends State<RescueCardEngine> {
   @override
   void initState() {
     super.initState();
-        RecoveryModeStore.changes.addListener(_handleModeChange);
-_loadCards();
+    RecoveryModeStore.changes.addListener(_handleModeChange);
+    _loadCards();
   }
 
   Future<void> _loadCards() async {
     final RecoveryMode mode =
         await RecoveryModeStore.loadMode() ?? RecoveryMode.secular;
 
-    final List<RescueCardContent> cards =
-        mode == RecoveryMode.christian
-            ? ChristianRescueCardPack.cards
-            : SecularRescueCardPack.cards;
+    final List<RescueCardContent> cards = mode == RecoveryMode.christian
+        ? ChristianRescueCardPack.cards
+        : SecularRescueCardPack.cards;
 
     if (!mounted) return;
 
@@ -61,6 +63,27 @@ _loadCards();
     });
   }
 
+  void _previousCard() {
+    if (_cards.isEmpty) return;
+
+    setState(() {
+      _currentIndex = (_currentIndex - 1 + _cards.length) % _cards.length;
+    });
+  }
+
+  void _handleCardSwipe(DragEndDetails details) {
+    final double velocity = details.primaryVelocity ?? 0;
+
+    if (velocity <= -_swipeVelocityThreshold) {
+      _nextCard();
+      return;
+    }
+
+    if (velocity >= _swipeVelocityThreshold) {
+      _previousCard();
+    }
+  }
+
   void _handleModeChange() {
     _loadCards();
   }
@@ -73,7 +96,7 @@ _loadCards();
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
+    final ThemeData theme = Theme.of(context);
 
     if (_loading) {
       return Container(
@@ -104,67 +127,83 @@ _loadCards();
     final RescueCardContent card = _cards[_currentIndex];
     final bool isChristian = _mode == RecoveryMode.christian;
 
-    return Container(
-      padding: const EdgeInsets.all(18),
-      decoration: BoxDecoration(
-        color: theme.colorScheme.surfaceContainerHighest.withOpacity(0.45),
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: theme.colorScheme.outlineVariant),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget>[
-          Text(
-            isChristian ? 'Christian Rescue Card' : 'Secular Rescue Card',
-            style: theme.textTheme.titleMedium?.copyWith(
-              fontWeight: FontWeight.w700,
-            ),
-          ),
-          const SizedBox(height: 6),
-          Text(
-            '${_currentIndex + 1} of ${_cards.length}',
-            style: theme.textTheme.bodySmall,
-          ),
-          const SizedBox(height: 14),
-          Text(
-            card.title,
-            style: theme.textTheme.titleLarge?.copyWith(
-              fontWeight: FontWeight.w700,
-            ),
-          ),
-          const SizedBox(height: 14),
-          _SectionBlock(
-            label: 'Calm line',
-            body: card.calmLine,
-          ),
-          const SizedBox(height: 12),
-          _SectionBlock(
-            label: 'Reframe',
-            body: card.reframe,
-          ),
-          const SizedBox(height: 12),
-          _SectionBlock(
-            label: 'Immediate action',
-            body: card.immediateAction,
-          ),
-          const SizedBox(height: 12),
-          _SectionBlock(
-            label: 'Next step',
-            body: card.nextStep,
-          ),
-          const SizedBox(height: 18),
-          FilledButton.tonal(
-            onPressed: _nextCard,
-            child: Padding(
-              padding: const EdgeInsets.symmetric(vertical: 14),
-              child: Text(
-                isChristian
-                    ? 'Show another Christian rescue card'
-                    : 'Show another secular rescue card',
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onHorizontalDragEnd: _handleCardSwipe,
+      child: Container(
+        padding: const EdgeInsets.all(18),
+        decoration: BoxDecoration(
+          color: theme.colorScheme.surfaceContainerHighest.withOpacity(0.45),
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(color: theme.colorScheme.outlineVariant),
+        ),
+        child: AnimatedSwitcher(
+          duration: const Duration(milliseconds: 180),
+          child: Column(
+            key: ValueKey<String>(card.id),
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              Text(
+                isChristian ? 'Christian Rescue Card' : 'Secular Rescue Card',
+                style: theme.textTheme.titleMedium?.copyWith(
+                  fontWeight: FontWeight.w700,
+                ),
               ),
-            ),
+              const SizedBox(height: 6),
+              Text(
+                '${_currentIndex + 1} of ${_cards.length}',
+                style: theme.textTheme.bodySmall,
+              ),
+              const SizedBox(height: 6),
+              Text(
+                'Swipe left or right for another rescue card.',
+                style: theme.textTheme.bodySmall?.copyWith(
+                  color: theme.colorScheme.onSurfaceVariant,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+              const SizedBox(height: 14),
+              Text(
+                card.title,
+                style: theme.textTheme.titleLarge?.copyWith(
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+              const SizedBox(height: 14),
+              _SectionBlock(
+                label: 'Calm line',
+                body: card.calmLine,
+              ),
+              const SizedBox(height: 12),
+              _SectionBlock(
+                label: 'Reframe',
+                body: card.reframe,
+              ),
+              const SizedBox(height: 12),
+              _SectionBlock(
+                label: 'Immediate action',
+                body: card.immediateAction,
+              ),
+              const SizedBox(height: 12),
+              _SectionBlock(
+                label: 'Next step',
+                body: card.nextStep,
+              ),
+              const SizedBox(height: 18),
+              FilledButton.tonal(
+                onPressed: _nextCard,
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 14),
+                  child: Text(
+                    isChristian
+                        ? 'Show another Christian rescue card'
+                        : 'Show another secular rescue card',
+                  ),
+                ),
+              ),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }
@@ -181,7 +220,7 @@ class _SectionBlock extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
+    final ThemeData theme = Theme.of(context);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
