@@ -6,6 +6,7 @@
 // Notes: BW-71A makes Calm Reset interactive.
 // Notes: BW-71B guides Calm Reset through three automatic breathing rounds.
 // Notes: BW-82D adds a short settle pause after the exhale step.
+// Notes: BW-82D1 clears the settle-pause flag before the next round starts.
 // ------------------------------------------------------------
 
 import 'dart:async';
@@ -107,12 +108,13 @@ class _CalmResetCardState extends State<CalmResetCard> {
 
       if (nextRoundCount >= _targetRounds) {
         timer.cancel();
-        setState(() {
-          _isRunning = false;
-          _activeStep = -1;
-          _remainingSeconds = 0;
-          _completedRounds = nextRoundCount;
-        });
+          setState(() {
+            _isRunning = false;
+            _isPostStepPause = false;
+            _activeStep = -1;
+            _remainingSeconds = 0;
+            _completedRounds = nextRoundCount;
+          });
 
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
@@ -122,11 +124,12 @@ class _CalmResetCardState extends State<CalmResetCard> {
         return;
       }
 
-      setState(() {
-        _completedRounds = nextRoundCount;
-        _activeStep = 0;
-        _remainingSeconds = _steps.first.seconds;
-      });
+        setState(() {
+          _isPostStepPause = false;
+          _completedRounds = nextRoundCount;
+          _activeStep = 0;
+          _remainingSeconds = _steps.first.seconds;
+        });
 
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
