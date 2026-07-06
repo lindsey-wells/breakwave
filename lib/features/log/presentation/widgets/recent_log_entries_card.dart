@@ -4,6 +4,7 @@
 // File: recent_log_entries_card.dart
 // Purpose: Recent log history surface for the BW-08 log flow.
 // Notes: BW-72B makes recent entries compact with expandable details.
+// Notes: BW-84A adds Show all / Show latest review controls.
 // ------------------------------------------------------------
 
 import 'package:flutter/material.dart';
@@ -12,18 +13,33 @@ import '../../domain/log_entry.dart';
 
 class RecentLogEntriesCard extends StatelessWidget {
   final List<LogEntry> entries;
+  final int totalEntryCount;
+  final bool showAllEntries;
+  final VoidCallback onToggleShowAll;
   final ValueChanged<LogEntry> onEdit;
   final ValueChanged<LogEntry> onDelete;
 
   const RecentLogEntriesCard({
     super.key,
     required this.entries,
+    required this.totalEntryCount,
+    required this.showAllEntries,
+    required this.onToggleShowAll,
     required this.onEdit,
     required this.onDelete,
   });
 
   @override
   Widget build(BuildContext context) {
+    final bool canToggleScope = totalEntryCount > 5;
+    final int visibleCount = entries.length;
+
+    final String reviewScopeText = entries.isEmpty
+        ? 'No saved entries yet.'
+        : showAllEntries
+            ? 'Showing all $totalEntryCount saved entries.'
+            : 'Showing latest $visibleCount of $totalEntryCount saved entries.';
+
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(20),
@@ -39,6 +55,27 @@ class RecentLogEntriesCard extends StatelessWidget {
               'Newest saved moments. Open details only when you need them.',
               style: Theme.of(context).textTheme.bodyMedium,
             ),
+            const SizedBox(height: 8),
+            Text(
+              reviewScopeText,
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                    fontWeight: FontWeight.w700,
+                  ),
+            ),
+            if (canToggleScope) ...<Widget>[
+              const SizedBox(height: 12),
+              OutlinedButton.icon(
+                onPressed: onToggleShowAll,
+                icon: Icon(
+                  showAllEntries
+                      ? Icons.filter_list_outlined
+                      : Icons.article_outlined,
+                ),
+                label: Text(
+                  showAllEntries ? 'Show latest 5' : 'Show all entries',
+                ),
+              ),
+            ],
             const SizedBox(height: 16),
             if (entries.isEmpty)
               const _EmptyHistoryState()

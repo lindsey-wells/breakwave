@@ -7,6 +7,7 @@
 // Notes: BW-76B keeps Log save/update confirmation on the Log tab.
 // Notes: BW-76C adds undo for accidental recent-log deletion.
 // Notes: BW-76D turns key replacement choices into real navigation actions.
+// Notes: BW-84A improves Log review scope, edit clarity, and delete undo timing.
 // ------------------------------------------------------------
 
 import 'package:flutter/material.dart';
@@ -62,6 +63,7 @@ class _LogScreenState extends State<LogScreen> {
   List<LogEntry> _recentEntries = const <LogEntry>[];
   String? _editingEntryId;
   String? _lastSaveMessage;
+  bool _showAllEntries = false;
 
   static const String _otherLabel = 'Other';
 
@@ -125,6 +127,22 @@ class _LogScreenState extends State<LogScreen> {
         _recentEntries = entries.take(5).toList();
       });
     } catch (_) {}
+  }
+
+  List<LogEntry> _visibleEntries(List<LogEntry> entries) {
+    if (_showAllEntries) {
+      return entries;
+    }
+
+    return entries.take(5).toList();
+  }
+
+  Future<void> _toggleShowAllEntries() async {
+    setState(() {
+      _showAllEntries = !_showAllEntries;
+    });
+
+    await _refreshFromStorage();
   }
 
   void _setEntryType(String value) {
@@ -249,6 +267,68 @@ class _LogScreenState extends State<LogScreen> {
     _notesController.clear();
   }
 
+  void _cancelEdit() {
+    setState(() {
+      _clearDraft();
+      _lastSaveMessage = 'Edit canceled. New draft started.';
+    });
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Edit canceled. New draft started.'),
+        duration: Duration(seconds: 3),
+      ),
+    );
+  }
+
+  Widget _buildEditingStatusBanner(BuildContext context) {
+    final ThemeData theme = Theme.of(context);
+
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: theme.colorScheme.primaryContainer.withOpacity(0.35),
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: theme.colorScheme.primary, width: 1.4),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          Row(
+            children: <Widget>[
+              Icon(
+                Icons.edit_note_outlined,
+                color: theme.colorScheme.primary,
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Text(
+                  'Editing saved entry',
+                  style: theme.textTheme.titleMedium?.copyWith(
+                    color: theme.colorScheme.primary,
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          Text(
+            'Changes will update this saved log entry instead of creating a new one.',
+            style: theme.textTheme.bodyMedium,
+          ),
+          const SizedBox(height: 12),
+          OutlinedButton.icon(
+            onPressed: _cancelEdit,
+            icon: const Icon(Icons.close_outlined),
+            label: const Text('Cancel edit'),
+          ),
+        ],
+      ),
+    );
+  }
+
   Future<void> _undoDeleteEntry(LogEntry entry) async {
     await _repository.saveEntry(entry);
     await _refreshFromStorage();
@@ -279,8 +359,8 @@ class _LogScreenState extends State<LogScreen> {
       ..hideCurrentSnackBar()
       ..showSnackBar(
         SnackBar(
-          content: const Text('Deleted log entry.'),
-          duration: const Duration(seconds: 5),
+          content: const Text('Deleted log entry. Undo available briefly.'),
+          duration: const Duration(seconds: 4),
           action: SnackBarAction(
             label: 'Undo',
             onPressed: () => _undoDeleteEntry(entry),
@@ -462,10 +542,13 @@ class _LogScreenState extends State<LogScreen> {
                   ),
                   const SizedBox(height: 16),
                   RecentLogEntriesCard(
-                    entries: _recentEntries,
-                    onEdit: _populateDraftFromEntry,
-                    onDelete: _deleteEntry,
-                  ),
+                      entries: _recentEntries,
+                      totalEntryCount: _savedEntryCount,
+                      showAllEntries: _showAllEntries,
+                      onToggleShowAll: _toggleShowAllEntries,
+                      onEdit: _populateDraftFromEntry,
+                      onDelete: _deleteEntry,
+                    )
                 ],
               ),
             ),
