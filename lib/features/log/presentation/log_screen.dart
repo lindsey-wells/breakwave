@@ -545,7 +545,7 @@ class _LogScreenState extends State<LogScreen> {
                     controller: _notesController,
                   ),
                   const SizedBox(height: 16),
-                  LogSaveCard(
+                    LogSaveCard(
                       entryType: _entryType,
                       intensity: _intensity,
                       triggerCount: _resolvedTriggers().length,
@@ -555,7 +555,7 @@ class _LogScreenState extends State<LogScreen> {
                       lastSaveMessage: _lastSaveMessage,
                       onSave: _saveEntry,
                       onCancelEdit: _cancelEdit,
-                    )
+                    ),
                   const SizedBox(height: 16),
                   RecentLogEntriesCard(
                       entries: _recentEntries,

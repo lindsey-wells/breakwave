@@ -9,7 +9,8 @@ checks = [
         "final int snackBarSerial = _deleteSnackBarSerial;",
         "Future<void>.delayed(const Duration(seconds: 4), () {",
         "ScaffoldMessenger.of(context).hideCurrentSnackBar();",
-        "onCancelEdit: _cancelEdit",
+        "onCancelEdit: _cancelEdit,",
+        "onCancelEdit: _cancelEdit,\n                    ),",
     ]),
     ("lib/features/log/presentation/widgets/log_save_card.dart", [
         "Notes: BW-84B makes editing mode visible near the save/update action.",
