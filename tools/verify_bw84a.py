@@ -9,7 +9,7 @@ checks = [
         "Future<void> _toggleShowAllEntries() async",
         "void _cancelEdit()",
         "Widget _buildEditingStatusBanner(BuildContext context)",
-        "Editing saved entry",
+        "Update Mode",
         "Changes will update this saved log entry instead of creating a new one.",
         "Cancel edit",
         "Deleted log entry. Undo available briefly.",

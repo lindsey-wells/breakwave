@@ -34,7 +34,7 @@ EXPECTED_PATTERNS = {
         "You can review it below.",
         "lastSaveMessage: _lastSaveMessage",
         "isEditing: isEditing",
-        "Editing a saved entry",
+        "Update Mode",
     ],
     "lib/features/log/presentation/widgets/log_save_card.dart": [
         "final bool isEditing;",

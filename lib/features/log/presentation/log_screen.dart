@@ -8,6 +8,7 @@
 // Notes: BW-76C adds undo for accidental recent-log deletion.
 // Notes: BW-76D turns key replacement choices into real navigation actions.
 // Notes: BW-84A improves Log review scope, edit clarity, and delete undo timing.
+// Notes: BW-84C adds a top-of-page Update Mode banner for edit clarity.
 // ------------------------------------------------------------
 
 import 'package:flutter/material.dart';
@@ -310,7 +311,7 @@ class _LogScreenState extends State<LogScreen> {
               const SizedBox(width: 10),
               Expanded(
                 child: Text(
-                  'Editing saved entry',
+                  'Update Mode',
                   style: theme.textTheme.titleMedium?.copyWith(
                     color: theme.colorScheme.primary,
                     fontWeight: FontWeight.w800,
@@ -498,13 +499,10 @@ class _LogScreenState extends State<LogScreen> {
                     'Saved locally on this device: $_savedEntryCount',
                     style: Theme.of(context).textTheme.titleMedium,
                   ),
-                  if (isEditing) ...<Widget>[
-                    const SizedBox(height: 8),
-                    Text(
-                      'Editing a saved entry',
-                      style: Theme.of(context).textTheme.titleMedium,
-                    ),
-                  ],
+                    if (isEditing) ...<Widget>[
+                      const SizedBox(height: 12),
+                      _buildEditingStatusBanner(context),
+                    ],
                   const SizedBox(height: 16),
                   LogEntryTypeSection(
                     selectedType: _entryType,
