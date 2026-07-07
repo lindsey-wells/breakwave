@@ -62,6 +62,13 @@ class RecentLogEntriesCard extends StatelessWidget {
                     fontWeight: FontWeight.w700,
                   ),
             ),
+            if (showAllEntries && totalEntryCount > 5) ...<Widget>[
+              const SizedBox(height: 6),
+              Text(
+                'Keep scrolling to review older saved entries.',
+                style: Theme.of(context).textTheme.bodySmall,
+              ),
+            ],
             if (canToggleScope) ...<Widget>[
               const SizedBox(height: 12),
               OutlinedButton.icon(

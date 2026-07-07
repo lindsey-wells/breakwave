@@ -4,6 +4,7 @@
 // File: log_save_card.dart
 // Purpose: Save confirmation card for the BW-04 log flow.
 // Notes: BW-76B adds clearer save/update feedback without leaving Log.
+// Notes: BW-84B makes editing mode visible near the save/update action.
 // ------------------------------------------------------------
 
 import 'package:flutter/material.dart';
@@ -17,6 +18,7 @@ class LogSaveCard extends StatelessWidget {
   final bool isEditing;
   final String? lastSaveMessage;
   final Future<void> Function() onSave;
+  final VoidCallback onCancelEdit;
 
   const LogSaveCard({
     super.key,
@@ -28,10 +30,12 @@ class LogSaveCard extends StatelessWidget {
     required this.isEditing,
     required this.lastSaveMessage,
     required this.onSave,
+    required this.onCancelEdit,
   });
 
   @override
   Widget build(BuildContext context) {
+    final ThemeData theme = Theme.of(context);
     final String triggerLabel = triggerCount == 1 ? 'trigger' : 'triggers';
 
     return Card(
@@ -42,18 +46,67 @@ class LogSaveCard extends StatelessWidget {
           children: <Widget>[
             Text(
               isEditing ? 'Update Entry' : 'Save Entry',
-              style: Theme.of(context).textTheme.titleLarge,
+              style: theme.textTheme.titleLarge,
             ),
             const SizedBox(height: 8),
             Text(
               'Current draft: $entryType • intensity $intensity • $triggerCount $triggerLabel selected',
-              style: Theme.of(context).textTheme.bodyMedium,
+              style: theme.textTheme.bodyMedium,
             ),
             const SizedBox(height: 8),
             Text(
               'Saved locally on this device: $savedEntryCount',
-              style: Theme.of(context).textTheme.bodyMedium,
+              style: theme.textTheme.bodyMedium,
             ),
+            if (isEditing) ...<Widget>[
+              const SizedBox(height: 14),
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(14),
+                decoration: BoxDecoration(
+                  color: theme.colorScheme.primaryContainer.withOpacity(0.35),
+                  borderRadius: BorderRadius.circular(18),
+                  border: Border.all(
+                    color: theme.colorScheme.primary,
+                    width: 1.4,
+                  ),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    Row(
+                      children: <Widget>[
+                        Icon(
+                          Icons.edit_note_outlined,
+                          color: theme.colorScheme.primary,
+                        ),
+                        const SizedBox(width: 10),
+                        Expanded(
+                          child: Text(
+                            'Editing saved entry',
+                            style: theme.textTheme.titleMedium?.copyWith(
+                              color: theme.colorScheme.primary,
+                              fontWeight: FontWeight.w800,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      'Changes will update this saved log entry instead of creating a new one.',
+                      style: theme.textTheme.bodyMedium,
+                    ),
+                    const SizedBox(height: 12),
+                    OutlinedButton.icon(
+                      onPressed: onCancelEdit,
+                      icon: const Icon(Icons.close_outlined),
+                      label: const Text('Cancel edit'),
+                    ),
+                  ],
+                ),
+              ),
+            ],
             if (lastSaveMessage != null) ...<Widget>[
               const SizedBox(height: 12),
               Row(
@@ -64,7 +117,7 @@ class LogSaveCard extends StatelessWidget {
                   Expanded(
                     child: Text(
                       lastSaveMessage!,
-                      style: Theme.of(context).textTheme.bodyMedium,
+                      style: theme.textTheme.bodyMedium,
                     ),
                   ),
                 ],

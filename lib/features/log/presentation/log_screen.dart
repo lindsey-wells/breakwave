@@ -64,6 +64,7 @@ class _LogScreenState extends State<LogScreen> {
   String? _editingEntryId;
   String? _lastSaveMessage;
   bool _showAllEntries = false;
+  int _deleteSnackBarSerial = 0;
 
   static const String _otherLabel = 'Other';
 
@@ -138,11 +139,16 @@ class _LogScreenState extends State<LogScreen> {
   }
 
   Future<void> _toggleShowAllEntries() async {
-    setState(() {
-      _showAllEntries = !_showAllEntries;
-    });
+    final bool nextShowAllEntries = !_showAllEntries;
+    final List<LogEntry> entries = await _repository.loadEntries();
 
-    await _refreshFromStorage();
+    if (!mounted) return;
+
+    setState(() {
+      _showAllEntries = nextShowAllEntries;
+      _savedEntryCount = entries.length;
+      _recentEntries = nextShowAllEntries ? entries : entries.take(5).toList();
+    });
   }
 
   void _setEntryType(String value) {
@@ -330,6 +336,7 @@ class _LogScreenState extends State<LogScreen> {
   }
 
   Future<void> _undoDeleteEntry(LogEntry entry) async {
+    _deleteSnackBarSerial++;
     await _repository.saveEntry(entry);
     await _refreshFromStorage();
 
@@ -355,6 +362,9 @@ class _LogScreenState extends State<LogScreen> {
 
     if (!mounted) return;
 
+    _deleteSnackBarSerial++;
+    final int snackBarSerial = _deleteSnackBarSerial;
+
     ScaffoldMessenger.of(context)
       ..hideCurrentSnackBar()
       ..showSnackBar(
@@ -367,6 +377,11 @@ class _LogScreenState extends State<LogScreen> {
           ),
         ),
       );
+
+    Future<void>.delayed(const Duration(seconds: 4), () {
+      if (!mounted || _deleteSnackBarSerial != snackBarSerial) return;
+      ScaffoldMessenger.of(context).hideCurrentSnackBar();
+    });
   }
 
   Future<void> _saveEntry() async {
@@ -531,15 +546,16 @@ class _LogScreenState extends State<LogScreen> {
                   ),
                   const SizedBox(height: 16),
                   LogSaveCard(
-                    entryType: _entryType,
-                    intensity: _intensity,
-                    triggerCount: _resolvedTriggers().length,
-                    savedEntryCount: _savedEntryCount,
-                    isSaving: _isSaving,
-                    isEditing: isEditing,
-                    lastSaveMessage: _lastSaveMessage,
-                    onSave: _saveEntry,
-                  ),
+                      entryType: _entryType,
+                      intensity: _intensity,
+                      triggerCount: _resolvedTriggers().length,
+                      savedEntryCount: _savedEntryCount,
+                      isSaving: _isSaving,
+                      isEditing: isEditing,
+                      lastSaveMessage: _lastSaveMessage,
+                      onSave: _saveEntry,
+                      onCancelEdit: _cancelEdit,
+                    )
                   const SizedBox(height: 16),
                   RecentLogEntriesCard(
                       entries: _recentEntries,
