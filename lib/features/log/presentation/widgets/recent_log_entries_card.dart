@@ -5,6 +5,7 @@
 // Purpose: Recent log history surface for the BW-08 log flow.
 // Notes: BW-72B makes recent entries compact with expandable details.
 // Notes: BW-84A adds Show all / Show latest review controls.
+// Notes: BW-84D highlights the most recently updated entry.
 // ------------------------------------------------------------
 
 import 'package:flutter/material.dart';
@@ -15,6 +16,7 @@ class RecentLogEntriesCard extends StatelessWidget {
   final List<LogEntry> entries;
   final int totalEntryCount;
   final bool showAllEntries;
+  final String? highlightedEntryId;
   final VoidCallback onToggleShowAll;
   final ValueChanged<LogEntry> onEdit;
   final ValueChanged<LogEntry> onDelete;
@@ -24,6 +26,7 @@ class RecentLogEntriesCard extends StatelessWidget {
     required this.entries,
     required this.totalEntryCount,
     required this.showAllEntries,
+    required this.highlightedEntryId,
     required this.onToggleShowAll,
     required this.onEdit,
     required this.onDelete,
@@ -93,6 +96,7 @@ class RecentLogEntriesCard extends StatelessWidget {
                     padding: const EdgeInsets.only(bottom: 12),
                     child: _RecentEntryRow(
                       entry: entry,
+                      isHighlighted: entry.id == highlightedEntryId,
                       onEdit: () => onEdit(entry),
                       onDelete: () => onDelete(entry),
                     ),
@@ -127,11 +131,13 @@ class _EmptyHistoryState extends StatelessWidget {
 
 class _RecentEntryRow extends StatelessWidget {
   final LogEntry entry;
+  final bool isHighlighted;
   final VoidCallback onEdit;
   final VoidCallback onDelete;
 
   const _RecentEntryRow({
     required this.entry,
+    required this.isHighlighted,
     required this.onEdit,
     required this.onDelete,
   });
@@ -165,6 +171,11 @@ class _RecentEntryRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final ThemeData theme = Theme.of(context);
+    final Color borderColor =
+        isHighlighted ? theme.colorScheme.primary : const Color(0x22FFFFFF);
+    final Color backgroundColor = isHighlighted
+        ? theme.colorScheme.primaryContainer.withOpacity(0.25)
+        : Colors.transparent;
 
     final String triggerText = entry.triggers.isEmpty
         ? 'No triggers tagged'
@@ -212,8 +223,12 @@ class _RecentEntryRow extends StatelessWidget {
       width: double.infinity,
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
+        color: backgroundColor,
         borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: const Color(0x22FFFFFF)),
+        border: Border.all(
+          color: borderColor,
+          width: isHighlighted ? 1.4 : 1,
+        ),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -245,6 +260,35 @@ class _RecentEntryRow extends StatelessWidget {
               ),
             ],
           ),
+          if (isHighlighted) ...<Widget>[
+            const SizedBox(height: 10),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
+              decoration: BoxDecoration(
+                color: theme.colorScheme.primary.withOpacity(0.16),
+                borderRadius: BorderRadius.circular(999),
+                border: Border.all(color: theme.colorScheme.primary),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: <Widget>[
+                  Icon(
+                    Icons.check_circle_outline,
+                    size: 18,
+                    color: theme.colorScheme.primary,
+                  ),
+                  const SizedBox(width: 6),
+                  Text(
+                    'Updated just now',
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      color: theme.colorScheme.primary,
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
           const SizedBox(height: 8),
           Text(
             'Triggers: $triggerText',

@@ -9,6 +9,7 @@
 // Notes: BW-76D turns key replacement choices into real navigation actions.
 // Notes: BW-84A improves Log review scope, edit clarity, and delete undo timing.
 // Notes: BW-84C adds a top-of-page Update Mode banner for edit clarity.
+// Notes: BW-84D highlights the most recently updated log entry.
 // ------------------------------------------------------------
 
 import 'package:flutter/material.dart';
@@ -66,6 +67,7 @@ class _LogScreenState extends State<LogScreen> {
   String? _lastSaveMessage;
   bool _showAllEntries = false;
   int _deleteSnackBarSerial = 0;
+  String? _recentlyUpdatedEntryId;
 
   static const String _otherLabel = 'Other';
 
@@ -211,6 +213,7 @@ class _LogScreenState extends State<LogScreen> {
   void _populateDraftFromEntry(LogEntry entry) {
     setState(() {
       _lastSaveMessage = null;
+        _recentlyUpdatedEntryId = null;
       _editingEntryId = entry.id;
       _entryType = entry.entryType;
       _intensity = entry.intensity;
@@ -428,6 +431,7 @@ class _LogScreenState extends State<LogScreen> {
         _savedEntryCount = entries.length;
         _recentEntries = entries.take(5).toList();
         _clearDraft();
+          _recentlyUpdatedEntryId = editingId;
         _lastSaveMessage = saveMessage;
         _isSaving = false;
       });
@@ -559,6 +563,7 @@ class _LogScreenState extends State<LogScreen> {
                       entries: _recentEntries,
                       totalEntryCount: _savedEntryCount,
                       showAllEntries: _showAllEntries,
+                      highlightedEntryId: _recentlyUpdatedEntryId,
                       onToggleShowAll: _toggleShowAllEntries,
                       onEdit: _populateDraftFromEntry,
                       onDelete: _deleteEntry,
