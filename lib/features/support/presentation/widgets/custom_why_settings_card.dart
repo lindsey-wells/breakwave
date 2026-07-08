@@ -4,6 +4,7 @@
 // File: custom_why_settings_card.dart
 // Purpose: BW-39 custom why settings card.
 // Notes: Lets the user save one why statement and one optional image.
+// Notes: BW-86B1 adds inline saved-state clarity for Custom Why.
 // ------------------------------------------------------------
 
 import 'dart:io';
@@ -27,17 +28,20 @@ class _CustomWhySettingsCardState extends State<CustomWhySettingsCard> {
 
   bool _loading = true;
   bool _saving = false;
+  String? _savedStatusMessage;
   String _imagePath = '';
 
   @override
   void initState() {
     super.initState();
     _whyController = TextEditingController();
+    _whyController.addListener(_handleDraftChanged);
     _load();
   }
 
   @override
   void dispose() {
+    _whyController.removeListener(_handleDraftChanged);
     _whyController.dispose();
     super.dispose();
   }
@@ -53,6 +57,14 @@ class _CustomWhySettingsCardState extends State<CustomWhySettingsCard> {
     });
   }
 
+
+  void _handleDraftChanged() {
+    if (!mounted || _loading || _saving || _savedStatusMessage == null) return;
+
+    setState(() {
+      _savedStatusMessage = null;
+    });
+  }
   Future<void> _save() async {
     if (_saving) return;
 
@@ -69,6 +81,9 @@ class _CustomWhySettingsCardState extends State<CustomWhySettingsCard> {
       );
 
       if (!mounted) return;
+        setState(() {
+          _savedStatusMessage = 'Custom why saved for Rescue.';
+        });
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Custom why saved.'),
@@ -121,6 +136,9 @@ class _CustomWhySettingsCardState extends State<CustomWhySettingsCard> {
       );
 
       if (!mounted) return;
+        setState(() {
+          _savedStatusMessage = 'Why image saved for Rescue.';
+        });
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Why image saved.'),
@@ -160,6 +178,9 @@ class _CustomWhySettingsCardState extends State<CustomWhySettingsCard> {
       );
       await CustomWhyImageService.deleteImageIfPresent(oldPath);
       if (!mounted) return;
+        setState(() {
+          _savedStatusMessage = 'Why image removed from Rescue.';
+        });
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Why image removed.'),
@@ -245,14 +266,50 @@ class _CustomWhySettingsCardState extends State<CustomWhySettingsCard> {
                       ),
                   ],
                 ),
-                const SizedBox(height: 16),
-                FilledButton(
-                  onPressed: _saving ? null : _save,
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 14),
-                    child: Text(_saving ? 'Saving...' : 'Save custom why'),
+                  if (_savedStatusMessage != null) ...<Widget>[
+                    const SizedBox(height: 16),
+                    Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.all(14),
+                      decoration: BoxDecoration(
+                        color: colorScheme.primaryContainer.withOpacity(0.25),
+                        borderRadius: BorderRadius.circular(16),
+                        border: Border.all(color: colorScheme.primary),
+                      ),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: <Widget>[
+                          Icon(
+                            Icons.check_circle_outline,
+                            color: colorScheme.primary,
+                          ),
+                          const SizedBox(width: 10),
+                          Expanded(
+                            child: Text(
+                              '$_savedStatusMessage This will appear in Rescue when the wave rises.',
+                              style: theme.textTheme.bodyMedium?.copyWith(
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                  const SizedBox(height: 16),
+                  FilledButton(
+                    onPressed: _saving ? null : _save,
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 14),
+                      child: Text(
+                        _saving
+                            ? 'Saving...'
+                            : _savedStatusMessage == null
+                                ? 'Save custom why'
+                                : 'Saved custom why',
+                      ),
+                    ),
                   ),
-                ),
               ],
             ),
     );
