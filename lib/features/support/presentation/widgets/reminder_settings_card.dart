@@ -8,6 +8,7 @@
 // File: reminder_settings_card.dart
 // Purpose: BW-22 reminder settings card.
 // Notes: BW-34 hardens reminder save feedback and permission handling.
+// Notes: BW-86B3 adds saved-state clarity and stronger reminder copy.
 // ------------------------------------------------------------
 
 import 'package:flutter/material.dart';
@@ -30,6 +31,7 @@ class _ReminderSettingsCardState extends State<ReminderSettingsCard> {
   bool _saving = false;
   ReminderSettings _settings = ReminderSettings.defaults;
   TriggersSelection _triggers = TriggersSelection.empty;
+  String? _savedStatusMessage;
 
   @override
   void initState() {
@@ -70,6 +72,12 @@ class _ReminderSettingsCardState extends State<ReminderSettingsCard> {
     return preview.isEmpty ? 'No watch-for patterns saved yet.' : preview.join(' • ');
   }
 
+
+  void _clearSavedStatus() {
+    if (_savedStatusMessage != null) {
+      _savedStatusMessage = null;
+    }
+  }
   Future<void> _pickDailyTime() async {
     final TimeOfDay? picked = await showTimePicker(
       context: context,
@@ -82,6 +90,7 @@ class _ReminderSettingsCardState extends State<ReminderSettingsCard> {
     if (picked == null) return;
 
     setState(() {
+                        _clearSavedStatus();
       _settings = _settings.copyWith(
         dailyHour: picked.hour,
         dailyMinute: picked.minute,
@@ -101,6 +110,7 @@ class _ReminderSettingsCardState extends State<ReminderSettingsCard> {
     if (picked == null) return;
 
     setState(() {
+                        _clearSavedStatus();
       _settings = _settings.copyWith(
         riskyHour: picked.hour,
         riskyMinute: picked.minute,
@@ -145,6 +155,12 @@ class _ReminderSettingsCardState extends State<ReminderSettingsCard> {
         message =
             'Reminder settings saved locally. Notification permission or refresh may need another try.';
       }
+
+        setState(() {
+          _savedStatusMessage = message == 'Reminder settings saved.'
+              ? 'Reminder settings saved. Daily check-ins and watch-for nudges will use the times you chose.'
+              : '$message Android may still delay delivery if battery saver is active.';
+        });
 
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -204,6 +220,7 @@ class _ReminderSettingsCardState extends State<ReminderSettingsCard> {
                   value: _settings.dailyReminderEnabled,
                   onChanged: (bool value) {
                     setState(() {
+        _clearSavedStatus();
                       _settings = _settings.copyWith(dailyReminderEnabled: value);
                     });
                   },
@@ -223,6 +240,7 @@ class _ReminderSettingsCardState extends State<ReminderSettingsCard> {
                   value: _settings.riskyNudgeEnabled,
                   onChanged: (bool value) {
                     setState(() {
+        _clearSavedStatus();
                       _settings = _settings.copyWith(riskyNudgeEnabled: value);
                     });
                   },
@@ -239,12 +257,48 @@ class _ReminderSettingsCardState extends State<ReminderSettingsCard> {
                   'Watch-for preview: ${_watchPreview()}',
                   style: theme.textTheme.bodyMedium,
                 ),
+                  if (_savedStatusMessage != null) ...<Widget>[
+                    const SizedBox(height: 16),
+                    Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.all(14),
+                      decoration: BoxDecoration(
+                        color: colorScheme.primaryContainer.withOpacity(0.25),
+                        borderRadius: BorderRadius.circular(16),
+                        border: Border.all(color: colorScheme.primary),
+                      ),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: <Widget>[
+                          Icon(
+                            Icons.check_circle_outline,
+                            color: colorScheme.primary,
+                          ),
+                          const SizedBox(width: 10),
+                          Expanded(
+                            child: Text(
+                              _savedStatusMessage!,
+                              style: theme.textTheme.bodyMedium?.copyWith(
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
                 const SizedBox(height: 16),
                 FilledButton(
                   onPressed: _saving ? null : _save,
                   child: Padding(
                     padding: const EdgeInsets.symmetric(vertical: 14),
-                    child: Text(_saving ? 'Saving...' : 'Save reminder settings'),
+                      child: Text(
+                        _saving
+                            ? 'Saving...'
+                            : _savedStatusMessage == null
+                                ? 'Save reminder settings'
+                                : 'Saved reminder settings',
+                      ),
                   ),
                 ),
               ],

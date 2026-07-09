@@ -5,6 +5,7 @@
 // Purpose: BW-22/BW-24 local reminders and risky-time nudges.
 // Notes: BW-75A hardens local notification permissions, timezone handling,
 // and neutral reminder copy without making reminders exact alarms.
+// Notes: BW-86B3 strengthens check-in and danger-window nudge copy.
 // ------------------------------------------------------------
 
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
@@ -128,7 +129,7 @@ class BreakWaveNotifications {
             privacy.discreetNotifications ? 'Check-in' : 'BreakWave check-in',
         body: privacy.discreetNotifications
             ? 'Take a brief pause.'
-            : 'Pause for 20 seconds and choose one clean next step.',
+            : 'Pause for 20 seconds. Open BreakWave and choose one clean next step.',
         scheduledDate: _nextInstance(settings.dailyHour, settings.dailyMinute),
         notificationDetails: _details(),
         androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
@@ -137,12 +138,12 @@ class BreakWaveNotifications {
     }
 
     if (settings.riskyNudgeEnabled) {
-      const String fullBody = 'Pause early and choose one clean next step.';
+      const String fullBody = 'Danger window. Pause now. Open BreakWave and choose one clean next step.';
 
       await _plugin.zonedSchedule(
         id: riskyNudgeId,
         title: privacy.discreetNotifications ? 'Nudge' : 'BreakWave nudge',
-        body: privacy.discreetNotifications ? 'Pause early.' : fullBody,
+        body: privacy.discreetNotifications ? 'Pause now.' : fullBody,
         scheduledDate: _nextInstance(settings.riskyHour, settings.riskyMinute),
         notificationDetails: _details(),
         androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,

@@ -6,8 +6,8 @@ notification_path = root / "lib/core/reminders/breakwave_notifications.dart"
 text = notification_path.read_text(encoding="utf-8")
 
 required = [
-    "const String fullBody = 'Pause early and choose one clean next step.';",
-    "body: privacy.discreetNotifications ? 'Pause early.' : fullBody",
+    "const String fullBody = 'Danger window. Pause now. Open BreakWave and choose one clean next step.';",
+    "body: privacy.discreetNotifications ? 'Pause now.' : fullBody",
     "title: privacy.discreetNotifications ? 'Nudge' : 'BreakWave nudge'",
 ]
 
