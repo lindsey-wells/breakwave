@@ -4,6 +4,7 @@
 // File: support_contact_card.dart
 // Purpose: BW-21/BW-37 support contact card.
 // Notes: Saves one trusted contact with phone and/or email for direct actions.
+// Notes: BW-86B2 adds inline saved-state clarity for trusted contact.
 // ------------------------------------------------------------
 
 import 'package:flutter/material.dart';
@@ -26,6 +27,8 @@ class _SupportContactCardState extends State<SupportContactCard> {
   bool _loading = true;
   bool _saving = false;
   bool _hasSavedContact = false;
+          _savedStatusMessage = 'Trusted contact cleared.';
+  String? _savedStatusMessage;
 
   @override
   void initState() {
@@ -33,11 +36,17 @@ class _SupportContactCardState extends State<SupportContactCard> {
     _nameController = TextEditingController();
     _phoneController = TextEditingController();
     _emailController = TextEditingController();
+    _nameController.addListener(_handleDraftChanged);
+    _phoneController.addListener(_handleDraftChanged);
+    _emailController.addListener(_handleDraftChanged);
     _load();
   }
 
   @override
   void dispose() {
+    _nameController.removeListener(_handleDraftChanged);
+    _phoneController.removeListener(_handleDraftChanged);
+    _emailController.removeListener(_handleDraftChanged);
     _nameController.dispose();
     _phoneController.dispose();
     _emailController.dispose();
@@ -58,6 +67,14 @@ class _SupportContactCardState extends State<SupportContactCard> {
     });
   }
 
+
+  void _handleDraftChanged() {
+    if (!mounted || _loading || _saving || _savedStatusMessage == null) return;
+
+    setState(() {
+      _savedStatusMessage = null;
+    });
+  }
   Future<void> _save() async {
     final String name = _nameController.text.trim();
     final String phoneNumber = _phoneController.text.trim();
@@ -84,6 +101,7 @@ class _SupportContactCardState extends State<SupportContactCard> {
 
       setState(() {
         _hasSavedContact = true;
+          _savedStatusMessage = 'Trusted contact saved.';
       });
 
       ScaffoldMessenger.of(context).showSnackBar(
@@ -204,12 +222,50 @@ class _SupportContactCardState extends State<SupportContactCard> {
                     hintText: 'Example: alex@example.com',
                   ),
                 ),
+                  if (_savedStatusMessage != null) ...<Widget>[
+                    const SizedBox(height: 16),
+                    Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.all(14),
+                      decoration: BoxDecoration(
+                        color: colorScheme.primaryContainer.withOpacity(0.25),
+                        borderRadius: BorderRadius.circular(16),
+                        border: Border.all(color: colorScheme.primary),
+                      ),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: <Widget>[
+                          Icon(
+                            Icons.check_circle_outline,
+                            color: colorScheme.primary,
+                          ),
+                          const SizedBox(width: 10),
+                          Expanded(
+                            child: Text(
+                              _savedStatusMessage == 'Trusted contact saved.'
+                                  ? 'Trusted contact saved. Ready for ${_nameController.text.trim()} when you need support.'
+                                  : 'Trusted contact cleared. Add a new person when you are ready.',
+                              style: theme.textTheme.bodyMedium?.copyWith(
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
                 const SizedBox(height: 16),
                 FilledButton(
                   onPressed: _saving ? null : _save,
                   child: Padding(
                     padding: const EdgeInsets.symmetric(vertical: 14),
-                    child: Text(_saving ? 'Saving...' : 'Save trusted contact'),
+                      child: Text(
+                        _saving
+                            ? 'Saving...'
+                            : _hasSavedContact && _savedStatusMessage == 'Trusted contact saved.'
+                                ? 'Saved trusted contact'
+                                : 'Save trusted contact',
+                      ),
                   ),
                 ),
                 if (_hasSavedContact) ...<Widget>[
