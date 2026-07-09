@@ -25,6 +25,12 @@ required = [
     "Clear trusted contact",
 ]
 
+
+first_45_lines = "\n".join(text.splitlines()[:45])
+if "_savedStatusMessage = 'Trusted contact cleared.';" in first_45_lines:
+    print("FAIL BW-86B2 placed cleared status in field declarations")
+    sys.exit(1)
+
 for needle in required:
     if needle not in text:
         print(f"FAIL BW-86B2 trusted contact saved-state missing: {needle}")

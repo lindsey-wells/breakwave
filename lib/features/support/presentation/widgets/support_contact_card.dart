@@ -27,7 +27,6 @@ class _SupportContactCardState extends State<SupportContactCard> {
   bool _loading = true;
   bool _saving = false;
   bool _hasSavedContact = false;
-          _savedStatusMessage = 'Trusted contact cleared.';
   String? _savedStatusMessage;
 
   @override
@@ -144,6 +143,7 @@ class _SupportContactCardState extends State<SupportContactCard> {
 
       setState(() {
         _hasSavedContact = false;
+          _savedStatusMessage = 'Trusted contact cleared.';
       });
 
       ScaffoldMessenger.of(context).showSnackBar(
