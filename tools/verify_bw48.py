@@ -3,7 +3,7 @@ import sys
 
 checks = [
     ("lib/core/email_capture/email_app_handoff_service.dart", [
-        "static const String defaultTeamEmailAddress = 'BreakWaveapp@proton.me';",
+        "static const String defaultTeamEmailAddress = 'support@breakwaveapp.com';",
         "BreakWave email / consent handoff",
         "Marketing updates consent:",
         "Research / feedback consent:",
@@ -22,7 +22,7 @@ checks = [
     ]),
     ("launch/email_app_handoff_setup.md", [
         "BW-48 launch polish",
-        "BreakWaveapp@proton.me",
+        "support@breakwaveapp.com",
         "manual email handoff",
     ]),
 ]

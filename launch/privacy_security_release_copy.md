@@ -17,7 +17,7 @@ BreakWave works without an email address. If a user chooses to save an email add
 - product updates
 - research / feedback invitations
 
-The manual handoff flow opens the user's email app with a prefilled draft to `BreakWaveapp@proton.me`. The user can review, edit, send, or cancel the email before anything is sent.
+The manual handoff flow opens the user's email app with a prefilled general-feedback draft to `support@breakwaveapp.com`. Privacy questions can be sent directly to `privacy@breakwaveapp.com`. The user can review, edit, send, or cancel the email before anything is sent.
 
 ## Privacy lock
 

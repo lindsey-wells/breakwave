@@ -29,7 +29,7 @@ Open the user's email app with a prefilled draft containing saved BreakWave emai
 
 ## BW-48 launch polish
 
-The app now defaults to `BreakWaveapp@proton.me` for manual email handoff.
+The app now defaults to `support@breakwaveapp.com` for manual email handoff.
 
 Users do not need to configure a team email address. The support screen can still store a local override during internal testing.
 

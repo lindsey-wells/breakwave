@@ -6,7 +6,7 @@ checks = [
         "BreakWave is designed as a private, local-first recovery companion.",
         "does not require an account",
         "manual handoff flow opens the user's email app",
-        "BreakWaveapp@proton.me",
+        "privacy@breakwaveapp.com",
         "app-level privacy lock",
         "6-digit PIN",
         "lock Log and Support while keeping Home and Rescue reachable",

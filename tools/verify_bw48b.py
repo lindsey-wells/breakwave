@@ -4,7 +4,7 @@ import sys
 checks = [
     ("lib/features/support/presentation/widgets/breakwave_contact_links_card.dart", [
         "class BreakWaveContactLinksCard",
-        "BreakWaveapp@proton.me",
+        "support@breakwaveapp.com",
         "https://www.tiktok.com/@BreakWaveapp",
         "https://x.com/BreakWaveapp",
         "Connect with BreakWave",

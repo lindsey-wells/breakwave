@@ -4,6 +4,7 @@
 // File: breakwave_contact_links_card.dart
 // Purpose: BW-48B BreakWave contact and social links.
 // Notes: BW-80E uses default browser first, with browser fallback choices.
+// Notes: BW-86D1 wires official BreakWave email and social links.
 // ------------------------------------------------------------
 
 import 'package:flutter/material.dart';
@@ -16,14 +17,21 @@ class BreakWaveContactLinksCard extends StatelessWidget {
   static const MethodChannel _socialLinksChannel =
       MethodChannel('breakwave/social_links');
 
-  static const String emailAddress = 'BreakWaveapp@proton.me';
+  static const String emailAddress = 'support@breakwaveapp.com';
+  static const String privacyEmailAddress = 'privacy@breakwaveapp.com';
   static const String tikTokHandle = '@BreakWaveapp';
   static const String xHandle = '@BreakWaveapp';
+  static const String instagramHandle = '@breakwaveapp';
+  static const String facebookHandle = '@breakwaveapp';
   static const String tikTokUrl = 'https://www.tiktok.com/@BreakWaveapp';
   static const String xUrl = 'https://x.com/BreakWaveapp';
+  static const String instagramUrl = 'https://instagram.com/breakwaveapp';
+  static const String facebookUrl = 'https://www.facebook.com/breakwaveapp';
   static const String tikTokBrowserUrl =
       'https://www.tiktok.com/@BreakWaveapp?is_from_webapp=1&sender_device=pc';
   static const String xBrowserUrl = 'https://x.com/BreakWaveapp';
+  static const String instagramBrowserUrl = 'https://instagram.com/breakwaveapp';
+  static const String facebookBrowserUrl = 'https://www.facebook.com/breakwaveapp';
   static const String chromePackage = 'com.android.chrome';
   static const String duckDuckGoPackage = 'com.duckduckgo.mobile.android';
 
@@ -47,6 +55,16 @@ class BreakWaveContactLinksCard extends StatelessWidget {
       scheme: 'mailto',
       path: emailAddress,
       query: 'subject=BreakWave%20Support',
+    );
+
+    return _openUri(context, uri);
+  }
+
+  Future<void> _openPrivacyEmail(BuildContext context) {
+    final Uri uri = Uri(
+      scheme: 'mailto',
+      path: privacyEmailAddress,
+      query: 'subject=BreakWave%20Privacy',
     );
 
     return _openUri(context, uri);
@@ -290,6 +308,26 @@ class BreakWaveContactLinksCard extends StatelessWidget {
     );
   }
 
+  Future<void> _openInstagram(BuildContext context) {
+    return _showSocialLinkOptions(
+      context,
+      label: 'Instagram',
+      handle: instagramHandle,
+      url: instagramUrl,
+      browserUrl: instagramBrowserUrl,
+    );
+  }
+
+  Future<void> _openFacebook(BuildContext context) {
+    return _showSocialLinkOptions(
+      context,
+      label: 'Facebook',
+      handle: facebookHandle,
+      url: facebookUrl,
+      browserUrl: facebookBrowserUrl,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final ThemeData theme = Theme.of(context);
@@ -326,6 +364,11 @@ class BreakWaveContactLinksCard extends StatelessWidget {
                 icon: const Icon(Icons.email_outlined),
                 label: const Text(emailAddress),
               ),
+                OutlinedButton.icon(
+                  onPressed: () => _openPrivacyEmail(context),
+                  icon: const Icon(Icons.privacy_tip_outlined),
+                  label: const Text(privacyEmailAddress),
+                ),
               OutlinedButton.icon(
                 onPressed: () => _openTikTok(context),
                 icon: const Icon(Icons.play_circle_outline),
@@ -336,6 +379,16 @@ class BreakWaveContactLinksCard extends StatelessWidget {
                 icon: const Icon(Icons.alternate_email),
                 label: const Text('X $xHandle'),
               ),
+                OutlinedButton.icon(
+                  onPressed: () => _openInstagram(context),
+                  icon: const Icon(Icons.camera_alt_outlined),
+                  label: const Text('Instagram $instagramHandle'),
+                ),
+                OutlinedButton.icon(
+                  onPressed: () => _openFacebook(context),
+                  icon: const Icon(Icons.public),
+                  label: const Text('Facebook $facebookHandle'),
+                ),
             ],
           ),
         ],

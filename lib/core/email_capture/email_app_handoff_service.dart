@@ -14,7 +14,7 @@ import 'email_capture_settings.dart';
 import 'email_capture_store.dart';
 
 class EmailAppHandoffService {
-  static const String defaultTeamEmailAddress = 'BreakWaveapp@proton.me';
+  static const String defaultTeamEmailAddress = 'support@breakwaveapp.com';
 
   static bool hasSendableData(EmailCaptureSettings settings) {
     return settings.emailAddress.trim().isNotEmpty ||

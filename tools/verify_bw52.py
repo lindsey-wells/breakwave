@@ -6,7 +6,7 @@ checks = [
         "Play Store Internal Testing Setup",
         "breakwave-release-aab",
         "com.cube23.breakwave",
-        "BreakWaveapp@proton.me",
+        "support@breakwaveapp.com",
         "Data Safety answers are drafted",
         "Upload the signed AAB from GitHub Actions",
         "Copy the tester opt-in link",

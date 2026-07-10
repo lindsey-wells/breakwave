@@ -13,7 +13,7 @@ Internal testing is the next correct release step after producing a signed AAB a
 - Confirm CI used Android release signing secrets
 - Confirm package name is correct: `com.cube23.breakwave`
 - Confirm version code/version name are ready
-- Confirm support email: `BreakWaveapp@proton.me`
+- Confirm support email: `support@breakwaveapp.com`
 - Confirm privacy policy URL is available
 - Confirm Play Store metadata draft is ready
 - Confirm Data Safety answers are drafted
@@ -63,7 +63,7 @@ Each tester should verify:
 - Custom Why text saves
 - Custom Why image saves, enlarges, changes, and removes
 - optional email preferences save
-- manual email handoff opens email draft to `BreakWaveapp@proton.me`
+- manual email handoff opens email draft to `support@breakwaveapp.com`
 - contact links open
 - privacy lock saves a 6-digit PIN
 - Lock Log & Support keeps Home and Rescue reachable
