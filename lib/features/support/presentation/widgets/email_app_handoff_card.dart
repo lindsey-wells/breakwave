@@ -40,15 +40,15 @@ class _EmailAppHandoffCardState extends State<EmailAppHandoffCard> {
     });
 
     try {
-      final Uri uri = Uri(
-        scheme: 'mailto',
-        path: EmailAppHandoffService.defaultTeamEmailAddress,
-        queryParameters: const <String, String>{
-          'subject': 'BreakWave feedback',
-          'body':
-              'Hello BreakWave team,\n\n'
-              'I would like to share this feedback:\n\n',
-        },
+      const String subject = 'BreakWave feedback';
+      const String body =
+          'Hello BreakWave team,\n\n'
+          'I would like to share this feedback:\n\n';
+
+      final Uri uri = Uri.parse(
+        'mailto:${EmailAppHandoffService.defaultTeamEmailAddress}'
+        '?subject=${Uri.encodeComponent(subject)}'
+        '&body=${Uri.encodeComponent(body)}',
       );
 
       final bool opened = await launchUrl(
