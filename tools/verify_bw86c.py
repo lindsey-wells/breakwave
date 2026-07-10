@@ -21,14 +21,14 @@ required_cbt = [
 
 required_edu = [
     "Notes: BW-86C removes duplicate Educate Me CTA; dedicated Educate Me card remains.",
-    "Use the Recovery Cycle Wheel to see the pattern clearly, then use Educate Me for short practical lessons.",
+    "See how triggers, thoughts, urges, actions, and consequences connect so you can interrupt the cycle earlier.",
     "Open Recovery Cycle Wheel",
 ]
 
 required_entry = [
     "Notes: BW-86C makes this the single Educate Me entry point on Support.",
     "Educate Me",
-    "Tap to open Educate Me",
+    "Open Educate Me",
     "practice a cleaner next step",
 ]
 
