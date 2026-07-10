@@ -21,9 +21,9 @@ checks = [
         "Save privacy settings",
     ]),
     ("lib/features/support/presentation/widgets/email_app_handoff_card.dart", [
-        "BreakWave opens your email app with a draft.",
-        "You can review, edit, or delete the draft before choosing whether to send.",
-        "Opened email draft.",
+        "Open a prefilled email to",
+        "Nothing leaves your device until you tap Send in your email app.",
+        "Opened feedback email.",
         "Open email draft",
     ]),
     ("lib/features/support/presentation/widgets/email_capture_settings_card.dart", [

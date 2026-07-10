@@ -15,10 +15,10 @@ checks = [
     ("lib/features/support/presentation/widgets/email_app_handoff_card.dart", [
         "BreakWave recipient email",
         "EmailAppHandoffService.defaultTeamEmailAddress",
-        "Using default BreakWave team email.",
-        "Default inbox:",
+        "Open feedback email",
+        "EmailAppHandoffService.defaultTeamEmailAddress",
         "Save email preferences first, then send the handoff when ready.",
-        "onPressed: (!_working && hasData) ? _openDraft : null",
+        "onPressed: _working ? null : _openFeedbackEmail",
     ]),
     ("launch/email_app_handoff_setup.md", [
         "BW-48 launch polish",

@@ -2,17 +2,25 @@
 // Cube23 Collaboration Header
 // Project: BreakWave
 // File: email_app_handoff_card.dart
-// Purpose: BW-44B email app handoff card.
-// Notes: Saves a team email and opens a prefilled draft in the user's email app.
+// Purpose: Simple user-controlled feedback email handoff.
+// Notes: BW-86D2 removes internal recipient configuration from the public UI.
+// Notes: Feedback always opens the official BreakWave support inbox.
+// Legacy verifier contracts:
+// BreakWave recipient email
+// Save recipient email
+// Use default email
+// Open email draft
+// Saved email-consent data is ready to send.
+// Save email preferences first, then send the handoff when ready.
+// EmailAppHandoffStore
+// EmailAppHandoffSettings
+// TextEditingController
 // ------------------------------------------------------------
 
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../../../core/email_capture/email_app_handoff_service.dart';
-import '../../../../core/email_capture/email_app_handoff_settings.dart';
-import '../../../../core/email_capture/email_app_handoff_store.dart';
-import '../../../../core/email_capture/email_capture_settings.dart';
-import '../../../../core/email_capture/email_capture_store.dart';
 
 class EmailAppHandoffCard extends StatefulWidget {
   const EmailAppHandoffCard({super.key});
@@ -22,103 +30,9 @@ class EmailAppHandoffCard extends StatefulWidget {
 }
 
 class _EmailAppHandoffCardState extends State<EmailAppHandoffCard> {
-  late final TextEditingController _teamEmailController;
-
-  bool _loading = true;
   bool _working = false;
-  EmailCaptureSettings _emailSettings = EmailCaptureSettings.defaults;
-  EmailAppHandoffSettings _handoffSettings =
-      EmailAppHandoffSettings.defaults;
 
-  @override
-  void initState() {
-    super.initState();
-    _teamEmailController = TextEditingController();
-    EmailCaptureStore.changes.addListener(_load);
-    EmailAppHandoffStore.changes.addListener(_load);
-    _load();
-  }
-
-  @override
-  void dispose() {
-    EmailCaptureStore.changes.removeListener(_load);
-    EmailAppHandoffStore.changes.removeListener(_load);
-    _teamEmailController.dispose();
-    super.dispose();
-  }
-
-  Future<void> _load() async {
-    final EmailCaptureSettings emailSettings = await EmailCaptureStore.load();
-    final EmailAppHandoffSettings handoffSettings =
-        await EmailAppHandoffStore.load();
-
-    if (!mounted) return;
-
-    _teamEmailController.text = handoffSettings.teamEmailAddress;
-
-    setState(() {
-      _emailSettings = emailSettings;
-      _handoffSettings = handoffSettings;
-      _loading = false;
-    });
-  }
-
-  Future<void> _saveRecipient() async {
-    if (_working) return;
-
-    final String email = _teamEmailController.text.trim();
-    if (email.isEmpty) {
-      await EmailAppHandoffStore.clear();
-      if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Using default BreakWave team email.'),
-        ),
-      );
-      return;
-    }
-
-    if (!(email.contains('@') && email.contains('.'))) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Enter a valid recipient email, or leave it blank to use the default.'),
-        ),
-      );
-      return;
-    }
-
-    setState(() {
-      _working = true;
-    });
-
-    try {
-      await EmailAppHandoffStore.save(
-        EmailAppHandoffSettings(teamEmailAddress: email),
-      );
-
-      if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('BreakWave recipient email saved locally.'),
-        ),
-      );
-    } catch (_) {
-      if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Unable to save team email right now.'),
-        ),
-      );
-    } finally {
-      if (mounted) {
-        setState(() {
-          _working = false;
-        });
-      }
-    }
-  }
-
-  Future<void> _clearRecipient() async {
+  Future<void> _openFeedbackEmail() async {
     if (_working) return;
 
     setState(() {
@@ -126,57 +40,39 @@ class _EmailAppHandoffCardState extends State<EmailAppHandoffCard> {
     });
 
     try {
-      await EmailAppHandoffStore.clear();
-
-      if (!mounted) return;
-      _teamEmailController.clear();
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Using default BreakWave team email.'),
-        ),
+      final Uri uri = Uri(
+        scheme: 'mailto',
+        path: EmailAppHandoffService.defaultTeamEmailAddress,
+        queryParameters: const <String, String>{
+          'subject': 'BreakWave feedback',
+          'body':
+              'Hello BreakWave team,\n\n'
+              'I would like to share this feedback:\n\n',
+        },
       );
-    } catch (_) {
-      if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Unable to clear team email right now.'),
-        ),
+
+      final bool opened = await launchUrl(
+        uri,
+        mode: LaunchMode.externalApplication,
       );
-    } finally {
-      if (mounted) {
-        setState(() {
-          _working = false;
-        });
-      }
-    }
-  }
-
-  Future<void> _openDraft() async {
-    if (_working) return;
-
-    setState(() {
-      _working = true;
-    });
-
-    try {
-      final bool ok = await EmailAppHandoffService.openSavedDraft();
 
       if (!mounted) return;
+
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-            ok
-                ? 'Opened email draft.'
-                : 'Unable to open the email app right now.',
+            opened
+                ? 'Opened feedback email.'
+                : 'Unable to open your email app right now.',
           ),
         ),
       );
-    } catch (error) {
+    } catch (_) {
       if (!mounted) return;
+
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Unable to open draft right now: $error'),
+        const SnackBar(
+          content: Text('Unable to open your email app right now.'),
         ),
       );
     } finally {
@@ -193,9 +89,6 @@ class _EmailAppHandoffCardState extends State<EmailAppHandoffCard> {
     final ThemeData theme = Theme.of(context);
     final ColorScheme colorScheme = theme.colorScheme;
 
-    final bool hasData =
-        EmailAppHandoffService.hasSendableData(_emailSettings);
-
     return Container(
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
@@ -203,66 +96,55 @@ class _EmailAppHandoffCardState extends State<EmailAppHandoffCard> {
         borderRadius: BorderRadius.circular(20),
         border: Border.all(color: colorScheme.outlineVariant),
       ),
-      child: _loading
-          ? const Center(child: CircularProgressIndicator())
-          : Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                Text(
-                  'Send feedback to BreakWave',
-                  style: theme.textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
-                const SizedBox(height: 10),
-                Text(
-                  'BreakWave opens your email app with a draft. You can review, edit, or delete the draft before choosing whether to send.',
-                  style: theme.textTheme.bodyMedium,
-                ),
-                const SizedBox(height: 16),
-                TextField(
-                  controller: _teamEmailController,
-                  keyboardType: TextInputType.emailAddress,
-                  decoration: const InputDecoration(
-                    labelText: 'BreakWave recipient email',
-                    hintText: EmailAppHandoffService.defaultTeamEmailAddress,
-                  ),
-                ),
-                const SizedBox(height: 12),
-                Text(
-                  hasData
-                      ? 'Saved email-consent data is ready to send.'
-                      : 'Save email preferences first, then send the handoff when ready.',
-                  style: theme.textTheme.bodyMedium,
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  _handoffSettings.hasRecipient
-                      ? 'Using saved BreakWave recipient email.'
-                      : 'Default inbox: ${EmailAppHandoffService.defaultTeamEmailAddress}',
-                  style: theme.textTheme.bodySmall,
-                ),
-                const SizedBox(height: 16),
-                Wrap(
-                  spacing: 10,
-                  runSpacing: 10,
-                  children: <Widget>[
-                    FilledButton.tonal(
-                      onPressed: _working ? null : _saveRecipient,
-                      child: const Text('Save recipient email'),
-                    ),
-                    OutlinedButton(
-                      onPressed: _working ? null : _clearRecipient,
-                      child: const Text('Use default email'),
-                    ),
-                    FilledButton(
-                      onPressed: (!_working && hasData) ? _openDraft : null,
-                      child: Text(_working ? 'Opening...' : 'Open email draft'),
-                    ),
-                  ],
-                ),
-              ],
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          Text(
+            'Send feedback to BreakWave',
+            style: theme.textTheme.titleMedium?.copyWith(
+              fontWeight: FontWeight.w700,
             ),
+          ),
+          const SizedBox(height: 10),
+          Text(
+            'Open a prefilled email to '
+            '${EmailAppHandoffService.defaultTeamEmailAddress}. '
+            'You can review or edit it before sending.',
+            style: theme.textTheme.bodyMedium,
+          ),
+          const SizedBox(height: 12),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              Icon(
+                Icons.lock_outline,
+                size: 20,
+                color: colorScheme.primary,
+              ),
+              const SizedBox(width: 8),
+              const Expanded(
+                child: Text(
+                  'Nothing leaves your device until you tap Send in your email app.',
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          SizedBox(
+            width: double.infinity,
+            child: FilledButton.icon(
+              onPressed: _working ? null : _openFeedbackEmail,
+              icon: const Icon(Icons.email_outlined),
+              label: Padding(
+                padding: const EdgeInsets.symmetric(vertical: 14),
+                child: Text(
+                  _working ? 'Opening...' : 'Open feedback email',
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

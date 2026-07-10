@@ -29,7 +29,7 @@ checks = [
     ("lib/features/support/presentation/widgets/email_app_handoff_card.dart", [
         "Send feedback to BreakWave",
         "BreakWave recipient email",
-        "review, edit, or delete the draft before choosing whether to send",
+        "Nothing leaves your device until you tap Send in your email app.",
         "Save recipient email",
         "Use default email",
     ]),
