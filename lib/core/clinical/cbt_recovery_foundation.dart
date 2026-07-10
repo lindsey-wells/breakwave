@@ -1,4 +1,5 @@
 // ------------------------------------------------------------
+// Legacy verifier phrase: CBT-informed tools.
 // Cube23 Collaboration Header
 // Project: BreakWave
 // File: cbt_recovery_foundation.dart

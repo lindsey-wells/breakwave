@@ -4,12 +4,12 @@
 // File: education_resources_card.dart
 // Purpose: Education resources card for BreakWave.
 // Notes: BW-37 replaces stub CTA with real learning/navigation actions.
+// Notes: BW-86C removes duplicate Educate Me CTA; dedicated Educate Me card remains.
 // ------------------------------------------------------------
 
 import 'package:flutter/material.dart';
 
 import '../../../cycle/presentation/recovery_cycle_wheel_screen.dart';
-import '../../../learn/presentation/educate_me_screen.dart';
 
 class EducationResourcesCard extends StatelessWidget {
   const EducationResourcesCard({super.key});
@@ -37,24 +37,10 @@ class EducationResourcesCard extends StatelessWidget {
           ),
           const SizedBox(height: 10),
           Text(
-            'Use short practical learning to understand the pattern earlier and respond faster when the wave starts rising.',
+              'Use the Recovery Cycle Wheel to see the pattern clearly, then use Educate Me for short practical lessons.',
             style: theme.textTheme.bodyMedium,
           ),
           const SizedBox(height: 16),
-          FilledButton(
-            onPressed: () {
-              Navigator.of(context).push(
-                MaterialPageRoute(
-                  builder: (_) => const EducateMeScreen(),
-                ),
-              );
-            },
-            child: const Padding(
-              padding: EdgeInsets.symmetric(vertical: 14),
-              child: Text('Open Educate Me'),
-            ),
-          ),
-          const SizedBox(height: 10),
           OutlinedButton(
             onPressed: () {
               Navigator.of(context).push(

@@ -24,7 +24,7 @@ checks = [
     ("lib/features/support/presentation/widgets/education_resources_card.dart", [
         "class EducationResourcesCard",
         "Education and resources",
-        "Open Educate Me",
+        "Educate Me",
         "Open Recovery Cycle Wheel",
     ]),
 ]

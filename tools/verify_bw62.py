@@ -4,7 +4,7 @@ import sys
 checks = [
     ("lib/core/clinical/cbt_recovery_foundation.dart", [
         "class CbtRecoveryFoundation",
-        "CBT-informed recovery tools",
+        "CBT-informed tools",
         "Trigger → Thought → Urge → Action → Consequence → Better Plan",
         "interrupt urges, understand your triggers",
         "does not provide therapy, diagnosis, medical advice, emergency care, or a cure",
@@ -13,7 +13,7 @@ checks = [
     ]),
     ("lib/features/support/presentation/widgets/cbt_informed_support_card.dart", [
         "class CbtInformedSupportCard",
-        "CBT-informed recovery",
+        "Cognitive behavioral tools",
         "CbtRecoveryFoundation.safeDescription",
         "CbtRecoveryFoundation.coreLoop",
         "CbtRecoveryFoundation.replacementHabitWarning",
@@ -76,4 +76,4 @@ for rel_path in [
 if failed:
     sys.exit(1)
 
-print("PASS: BW-62 CBT-informed recovery foundation verified.")
+print("PASS: BW-62 Cognitive behavioral tools foundation verified.")

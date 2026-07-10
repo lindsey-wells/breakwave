@@ -78,7 +78,7 @@ class SupportScreen extends StatelessWidget {
 
                   const _SupportGroup(
                     eyebrow: 'Recovery model',
-                    title: 'Use CBT-informed tools, not shame',
+                    title: 'Cognitive behavioral tools, not shame',
                     subtitle:
                         'Understand the recovery approach behind BreakWave before the support tools.',
                     icon: Icons.psychology_alt_outlined,

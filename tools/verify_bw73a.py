@@ -11,7 +11,7 @@ checks = [
     "initiallyExpanded: true",
     "initiallyExpanded: false",
     "Recovery model",
-    "Use CBT-informed tools, not shame",
+    "Cognitive behavioral tools, not shame",
     "Understand the recovery approach behind BreakWave before the support tools.",
     "Icons.psychology_alt_outlined",
     "Get help now",

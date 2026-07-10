@@ -6,7 +6,7 @@ text = path.read_text(encoding="utf-8")
 
 checks = [
     "eyebrow: 'Recovery model'",
-    "title: 'Use CBT-informed tools, not shame'",
+    "title: 'Cognitive behavioral tools, not shame'",
     "CbtInformedSupportCard",
     "ProfessionalHelpCard",
     "eyebrow: 'Get help now'",

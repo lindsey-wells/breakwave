@@ -4,6 +4,7 @@
 // File: educate_me_entry_card.dart
 // Purpose: BW-28 Educate Me entry card.
 // Notes: Support-screen entry point into the learning surface.
+// Notes: BW-86C makes this the single Educate Me entry point on Support.
 // ------------------------------------------------------------
 
 import 'package:flutter/material.dart';
@@ -45,7 +46,15 @@ class EducateMeEntryCard extends StatelessWidget {
             ),
             const SizedBox(height: 10),
             const Text(
-              'Short practical lessons to help you understand the wave sooner and interrupt it earlier.',
+              'Short practical lessons to help you understand the wave sooner, interrupt it earlier, and practice a cleaner next step.',
+            ),
+            const SizedBox(height: 12),
+            Text(
+              'Tap to open Educate Me',
+              style: theme.textTheme.labelLarge?.copyWith(
+                color: colorScheme.primary,
+                fontWeight: FontWeight.w800,
+              ),
             ),
           ],
         ),
