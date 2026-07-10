@@ -9,6 +9,7 @@
 // Purpose: BW-22 reminder settings card.
 // Notes: BW-34 hardens reminder save feedback and permission handling.
 // Notes: BW-86B3 adds saved-state clarity and stronger reminder copy.
+// Notes: BW-86B4 improves reminder time picker contrast and timing clarity.
 // ------------------------------------------------------------
 
 import 'package:flutter/material.dart';
@@ -57,6 +58,33 @@ class _ReminderSettingsCardState extends State<ReminderSettingsCard> {
     return time.format(context);
   }
 
+  Future<TimeOfDay?> _showBreakWaveTimePicker({
+    required TimeOfDay initialTime,
+    required String helpText,
+  }) {
+    return showTimePicker(
+      context: context,
+      initialTime: initialTime,
+      initialEntryMode: TimePickerEntryMode.dial,
+      helpText: helpText,
+      builder: (BuildContext context, Widget? child) {
+        final ThemeData theme = Theme.of(context);
+        final ColorScheme colorScheme = theme.colorScheme;
+
+        return Theme(
+          data: theme.copyWith(
+            textSelectionTheme: theme.textSelectionTheme.copyWith(
+              cursorColor: colorScheme.primary,
+              selectionColor: colorScheme.primaryContainer,
+              selectionHandleColor: colorScheme.primary,
+            ),
+          ),
+          child: child ?? const SizedBox.shrink(),
+        );
+      },
+    );
+  }
+
   String _watchPreview() {
     final List<String> preview = <String>[];
     for (final String item in <String>[
@@ -79,12 +107,12 @@ class _ReminderSettingsCardState extends State<ReminderSettingsCard> {
     }
   }
   Future<void> _pickDailyTime() async {
-    final TimeOfDay? picked = await showTimePicker(
-      context: context,
-      initialTime: TimeOfDay(
+    final TimeOfDay? picked = await _showBreakWaveTimePicker(
+        initialTime: TimeOfDay(
         hour: _settings.dailyHour,
         minute: _settings.dailyMinute,
       ),
+      helpText: 'Choose daily check-in time',
     );
 
     if (picked == null) return;
@@ -99,12 +127,12 @@ class _ReminderSettingsCardState extends State<ReminderSettingsCard> {
   }
 
   Future<void> _pickRiskyTime() async {
-    final TimeOfDay? picked = await showTimePicker(
-      context: context,
-      initialTime: TimeOfDay(
+    final TimeOfDay? picked = await _showBreakWaveTimePicker(
+        initialTime: TimeOfDay(
         hour: _settings.riskyHour,
         minute: _settings.riskyMinute,
       ),
+      helpText: 'Choose watch-for nudge time',
     );
 
     if (picked == null) return;
@@ -257,6 +285,13 @@ class _ReminderSettingsCardState extends State<ReminderSettingsCard> {
                   'Watch-for preview: ${_watchPreview()}',
                   style: theme.textTheme.bodyMedium,
                 ),
+                  const SizedBox(height: 8),
+                  Text(
+                    'Android may delay scheduled reminders slightly when Battery Saver or background limits are active.',
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      color: colorScheme.onSurfaceVariant,
+                    ),
+                  ),
                   if (_savedStatusMessage != null) ...<Widget>[
                     const SizedBox(height: 16),
                     Container(
