@@ -8,7 +8,7 @@ checks = [
     "BW-73A declutters Support with collapsible launch-ready groups.",
     "class _SupportGroup extends StatelessWidget",
     "ExpansionTile",
-    "initiallyExpanded: true",
+    "initiallyExpanded: false",
     "initiallyExpanded: false",
     "Recovery model",
     "Cognitive behavioral tools, not shame",

@@ -82,7 +82,7 @@ class SupportScreen extends StatelessWidget {
                     subtitle:
                         'Understand the recovery approach behind BreakWave before the support tools.',
                     icon: Icons.psychology_alt_outlined,
-                    initiallyExpanded: true,
+                    initiallyExpanded: false,
                     children: <Widget>[
                       CbtInformedSupportCard(),
                       ProfessionalHelpCard(),
