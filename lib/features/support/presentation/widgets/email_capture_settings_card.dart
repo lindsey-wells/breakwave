@@ -4,6 +4,7 @@
 // File: email_capture_settings_card.dart
 // Purpose: BW-42 optional email capture card.
 // Notes: Saves email + separate marketing/research consent locally.
+// Notes: BW-86D4 adds inline saved-state clarity for email preferences.
 // ------------------------------------------------------------
 
 import 'package:flutter/material.dart';
@@ -25,17 +26,20 @@ class _EmailCaptureSettingsCardState extends State<EmailCaptureSettingsCard> {
   bool _saving = false;
   bool _marketingOptIn = false;
   bool _researchOptIn = false;
+  String? _savedStatusMessage;
   bool _hasSaved = false;
 
   @override
   void initState() {
     super.initState();
     _emailController = TextEditingController();
+    _emailController.addListener(_handleDraftChanged);
     _load();
   }
 
   @override
   void dispose() {
+    _emailController.removeListener(_handleDraftChanged);
     _emailController.dispose();
     super.dispose();
   }
@@ -59,6 +63,14 @@ class _EmailCaptureSettingsCardState extends State<EmailCaptureSettingsCard> {
     return email.contains('@') && email.contains('.');
   }
 
+
+  void _handleDraftChanged() {
+    if (!mounted || _loading || _saving || _savedStatusMessage == null) return;
+
+    setState(() {
+      _savedStatusMessage = null;
+    });
+  }
   Future<void> _save() async {
     if (_saving) return;
 
@@ -90,6 +102,7 @@ class _EmailCaptureSettingsCardState extends State<EmailCaptureSettingsCard> {
 
       setState(() {
         _hasSaved = email.isNotEmpty || _marketingOptIn || _researchOptIn;
+          _savedStatusMessage = 'Email preferences saved on this device.';
       });
 
       ScaffoldMessenger.of(context).showSnackBar(
@@ -132,6 +145,7 @@ class _EmailCaptureSettingsCardState extends State<EmailCaptureSettingsCard> {
         _marketingOptIn = false;
         _researchOptIn = false;
         _hasSaved = false;
+          _savedStatusMessage = 'Email preferences cleared from this device.';
       });
 
       ScaffoldMessenger.of(context).showSnackBar(
@@ -199,6 +213,7 @@ class _EmailCaptureSettingsCardState extends State<EmailCaptureSettingsCard> {
                   value: _marketingOptIn,
                   onChanged: (bool value) {
                     setState(() {
+                      _savedStatusMessage = null;
                       _marketingOptIn = value;
                     });
                   },
@@ -210,18 +225,56 @@ class _EmailCaptureSettingsCardState extends State<EmailCaptureSettingsCard> {
                   value: _researchOptIn,
                   onChanged: (bool value) {
                     setState(() {
+                      _savedStatusMessage = null;
                       _researchOptIn = value;
                     });
                   },
                   title: const Text('Invite me to research or feedback'),
                   subtitle: const Text('Optional product interviews, surveys, beta testing, or feedback.'),
                 ),
+                  if (_savedStatusMessage != null) ...<Widget>[
+                    const SizedBox(height: 12),
+                    Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.all(14),
+                      decoration: BoxDecoration(
+                        color: colorScheme.primaryContainer.withOpacity(0.25),
+                        borderRadius: BorderRadius.circular(16),
+                        border: Border.all(color: colorScheme.primary),
+                      ),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: <Widget>[
+                          Icon(
+                            Icons.check_circle_outline,
+                            color: colorScheme.primary,
+                          ),
+                          const SizedBox(width: 10),
+                          Expanded(
+                            child: Text(
+                              _savedStatusMessage!,
+                              style: theme.textTheme.bodyMedium?.copyWith(
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
                 const SizedBox(height: 12),
                 FilledButton(
                   onPressed: _saving ? null : _save,
                   child: Padding(
                     padding: const EdgeInsets.symmetric(vertical: 14),
-                    child: Text(_saving ? 'Saving...' : 'Save email preferences'),
+                    child: Text(
+                      _saving
+                          ? 'Saving...'
+                          : _savedStatusMessage ==
+                                  'Email preferences saved on this device.'
+                              ? 'Saved email preferences'
+                              : 'Save email preferences',
+                    ),
                   ),
                 ),
                 if (_hasSaved) ...<Widget>[
