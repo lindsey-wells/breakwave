@@ -5,6 +5,7 @@
 // Purpose: BW-42 optional email capture card.
 // Notes: Saves email + separate marketing/research consent locally.
 // Notes: BW-86D4 adds inline saved-state clarity for email preferences.
+// Notes: BW-86D5 clarifies that saving does not send email.
 // ------------------------------------------------------------
 
 import 'package:flutter/material.dart';
@@ -198,6 +199,13 @@ class _EmailCaptureSettingsCardState extends State<EmailCaptureSettingsCard> {
                   'Optional. BreakWave works without email.',
                   style: theme.textTheme.bodyMedium,
                 ),
+                  const SizedBox(height: 8),
+                  Text(
+                    'Saving stores these preferences on this device. It does not send an email or contact BreakWave.',
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      color: colorScheme.onSurfaceVariant,
+                    ),
+                  ),
                 const SizedBox(height: 16),
                 TextField(
                   controller: _emailController,
@@ -273,7 +281,7 @@ class _EmailCaptureSettingsCardState extends State<EmailCaptureSettingsCard> {
                           : _savedStatusMessage ==
                                   'Email preferences saved on this device.'
                               ? 'Saved email preferences'
-                              : 'Save email preferences',
+                              : 'Save preferences on this device',
                     ),
                   ),
                 ),

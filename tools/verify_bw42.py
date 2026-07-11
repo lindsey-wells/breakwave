@@ -23,7 +23,7 @@ checks = [
         "Email address",
         "Send me product updates",
         "Invite me to research or feedback",
-        "Save email preferences",
+        "Save preferences on this device",
         "Clear email preferences",
     ]),
     ("lib/features/support/presentation/support_screen.dart", [

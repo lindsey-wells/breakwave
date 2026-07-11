@@ -16,7 +16,7 @@ required = [
     "_savedStatusMessage = 'Email preferences cleared from this device.';",
     "Icons.check_circle_outline",
     "Saved email preferences",
-    "Save email preferences",
+    "Save preferences on this device",
     "Clear email preferences",
 ]
 

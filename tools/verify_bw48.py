@@ -17,7 +17,7 @@ checks = [
         "EmailAppHandoffService.defaultTeamEmailAddress",
         "Open feedback email",
         "EmailAppHandoffService.defaultTeamEmailAddress",
-        "Save email preferences first, then send the handoff when ready.",
+        "Nothing leaves your device until you tap Send in your email app.",
         "onPressed: _working ? null : _openFeedbackEmail",
     ]),
     ("launch/email_app_handoff_setup.md", [

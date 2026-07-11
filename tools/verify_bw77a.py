@@ -29,7 +29,7 @@ checks = [
     ("lib/features/support/presentation/widgets/email_capture_settings_card.dart", [
         "Optional. BreakWave works without email.",
         "Optional product interviews, surveys, beta testing, or feedback.",
-        "Save email preferences",
+        "Save preferences on this device",
     ]),
     ("lib/features/support/presentation/widgets/email_export_card.dart", [
         "Exports stay on your device unless you choose to share them.",

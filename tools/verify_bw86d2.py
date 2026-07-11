@@ -38,7 +38,7 @@ for old_ui in [
     "Use default email",
     "Open email draft",
     "Saved email-consent data is ready to send.",
-    "Save email preferences first",
+    "Save preferences on this device first",
     "TextField(",
 ]:
     if old_ui in visible_ui:
