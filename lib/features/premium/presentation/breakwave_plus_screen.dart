@@ -2,81 +2,15 @@
 // Cube23 Collaboration Header
 // Project: BreakWave
 // File: breakwave_plus_screen.dart
-// Purpose: BW-54 BreakWave Plus value wall.
-// Notes: Plus value screen for planned upgrade access.
+// Purpose: Public BreakWave Plus value and subscription screen.
+// Notes: BW-87A1 removes preview unlock and offer-testing controls.
+// Notes: Pricing remains visible while purchases are disabled in testing builds.
 // ------------------------------------------------------------
 
 import 'package:flutter/material.dart';
 
-import '../../../core/premium/premium_state_store.dart';
-
-class BreakWavePlusScreen extends StatefulWidget {
+class BreakWavePlusScreen extends StatelessWidget {
   const BreakWavePlusScreen({super.key});
-
-  @override
-  State<BreakWavePlusScreen> createState() => _BreakWavePlusScreenState();
-}
-
-class _BreakWavePlusScreenState extends State<BreakWavePlusScreen> {
-  bool _saving = false;
-
-  Future<void> _setVariant(String variant) async {
-    if (_saving) return;
-
-    setState(() {
-      _saving = true;
-    });
-
-    try {
-      await PremiumStateStore.setOfferVariant(variant);
-
-      if (!mounted) return;
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            variant == 'annual_trial'
-                ? 'Saved Plus offer: annual with 7-day trial.'
-                : 'Saved Plus offer: annual without trial.',
-          ),
-        ),
-      );
-    } finally {
-      if (mounted) {
-        setState(() {
-          _saving = false;
-        });
-      }
-    }
-  }
-
-  Future<void> _enablePlusPreview() async {
-    if (_saving) return;
-
-    setState(() {
-      _saving = true;
-    });
-
-    try {
-      await PremiumStateStore.setPlusUnlocked(true);
-
-      if (!mounted) return;
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('BreakWave Plus unlocked.'),
-        ),
-      );
-
-      Navigator.of(context).pop(true);
-    } finally {
-      if (mounted) {
-        setState(() {
-          _saving = false;
-        });
-      }
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -95,31 +29,23 @@ class _BreakWavePlusScreenState extends State<BreakWavePlusScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
                   Text(
-                    'Free immediate relief. Paid ongoing transformation.',
+                    'Immediate support stays free. Plus builds the longer plan.',
                     style: theme.textTheme.headlineSmall?.copyWith(
                       fontWeight: FontWeight.w800,
                     ),
                   ),
                   const SizedBox(height: 12),
                   const Text(
-                    'BreakWave Plus does not gate immediate relief. BreakWave keeps urgent help free and unlocks deeper tools for planning, insight, accountability, and long-term growth. BreakWave Plus is for users who want deeper insight, a personal plan, stronger accountability, and guided recovery structure.',
-                  ),
-                  const SizedBox(height: 16),
-                  FilledButton(
-                    onPressed: _saving ? null : _enablePlusPreview,
-                    child: const Padding(
-                      padding: EdgeInsets.symmetric(vertical: 14),
-                      child: Text('Explore BreakWave Plus'),
-                    ),
+                    'BreakWave Plus is designed for people who want to understand their patterns over time, build a personal recovery plan, strengthen accountability, and keep making progress after the immediate wave passes.',
                   ),
                 ],
               ),
             ),
             const SizedBox(height: 16),
-            _PlusCard(
+            const _PlusCard(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
-                children: const <Widget>[
+                children: <Widget>[
                   Text(
                     'Free vs Plus',
                     style: TextStyle(
@@ -130,23 +56,25 @@ class _BreakWavePlusScreenState extends State<BreakWavePlusScreen> {
                   SizedBox(height: 12),
                   _Bullet(
                     title: 'Free core',
-                    body: 'Rescue, basic logging, recent history, privacy basics, recovery mode, and support resources stay available.',
+                    body:
+                        'Rescue, basic logging, recent history, recovery mode, privacy controls, and support resources remain available without a subscription.',
                   ),
                   SizedBox(height: 12),
                   _Bullet(
                     title: 'BreakWave Plus',
-                    body: 'Unlock the deeper transformation layer: insights, guided plans, premium Christian depth, accountability templates, exports, and advanced privacy tools.',
+                    body:
+                        'Longer history and pattern views, guided routines, custom recovery planning, accountability templates, expanded exports, and Christian depth when Christian mode is selected.',
                   ),
                 ],
               ),
             ),
             const SizedBox(height: 16),
-            _PlusCard(
+            const _PlusCard(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
-                children: const <Widget>[
+                children: <Widget>[
                   Text(
-                    'BreakWave Plus includes',
+                    'What Plus is built to provide',
                     style: TextStyle(
                       fontSize: 22,
                       fontWeight: FontWeight.w800,
@@ -154,39 +82,45 @@ class _BreakWavePlusScreenState extends State<BreakWavePlusScreen> {
                   ),
                   SizedBox(height: 14),
                   _FeaturePillar(
-                    title: 'Deep Insights',
-                    body: 'Longer history, trigger trends, risky-time patterns, weekly summaries, and clearer “what usually happens before a slip” views.',
+                    title: 'Deeper patterns and summaries',
+                    body:
+                        'Longer history, trigger trends, risky-time patterns, weekly summaries, and clearer views of what commonly happens before a slip.',
                   ),
                   _FeaturePillar(
-                    title: 'Custom Rescue Plan',
-                    body: 'A personal plan built around your triggers, danger times, reasons, redirect actions, trusted person, and after-slip reset.',
+                    title: 'Your personal recovery plan',
+                    body:
+                        'Bring together your triggers, danger times, reasons, redirect actions, trusted person, and after-slip reset in one structured plan.',
                   ),
                   _FeaturePillar(
-                    title: 'Guided Recovery Routines',
-                    body: 'Morning reset, bedtime protection, after-slip recovery, loneliness plan, stress plan, and phone-boundary routines.',
+                    title: 'Guided recovery routines',
+                    body:
+                        'Use focused routines for mornings, bedtime, stress, loneliness, phone boundaries, and getting back on track after a slip.',
                   ),
                   _FeaturePillar(
-                    title: 'Accountability Tools',
-                    body: 'Trusted-person check-ins, shareable summaries, honesty templates, victory reports, and “I need help now” messages.',
+                    title: 'Stronger accountability',
+                    body:
+                        'Use trusted-person check-ins, shareable summaries, honesty templates, victory reports, and ready-to-send support messages.',
                   ),
                   _FeaturePillar(
-                    title: 'Premium Christian Depth',
-                    body: 'Grace-forward paths for shame, secrecy, loneliness, rebuilding integrity, and nighttime temptation.',
+                    title: 'Christian recovery depth',
+                    body:
+                        'When Christian mode is selected, explore grace-forward paths for shame, secrecy, loneliness, integrity, and nighttime temptation.',
                   ),
                   _FeaturePillar(
-                    title: 'Advanced Privacy and Exports',
-                    body: 'Longer export options, advanced privacy controls, and deeper data tools once billing and release systems are live.',
+                    title: 'Expanded privacy and exports',
+                    body:
+                        'Access longer export options, deeper data tools, and additional privacy controls as paid access becomes available.',
                   ),
                 ],
               ),
             ),
             const SizedBox(height: 16),
-            _PlusCard(
+            const _PlusCard(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
-                children: const <Widget>[
+                children: <Widget>[
                   Text(
-                    'Planned Plus options',
+                    'Expected launch pricing',
                     style: TextStyle(
                       fontSize: 22,
                       fontWeight: FontWeight.w800,
@@ -196,66 +130,28 @@ class _BreakWavePlusScreenState extends State<BreakWavePlusScreen> {
                   _PlanRow(
                     title: 'BreakWave Plus Annual',
                     price: '\$59.99/year',
-                    note: 'Planned best-value option.',
+                    note: 'Best value — about \$5 per month.',
                   ),
                   SizedBox(height: 12),
                   _PlanRow(
                     title: 'BreakWave Plus Monthly',
                     price: '\$8.99/month',
-                    note: 'Planned flexible option.',
+                    note: 'Flexible month-to-month access.',
                   ),
                   SizedBox(height: 12),
                   Text(
-                    'No weekly plan. No lifetime plan at launch.',
+                    'No weekly plan and no lifetime plan at launch. Pricing shown is the intended launch pricing and may change before paid access is enabled.',
                   ),
                 ],
               ),
             ),
             const SizedBox(height: 16),
-            _PlusCard(
+            const _PlusCard(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
                   Text(
-                    'Planned launch offer',
-                    style: theme.textTheme.titleLarge?.copyWith(
-                      fontWeight: FontWeight.w800,
-                    ),
-                  ),
-                  const SizedBox(height: 10),
-                  const Text(
-                    'Compare planned annual offer options before the launch default is finalized.',
-                  ),
-                  const SizedBox(height: 16),
-                  FilledButton.tonal(
-                    onPressed: _saving
-                        ? null
-                        : () => _setVariant('annual_no_trial'),
-                    child: const Padding(
-                      padding: EdgeInsets.symmetric(vertical: 14),
-                      child: Text('Select annual no-trial'),
-                    ),
-                  ),
-                  const SizedBox(height: 10),
-                  FilledButton.tonal(
-                    onPressed: _saving
-                        ? null
-                        : () => _setVariant('annual_trial'),
-                    child: const Padding(
-                      padding: EdgeInsets.symmetric(vertical: 14),
-                      child: Text('Select annual 7-day trial'),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 16),
-            _PlusCard(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: const <Widget>[
-                  Text(
-                    'Purchase status',
+                    'Testing build status',
                     style: TextStyle(
                       fontSize: 22,
                       fontWeight: FontWeight.w800,
@@ -263,7 +159,7 @@ class _BreakWavePlusScreenState extends State<BreakWavePlusScreen> {
                   ),
                   SizedBox(height: 10),
                   Text(
-                    'BreakWave Plus purchasing is not active yet. Immediate support tools remain free while paid upgrade access is finalized.',
+                    'Subscriptions are not enabled in this testing build. No charge can occur from this screen. Core Rescue and support tools remain free.',
                   ),
                 ],
               ),

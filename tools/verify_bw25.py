@@ -6,7 +6,6 @@ checks = [
         "class PremiumState",
         "isPlusUnlocked",
         "offerVariant",
-        "annual_no_trial",
         "defaults",
     ]),
     ("lib/core/premium/premium_state_store.dart", [
@@ -20,12 +19,13 @@ checks = [
     ("lib/features/premium/presentation/breakwave_plus_screen.dart", [
         "class BreakWavePlusScreen",
         "BreakWave Plus",
-        "Free immediate relief. Paid ongoing transformation.",
+        "Immediate support stays free. Plus builds the longer plan.",
+        "Free vs Plus",
+        "Expected launch pricing",
         "$59.99/year",
         "$8.99/month",
-        "Select annual no-trial",
-        "Select annual 7-day trial",
-        "Explore BreakWave Plus",
+        "Subscriptions are not enabled in this testing build.",
+        "No charge can occur from this screen.",
     ]),
     ("lib/features/premium/presentation/premium_gate_tile.dart", [
         "class PremiumGateTile",
@@ -39,26 +39,27 @@ failed = False
 
 for rel_path, needles in checks:
     path = Path(rel_path)
+
     if not path.exists():
         print(f"FAIL missing file: {rel_path}")
         failed = True
         continue
 
     text = path.read_text(encoding="utf-8")
+
     for needle in needles:
         if needle not in text:
             print(f"FAIL {rel_path} missing: {needle}")
             failed = True
 
 support_path = Path("lib/features/support/presentation/support_screen.dart")
+
 if not support_path.exists():
-    print("FAIL missing file: lib/features/support/presentation/support_screen.dart")
+    print("FAIL missing Support screen")
     failed = True
-else:
-    support_text = support_path.read_text(encoding="utf-8")
-    if "PremiumGateTile" not in support_text:
-        print("FAIL lib/features/support/presentation/support_screen.dart missing: PremiumGateTile")
-        failed = True
+elif "PremiumGateTile" not in support_path.read_text(encoding="utf-8"):
+    print("FAIL Support screen missing PremiumGateTile")
+    failed = True
 
 if failed:
     sys.exit(1)

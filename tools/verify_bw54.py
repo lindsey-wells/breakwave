@@ -3,23 +3,24 @@ import sys
 
 checks = [
     ("lib/features/premium/presentation/breakwave_plus_screen.dart", [
-        "Free immediate relief. Paid ongoing transformation.",
-        "BreakWave Plus is for users who want deeper insight",
+        "Immediate support stays free. Plus builds the longer plan.",
         "Free vs Plus",
-        "BreakWave Plus includes",
-        "Deep Insights",
-        "Custom Rescue Plan",
-        "Guided Recovery Routines",
-        "Accountability Tools",
-        "Premium Christian Depth",
-        "Advanced Privacy and Exports",
+        "What Plus is built to provide",
+        "Deeper patterns and summaries",
+        "Your personal recovery plan",
+        "Guided recovery routines",
+        "Stronger accountability",
+        "Christian recovery depth",
+        "Expanded privacy and exports",
         "BreakWave Plus Annual",
         "$59.99/year",
         "BreakWave Plus Monthly",
         "$8.99/month",
-        "No weekly plan. No lifetime plan at launch.",
-        "Explore BreakWave Plus",
-        "BreakWave Plus purchasing is not active yet",
+        "No weekly plan and no lifetime plan at launch.",
+        "Testing build status",
+        "Subscriptions are not enabled in this testing build.",
+        "No charge can occur from this screen.",
+        "Core Rescue and support tools remain free.",
     ]),
     ("launch/breakwave_plus_value_wall.md", [
         "BreakWave Plus — Value Wall and Feature Map",
@@ -33,33 +34,46 @@ checks = [
         "Do not charge for BreakWave Plus until the paid section contains enough real value",
     ]),
     ("tools/verify_bw25.py", [
-        "Explore BreakWave Plus",
+        "Immediate support stays free. Plus builds the longer plan.",
+        "Subscriptions are not enabled in this testing build.",
     ]),
+]
+
+blocked = [
+    "Debug unlock BreakWave Plus",
+    "_enablePlusPreview",
+    "_setVariant",
+    "Select annual no-trial",
+    "Select annual 7-day trial",
+    "Explore BreakWave Plus",
+    "Planned Plus options",
+    "Planned launch offer",
 ]
 
 failed = False
 
 for rel_path, needles in checks:
     path = Path(rel_path)
+
     if not path.exists():
         print(f"FAIL missing file: {rel_path}")
         failed = True
         continue
 
     text = path.read_text(encoding="utf-8")
+
     for needle in needles:
         if needle not in text:
             print(f"FAIL {rel_path} missing: {needle}")
             failed = True
 
-blocked = [
-    ("lib/features/premium/presentation/breakwave_plus_screen.dart", "Debug unlock BreakWave Plus"),
-]
+plus_text = Path(
+    "lib/features/premium/presentation/breakwave_plus_screen.dart"
+).read_text(encoding="utf-8")
 
-for rel_path, needle in blocked:
-    text = Path(rel_path).read_text(encoding="utf-8")
-    if needle in text:
-        print(f"FAIL {rel_path} still contains old debug copy: {needle}")
+for needle in blocked:
+    if needle in plus_text:
+        print(f"FAIL Plus screen still contains internal control: {needle}")
         failed = True
 
 if failed:
