@@ -6,11 +6,13 @@
 // Notes: BW-87B1 removes pricing and unavailable-feature sales claims.
 // Notes: Subscriptions remain blocked until the paid launch gate is met.
 // Notes: BW-87B2B adds a working recovery insights preview.
+// Notes: BW-87B3B adds a working personal recovery plan preview.
 // ------------------------------------------------------------
 
 import 'package:flutter/material.dart';
 
 import '../../insights/presentation/recovery_insights_screen.dart';
+import '../../personal_plan/presentation/personal_recovery_plan_screen.dart';
 
 class BreakWavePlusScreen extends StatelessWidget {
   const BreakWavePlusScreen({super.key});
@@ -19,6 +21,14 @@ class BreakWavePlusScreen extends StatelessWidget {
     Navigator.of(context).push(
       MaterialPageRoute<void>(
         builder: (_) => const RecoveryInsightsScreen(),
+      ),
+    );
+  }
+
+  void _openPersonalRecoveryPlan(BuildContext context) {
+    Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder: (_) => const PersonalRecoveryPlanScreen(),
       ),
     );
   }
@@ -119,6 +129,23 @@ class BreakWavePlusScreen extends StatelessWidget {
                     body:
                         'A practical plan connecting triggers, danger windows, reasons, redirect actions, trusted support, phone boundaries, and an after-slip reset.',
                   ),
+                  const SizedBox(height: 2),
+                  SizedBox(
+                    width: double.infinity,
+                    child: FilledButton.tonal(
+                      onPressed: () =>
+                          _openPersonalRecoveryPlan(context),
+                      child: const Padding(
+                        padding: EdgeInsets.symmetric(
+                          vertical: 14,
+                        ),
+                        child: Text(
+                          'Preview personal recovery plan',
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
                   _FeaturePillar(
                     title: 'Guided recovery routines',
                     body:
