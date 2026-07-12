@@ -4,6 +4,7 @@
 // File: personal_recovery_plan_prefill.dart
 // Purpose: Safely import and refresh personal-plan sections.
 // Notes: BW-87B3B1 refreshes imported values without replacing manual work.
+// Notes: BW-87B3B2 maps saved Why to the main reason and migrates legacy scalar imports.
 // ------------------------------------------------------------
 
 import '../../../core/reasons/reasons_selection.dart';
@@ -33,9 +34,9 @@ class PersonalRecoveryPlanPrefill {
           : current.reasons,
       primaryReason:
           current.primaryReason.trim().isEmpty
-              ? (savedFocus.isNotEmpty
-                  ? savedFocus
-                  : savedWhy)
+              ? (savedWhy.isNotEmpty
+                  ? savedWhy
+                  : savedFocus)
               : current.primaryReason,
       triggers: current.triggers.isEmpty
           ? triggersSelection.selectedTriggers
@@ -68,15 +69,14 @@ class PersonalRecoveryPlanPrefill {
         reasonsSelection.currentFocus?.trim() ?? '';
 
     final List<String> importedReasons =
-        _dedupe(<String>[
-      ...reasonsSelection.selectedReasons,
-      if (savedWhy.isNotEmpty) savedWhy,
-    ]);
+        _dedupe(
+      reasonsSelection.selectedReasons,
+    );
 
     final String importedPrimaryReason =
-        savedFocus.isNotEmpty
-            ? savedFocus
-            : savedWhy;
+        savedWhy.isNotEmpty
+            ? savedWhy
+            : savedFocus;
 
     final List<String> importedTriggers =
         _dedupe(<String>[
@@ -141,6 +141,15 @@ class PersonalRecoveryPlanPrefill {
     required String nextImported,
   }) {
     final String currentTrimmed = current.trim();
+    final String previousTrimmed =
+        previousImported.trim();
+    final String nextTrimmed = nextImported.trim();
+
+    if (previousTrimmed.isEmpty) {
+      return nextTrimmed.isNotEmpty
+          ? nextImported
+          : current;
+    }
 
     if (currentTrimmed.isEmpty ||
         _sameText(

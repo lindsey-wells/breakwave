@@ -87,7 +87,10 @@ void main() {
       result.reasons,
       <String>['Family', 'Health'],
     );
-    expect(result.primaryReason, 'Family');
+    expect(
+      result.primaryReason,
+      'I want my life back.',
+    );
     expect(
       result.triggers,
       <String>['Stress', 'Tired'],

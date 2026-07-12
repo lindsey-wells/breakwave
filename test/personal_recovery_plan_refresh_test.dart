@@ -95,8 +95,11 @@ void main() {
         containsAll(<String>[
           'My custom reason',
           'Health',
-          'A new saved Why',
         ]),
+      );
+      expect(
+        refreshed.reasons,
+        isNot(contains('A new saved Why')),
       );
       expect(
         refreshed.reasons,
@@ -126,7 +129,7 @@ void main() {
 
       expect(
         refreshed.primaryReason,
-        'Health',
+        'A new saved Why',
       );
       expect(
         refreshed.trustedSupportName,
@@ -197,4 +200,75 @@ void main() {
       );
     },
   );
+  test(
+    'legacy imported Why and contact refresh when metadata is missing',
+    () {
+      const PersonalRecoveryPlan legacyPlan =
+          PersonalRecoveryPlan(
+        reasons: <String>['Relationships'],
+        primaryReason: 'My family',
+        triggers: <String>[],
+        dangerWindows: <String>[],
+        redirectActions: <String>[],
+        trustedSupportName: 'Alex',
+        phoneBoundary: '',
+        bedtimeStrategy: '',
+        afterSlipReset: '',
+        faithSupport: '',
+        createdAtIso: '2026-07-12T10:00:00.000',
+        updatedAtIso: '2026-07-12T10:00:00.000',
+      );
+
+      final PersonalRecoveryPlan refreshed =
+          prefill.refreshFromCurrentChoices(
+        current: legacyPlan,
+        reasonsSelection:
+            const ReasonsSelection(
+          selectedReasons: <String>[
+            'Relationships',
+            'Sexual health',
+          ],
+          currentFocus: 'Relationships',
+        ),
+        triggersSelection:
+            TriggersSelection.empty,
+        supportContact:
+            const SupportContact(
+          name: 'Sam',
+          phoneNumber: '555-0199',
+          emailAddress: '',
+        ),
+        customWhy:
+            const CustomWhyEntry(
+          whyText: 'Mi familia',
+          imagePath: '',
+        ),
+      );
+
+      expect(
+        refreshed.primaryReason,
+        'Mi familia',
+      );
+      expect(
+        refreshed.trustedSupportName,
+        'Sam',
+      );
+      expect(
+        refreshed.reasons,
+        <String>[
+          'Relationships',
+          'Sexual health',
+        ],
+      );
+      expect(
+        refreshed.importedPrimaryReason,
+        'Mi familia',
+      );
+      expect(
+        refreshed.importedTrustedSupportName,
+        'Sam',
+      );
+    },
+  );
+
 }

@@ -90,6 +90,9 @@ for needle in [
 for needle in [
     "refreshes imported sections and preserves manual additions",
     "manual scalar edits are never replaced by refresh",
+    "legacy imported Why and contact refresh when metadata is missing",
+    "A new saved Why",
+    "Mi familia",
     "My custom reason",
     "My custom trigger",
     "Charge my phone outside.",
