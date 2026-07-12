@@ -7,10 +7,12 @@
 // Notes: Subscriptions remain blocked until the paid launch gate is met.
 // Notes: BW-87B2B adds a working recovery insights preview.
 // Notes: BW-87B3B adds a working personal recovery plan preview.
+// Notes: BW-87B4B adds the guided routine library and player preview.
 // ------------------------------------------------------------
 
 import 'package:flutter/material.dart';
 
+import '../../guided_routines/presentation/guided_routines_screen.dart';
 import '../../insights/presentation/recovery_insights_screen.dart';
 import '../../personal_plan/presentation/personal_recovery_plan_screen.dart';
 
@@ -32,6 +34,15 @@ class BreakWavePlusScreen extends StatelessWidget {
       ),
     );
   }
+
+  void _openGuidedRoutines(BuildContext context) {
+    Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder: (_) => const GuidedRoutinesScreen(),
+      ),
+    );
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -151,6 +162,23 @@ class BreakWavePlusScreen extends StatelessWidget {
                     body:
                         'Repeatable routines for bedtime, stress, loneliness, phone boundaries, mornings, and getting back on track—with progress that can be saved.',
                   ),
+                  const SizedBox(height: 2),
+                  SizedBox(
+                    width: double.infinity,
+                    child: FilledButton.tonal(
+                      onPressed: () =>
+                          _openGuidedRoutines(context),
+                      child: const Padding(
+                        padding: EdgeInsets.symmetric(
+                          vertical: 14,
+                        ),
+                        child: Text(
+                          'Preview guided routines',
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
                   _FeaturePillar(
                     title: 'Useful accountability tools',
                     body:
