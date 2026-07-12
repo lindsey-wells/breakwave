@@ -21,7 +21,7 @@ checks = [
         "BreakWave Plus",
         "Immediate support stays free. Plus builds the longer plan.",
         "Free vs Plus",
-        "Expected launch pricing",
+        "Subscription pricing preview",
         "$59.99/year",
         "$8.99/month",
         "Subscriptions are not enabled in this testing build.",

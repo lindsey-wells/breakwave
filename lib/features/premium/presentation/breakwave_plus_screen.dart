@@ -5,6 +5,7 @@
 // Purpose: Public BreakWave Plus value and subscription screen.
 // Notes: BW-87A1 removes preview unlock and offer-testing controls.
 // Notes: Pricing remains visible while purchases are disabled in testing builds.
+// Notes: BW-87A1B clarifies pricing-preview language.
 // ------------------------------------------------------------
 
 import 'package:flutter/material.dart';
@@ -120,7 +121,7 @@ class BreakWavePlusScreen extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
                   Text(
-                    'Expected launch pricing',
+                    'Subscription pricing preview',
                     style: TextStyle(
                       fontSize: 22,
                       fontWeight: FontWeight.w800,
@@ -140,7 +141,7 @@ class BreakWavePlusScreen extends StatelessWidget {
                   ),
                   SizedBox(height: 12),
                   Text(
-                    'No weekly plan and no lifetime plan at launch. Pricing shown is the intended launch pricing and may change before paid access is enabled.',
+                    'No weekly plan and no lifetime plan at launch. These are the prices currently planned for launch. They may change before subscriptions are enabled.',
                   ),
                 ],
               ),

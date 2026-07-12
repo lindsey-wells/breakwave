@@ -16,7 +16,7 @@ required = [
     "Stronger accountability",
     "Christian recovery depth",
     "Expanded privacy and exports",
-    "Expected launch pricing",
+    "Subscription pricing preview",
     r"\$59.99/year",
     r"\$8.99/month",
     "Subscriptions are not enabled in this testing build.",
