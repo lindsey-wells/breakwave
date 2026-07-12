@@ -10,6 +10,7 @@
 // Notes: BW-84A improves Log review scope, edit clarity, and delete undo timing.
 // Notes: BW-84C adds a top-of-page Update Mode banner for edit clarity.
 // Notes: BW-84D highlights the most recently updated log entry.
+// Notes: BW-87B2A preserves the original timestamp when editing.
 // ------------------------------------------------------------
 
 import 'package:flutter/material.dart';
@@ -64,6 +65,7 @@ class _LogScreenState extends State<LogScreen> {
   bool _isSaving = false;
   List<LogEntry> _recentEntries = const <LogEntry>[];
   String? _editingEntryId;
+  String? _editingCreatedAtIso;
   String? _lastSaveMessage;
   bool _showAllEntries = false;
   int _deleteSnackBarSerial = 0;
@@ -215,6 +217,7 @@ class _LogScreenState extends State<LogScreen> {
       _lastSaveMessage = null;
         _recentlyUpdatedEntryId = null;
       _editingEntryId = entry.id;
+      _editingCreatedAtIso = entry.createdAtIso;
       _entryType = entry.entryType;
       _intensity = entry.intensity;
 
@@ -264,6 +267,7 @@ class _LogScreenState extends State<LogScreen> {
 
   void _clearDraft() {
     _editingEntryId = null;
+    _editingCreatedAtIso = null;
     _entryType = 'Urge';
     _intensity = 3;
     _selectedTriggers.clear();
@@ -410,7 +414,9 @@ class _LogScreenState extends State<LogScreen> {
         betterPlan: _betterPlanController.text.trim(),
         replacementAction: replacementActionForSave,
         notes: _notesController.text.trim(),
-        createdAtIso: DateTime.now().toIso8601String(),
+        createdAtIso: editingId == null
+            ? DateTime.now().toIso8601String()
+            : (_editingCreatedAtIso ?? ''),
       );
 
       if (editingId == null) {
