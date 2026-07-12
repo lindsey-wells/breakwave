@@ -5,6 +5,7 @@
 // Purpose: Safely import and refresh personal-plan sections.
 // Notes: BW-87B3B1 refreshes imported values without replacing manual work.
 // Notes: BW-87B3B2 maps saved Why to the main reason and migrates legacy scalar imports.
+// Notes: BW-87B3B3 migrates plans created before import schema v2.
 // ------------------------------------------------------------
 
 import '../../../core/reasons/reasons_selection.dart';
@@ -15,6 +16,8 @@ import 'personal_recovery_plan.dart';
 
 class PersonalRecoveryPlanPrefill {
   const PersonalRecoveryPlanPrefill();
+
+  static const int currentImportSchemaVersion = 2;
 
   PersonalRecoveryPlan fillEmptySections({
     required PersonalRecoveryPlan current,
@@ -93,6 +96,10 @@ class PersonalRecoveryPlanPrefill {
     final String importedSupportName =
         supportContact?.name.trim() ?? '';
 
+    final bool requiresLegacyMigration =
+        current.importSchemaVersion <
+            currentImportSchemaVersion;
+
     return current.copyWith(
       reasons: _refreshList(
         current: current.reasons,
@@ -105,6 +112,8 @@ class PersonalRecoveryPlanPrefill {
         previousImported:
             current.importedPrimaryReason,
         nextImported: importedPrimaryReason,
+        forceSourceRefresh:
+            requiresLegacyMigration,
       ),
       triggers: _refreshList(
         current: current.triggers,
@@ -123,6 +132,8 @@ class PersonalRecoveryPlanPrefill {
         previousImported:
             current.importedTrustedSupportName,
         nextImported: importedSupportName,
+        forceSourceRefresh:
+            requiresLegacyMigration,
       ),
       importedReasons: importedReasons,
       importedPrimaryReason:
@@ -132,6 +143,8 @@ class PersonalRecoveryPlanPrefill {
           importedDangerWindows,
       importedTrustedSupportName:
           importedSupportName,
+      importSchemaVersion:
+          currentImportSchemaVersion,
     );
   }
 
@@ -139,11 +152,16 @@ class PersonalRecoveryPlanPrefill {
     required String current,
     required String previousImported,
     required String nextImported,
+    bool forceSourceRefresh = false,
   }) {
     final String currentTrimmed = current.trim();
     final String previousTrimmed =
         previousImported.trim();
     final String nextTrimmed = nextImported.trim();
+
+    if (forceSourceRefresh) {
+      return nextImported;
+    }
 
     if (previousTrimmed.isEmpty) {
       return nextTrimmed.isNotEmpty

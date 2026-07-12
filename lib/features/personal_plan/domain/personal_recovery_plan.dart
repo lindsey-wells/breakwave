@@ -5,6 +5,7 @@
 // Purpose: Saved longer-term personal recovery plan model.
 // Notes: BW-87B3A stores concise, user-controlled recovery planning.
 // Notes: BW-87B3B1 tracks imported values so they can refresh safely.
+// Notes: BW-87B3B3 versions imported plan metadata for safe legacy migration.
 // ------------------------------------------------------------
 
 class PersonalRecoveryPlan {
@@ -26,6 +27,7 @@ class PersonalRecoveryPlan {
     this.importedTriggers = const <String>[],
     this.importedDangerWindows = const <String>[],
     this.importedTrustedSupportName = '',
+    this.importSchemaVersion = 0,
   });
 
   final List<String> reasons;
@@ -46,6 +48,7 @@ class PersonalRecoveryPlan {
   final List<String> importedTriggers;
   final List<String> importedDangerWindows;
   final String importedTrustedSupportName;
+  final int importSchemaVersion;
 
   static const PersonalRecoveryPlan empty =
       PersonalRecoveryPlan(
@@ -93,6 +96,7 @@ class PersonalRecoveryPlan {
     List<String>? importedTriggers,
     List<String>? importedDangerWindows,
     String? importedTrustedSupportName,
+    int? importSchemaVersion,
   }) {
     return PersonalRecoveryPlan(
       reasons: reasons ?? this.reasons,
@@ -131,6 +135,9 @@ class PersonalRecoveryPlan {
       importedTrustedSupportName:
           importedTrustedSupportName ??
               this.importedTrustedSupportName,
+      importSchemaVersion:
+          importSchemaVersion ??
+              this.importSchemaVersion,
     );
   }
 
@@ -168,6 +175,7 @@ class PersonalRecoveryPlan {
           importedDangerWindows,
       'importedTrustedSupportName':
           importedTrustedSupportName,
+      'importSchemaVersion': importSchemaVersion,
     };
   }
 
@@ -215,6 +223,14 @@ class PersonalRecoveryPlan {
           _normalizedText(
         map['importedTrustedSupportName'],
       ),
+      importSchemaVersion:
+          map['importSchemaVersion'] is int
+              ? map['importSchemaVersion'] as int
+              : int.tryParse(
+                    (map['importSchemaVersion'] ?? '0')
+                        .toString(),
+                  ) ??
+                  0,
     );
   }
 

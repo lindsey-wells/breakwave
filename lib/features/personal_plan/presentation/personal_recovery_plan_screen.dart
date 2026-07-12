@@ -4,6 +4,7 @@
 // File: personal_recovery_plan_screen.dart
 // Purpose: Editable, locally saved personal recovery plan.
 // Notes: BW-87B3B connects existing BreakWave choices into one plan.
+// Notes: BW-87B3B3 detects source changes through imported metadata.
 // ------------------------------------------------------------
 
 import 'package:flutter/material.dart';
@@ -190,7 +191,9 @@ class _PersonalRecoveryPlanScreenState
       setState(() {
         _sourceUpdateAvailable =
             _editableSignature(refreshed) !=
-                _editableSignature(basePlan);
+                    _editableSignature(basePlan) ||
+                _importSourceSignature(refreshed) !=
+                    _importSourceSignature(basePlan);
         _loading = false;
       });
     } catch (_) {
@@ -306,6 +309,19 @@ class _PersonalRecoveryPlanScreenState
     ].join('§');
   }
 
+  String _importSourceSignature(
+    PersonalRecoveryPlan plan,
+  ) {
+    return <String>[
+      plan.importSchemaVersion.toString(),
+      plan.importedReasons.join('|').toLowerCase(),
+      plan.importedPrimaryReason.trim().toLowerCase(),
+      plan.importedTriggers.join('|').toLowerCase(),
+      plan.importedDangerWindows.join('|').toLowerCase(),
+      plan.importedTrustedSupportName.trim().toLowerCase(),
+    ].join('§');
+  }
+
   Future<PersonalRecoveryPlan>
       _refreshFromBreakWave(
     PersonalRecoveryPlan current,
@@ -377,7 +393,9 @@ class _PersonalRecoveryPlanScreenState
 
       final bool changed =
           _editableSignature(imported) !=
-              _editableSignature(current);
+                  _editableSignature(current) ||
+              _importSourceSignature(imported) !=
+                  _importSourceSignature(current);
 
       if (changed) {
         _applyPlan(imported, dirty: true);

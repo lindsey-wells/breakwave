@@ -271,4 +271,104 @@ void main() {
     },
   );
 
+  test(
+    'migrates incorrect metadata saved by earlier plan builds',
+    () {
+      const PersonalRecoveryPlan brokenEarlierPlan =
+          PersonalRecoveryPlan(
+        reasons: <String>[
+          'Relationships',
+          'My family',
+        ],
+        primaryReason: 'My family',
+        triggers: <String>['Stress'],
+        dangerWindows: <String>['Late night'],
+        redirectActions: <String>[],
+        trustedSupportName: 'Alex',
+        phoneBoundary:
+            'Charge my phone outside the bedroom.',
+        bedtimeStrategy: '',
+        afterSlipReset: '',
+        faithSupport: '',
+        createdAtIso: '2026-07-12T10:00:00.000',
+        updatedAtIso: '2026-07-12T10:00:00.000',
+        importedReasons: <String>[
+          'Relationships',
+          'My family',
+        ],
+        importedPrimaryReason: 'Relationships',
+        importedTriggers: <String>['Stress'],
+        importedDangerWindows: <String>['Late night'],
+        importedTrustedSupportName: 'Alex',
+        importSchemaVersion: 0,
+      );
+
+      final PersonalRecoveryPlan refreshed =
+          prefill.refreshFromCurrentChoices(
+        current: brokenEarlierPlan,
+        reasonsSelection:
+            const ReasonsSelection(
+          selectedReasons: <String>[
+            'Relationships',
+            'Sexual health',
+          ],
+          currentFocus: 'Relationships',
+        ),
+        triggersSelection:
+            const TriggersSelection(
+          selectedTriggers: <String>[
+            'Boredom',
+          ],
+          selectedRiskyTimes: <String>[
+            'Home alone',
+          ],
+        ),
+        supportContact:
+            const SupportContact(
+          name: 'Sam',
+          phoneNumber: '555-0199',
+          emailAddress: '',
+        ),
+        customWhy:
+            const CustomWhyEntry(
+          whyText: 'Mi familia',
+          imagePath: '',
+        ),
+      );
+
+      expect(
+        refreshed.primaryReason,
+        'Mi familia',
+      );
+      expect(
+        refreshed.trustedSupportName,
+        'Sam',
+      );
+      expect(
+        refreshed.reasons,
+        <String>[
+          'Relationships',
+          'Sexual health',
+        ],
+      );
+      expect(
+        refreshed.reasons,
+        isNot(contains('My family')),
+      );
+      expect(
+        refreshed.reasons,
+        isNot(contains('Mi familia')),
+      );
+      expect(
+        refreshed.phoneBoundary,
+        'Charge my phone outside the bedroom.',
+      );
+      expect(
+        refreshed.importSchemaVersion,
+        PersonalRecoveryPlanPrefill
+            .currentImportSchemaVersion,
+      );
+    },
+  );
+
 }
