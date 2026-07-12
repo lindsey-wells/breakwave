@@ -1,3 +1,5 @@
+> **Beta status:** This document is a product concept, not a list of currently delivered paid features. Paid launch is blocked until the requirements in `breakwave_plus_paid_launch_gate.md` are met.
+
 # BreakWave Plus — Value Wall and Feature Map
 
 ## Product line

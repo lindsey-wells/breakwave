@@ -9,7 +9,6 @@
 
 import 'package:flutter/material.dart';
 
-import '../../premium/presentation/premium_gate_tile.dart';
 import '../domain/learning_card_content.dart';
 import '../domain/learning_card_pack.dart';
 
@@ -107,17 +106,6 @@ class _EducateMeScreenState extends State<EducateMeScreen> {
               ),
             ),
             const SizedBox(height: 16),
-            PremiumGateTile(
-              title: 'Guided learning and routines',
-              description: 'Unlock deeper guided learning, templates, and structured recovery routines in BreakWave Plus.',
-              onUnlockedTap: () {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('Premium guided learning is part of BreakWave Plus.'),
-                  ),
-                );
-              },
-            ),
           ],
         ),
       ),

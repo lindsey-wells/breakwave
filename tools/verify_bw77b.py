@@ -14,7 +14,6 @@ checks = [
     "ValueChanged<int> onSelected",
     "onTap: () => onSelected(index)",
     "LearningCardPack.starter[index].title",
-    "Guided learning and routines",
 ]
 
 failed = False

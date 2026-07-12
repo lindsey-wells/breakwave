@@ -14,7 +14,7 @@ checks = [
         "Data export tools",
         "BreakWavePlusScreen",
         "_BreakWavePlusPreviewCard",
-        "View Plus features",
+        "Preview Plus roadmap",
         "SupportContactCard",
         "SupportQuickActionsCard",
         "EmergencyHelpCard",

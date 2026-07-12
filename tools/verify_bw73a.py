@@ -43,7 +43,6 @@ checks = [
     "EducationResourcesCard",
     "EducateMeEntryCard",
     "_BreakWavePlusPreviewCard",
-    "PremiumGateTile",
     "EmailCaptureSettingsCard",
     "EmailAppHandoffCard",
     "BreakWaveContactLinksCard",

@@ -3,39 +3,38 @@ import sys
 
 checks = [
     ("lib/features/premium/presentation/breakwave_plus_screen.dart", [
-        "Immediate support stays free. Plus builds the longer plan.",
-        "Free vs Plus",
-        "What Plus is built to provide",
-        "Deeper patterns and summaries",
-        "Your personal recovery plan",
+        "BreakWave Plus is in development.",
+        "Available free in this testing build",
+        "What Plus must deliver before paid launch",
+        "Meaningful insights",
+        "A saved personal recovery plan",
         "Guided recovery routines",
-        "Stronger accountability",
-        "Christian recovery depth",
-        "Expanded privacy and exports",
-        "BreakWave Plus Annual",
-        "$59.99/year",
-        "BreakWave Plus Monthly",
-        "$8.99/month",
-        "No weekly plan and no lifetime plan at launch.",
-        "Testing build status",
-        "Subscriptions are not enabled in this testing build.",
+        "Useful accountability tools",
+        "Substantial Christian depth",
+        "Meaningful recovery exports",
+        "Our paid-launch standard",
+        "Current testing status",
+        "Subscriptions and purchases are not enabled.",
         "No charge can occur from this screen.",
-        "Core Rescue and support tools remain free.",
     ]),
     ("launch/breakwave_plus_value_wall.md", [
+        "Beta status:",
+        "product concept",
         "BreakWave Plus — Value Wall and Feature Map",
-        "Free = help me right now.",
-        "BreakWave Plus = help me understand the pattern",
-        "Deep Insights",
-        "Custom Rescue Plan",
-        "Guided Recovery Routines",
-        "Accountability Tools",
-        "Premium Christian Depth",
         "Do not charge for BreakWave Plus until the paid section contains enough real value",
+        "breakwave_plus_paid_launch_gate.md",
+    ]),
+    ("launch/breakwave_plus_paid_launch_gate.md", [
+        "BreakWave Plus — Paid Launch Gate",
+        "30-day and 90-day recovery history",
+        "Personal recovery plan",
+        "At least five complete routines",
+        "Christian depth must be more than static reading cards.",
+        "Google Play Billing must be implemented and tested",
     ]),
     ("tools/verify_bw25.py", [
-        "Immediate support stays free. Plus builds the longer plan.",
-        "Subscriptions are not enabled in this testing build.",
+        "BreakWave Plus is in development.",
+        "Preview Plus roadmap",
     ]),
 ]
 
@@ -46,8 +45,9 @@ blocked = [
     "Select annual no-trial",
     "Select annual 7-day trial",
     "Explore BreakWave Plus",
-    "Planned Plus options",
-    "Planned launch offer",
+    "Subscription pricing preview",
+    "$59.99/year",
+    "$8.99/month",
 ]
 
 failed = False
@@ -73,10 +73,10 @@ plus_text = Path(
 
 for needle in blocked:
     if needle in plus_text:
-        print(f"FAIL Plus screen still contains internal control: {needle}")
+        print(f"FAIL Plus screen contains blocked paid/internal wording: {needle}")
         failed = True
 
 if failed:
     sys.exit(1)
 
-print("PASS: BW-54 BreakWave Plus value wall verified.")
+print("PASS: BW-54 BreakWave Plus honest value wall verified.")

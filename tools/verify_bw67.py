@@ -9,9 +9,6 @@ checks = [
         "BreakWave is ready.",
         "Home, Rescue, Log, and Support",
     ]),
-    ("lib/features/learn/presentation/educate_me_screen.dart", [
-        "Premium guided learning is part of BreakWave Plus.",
-    ]),
     ("launch/app_dead_button_audit.md", [
         "BW-67 App-Wide Dead Button Audit",
         "dead actions",
@@ -56,6 +53,15 @@ for path in Path("lib").rglob("*.dart"):
 
     if "coming soon" in lower:
         print(f"FAIL coming-soon copy still present in {path}")
+        failed = True
+
+learn_path = Path(
+    "lib/features/learn/presentation/educate_me_screen.dart"
+)
+if learn_path.exists():
+    learn_text = learn_path.read_text(encoding="utf-8")
+    if "Premium guided learning is part of BreakWave Plus." in learn_text:
+        print("FAIL unavailable premium guided-learning snackbar remains")
         failed = True
 
 clinical = Path("lib/core/clinical/cbt_recovery_foundation.dart")

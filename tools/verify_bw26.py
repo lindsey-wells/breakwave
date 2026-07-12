@@ -34,31 +34,38 @@ failed = False
 
 for rel_path, needles in checks:
     path = Path(rel_path)
+
     if not path.exists():
         print(f"FAIL missing file: {rel_path}")
         failed = True
         continue
 
     text = path.read_text(encoding="utf-8")
+
     for needle in needles:
         if needle not in text:
             print(f"FAIL {rel_path} missing: {needle}")
             failed = True
 
-support_path = Path("lib/features/support/presentation/support_screen.dart")
+support_path = Path(
+    "lib/features/support/presentation/support_screen.dart"
+)
+
 if not support_path.exists():
-    print("FAIL missing file: lib/features/support/presentation/support_screen.dart")
+    print("FAIL missing Support screen")
     failed = True
 else:
     support_text = support_path.read_text(encoding="utf-8")
-    if "FaithDepthPackScreen" not in support_text:
-        print("FAIL lib/features/support/presentation/support_screen.dart missing: FaithDepthPackScreen")
-        failed = True
-    if "Faith depth pack" not in support_text:
-        print("FAIL lib/features/support/presentation/support_screen.dart missing: Faith depth pack")
-        failed = True
+
+    for forbidden in [
+        "title: 'Faith depth pack'",
+        "FaithDepthPackScreen",
+    ]:
+        if forbidden in support_text:
+            print(f"FAIL Support still advertises thin paid faith content: {forbidden}")
+            failed = True
 
 if failed:
     sys.exit(1)
 
-print("PASS: BW-26 faith depth pack verified.")
+print("PASS: BW-26 faith depth foundation verified.")

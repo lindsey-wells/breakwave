@@ -42,8 +42,8 @@ checks = [
     ]),
     ("lib/features/premium/presentation/breakwave_plus_screen.dart", [
         "BreakWave Plus",
-        "$59.99/year",
-        "$8.99/month",
+        "BreakWave Plus is in development.",
+        "Subscriptions and purchases are not enabled.",
     ]),
 ]
 

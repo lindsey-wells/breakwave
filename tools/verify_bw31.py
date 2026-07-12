@@ -24,8 +24,8 @@ checks = [
         "understand the pattern sooner so you can interrupt it faster in real life.",
     ]),
     ("lib/features/premium/presentation/breakwave_plus_screen.dart", [
-        "Immediate support stays free. Plus builds the longer plan.",
-        "understand their patterns over time, build a personal recovery plan",
+        "BreakWave Plus is in development.",
+        "What Plus must deliver before paid launch",
     ]),
 ]
 

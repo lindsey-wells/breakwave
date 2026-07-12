@@ -18,13 +18,11 @@ checks = [
     ]),
     ("lib/features/premium/presentation/breakwave_plus_screen.dart", [
         "class BreakWavePlusScreen",
-        "BreakWave Plus",
-        "Immediate support stays free. Plus builds the longer plan.",
-        "Free vs Plus",
-        "Subscription pricing preview",
-        "$59.99/year",
-        "$8.99/month",
-        "Subscriptions are not enabled in this testing build.",
+        "BreakWave Plus is in development.",
+        "Available free in this testing build",
+        "What Plus must deliver before paid launch",
+        "Our paid-launch standard",
+        "Subscriptions and purchases are not enabled.",
         "No charge can occur from this screen.",
     ]),
     ("lib/features/premium/presentation/premium_gate_tile.dart", [
@@ -52,14 +50,19 @@ for rel_path, needles in checks:
             print(f"FAIL {rel_path} missing: {needle}")
             failed = True
 
-support_path = Path("lib/features/support/presentation/support_screen.dart")
+support_path = Path(
+    "lib/features/support/presentation/support_screen.dart"
+)
 
 if not support_path.exists():
     print("FAIL missing Support screen")
     failed = True
-elif "PremiumGateTile" not in support_path.read_text(encoding="utf-8"):
-    print("FAIL Support screen missing PremiumGateTile")
-    failed = True
+else:
+    support_text = support_path.read_text(encoding="utf-8")
+
+    if "Preview Plus roadmap" not in support_text:
+        print("FAIL Support screen missing Plus roadmap action")
+        failed = True
 
 if failed:
     sys.exit(1)

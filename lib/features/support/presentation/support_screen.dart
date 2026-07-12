@@ -10,9 +10,7 @@ import 'package:flutter/material.dart';
 
 import '../../../core/ui/wave_surface.dart';
 import '../../../core/ui/breakwave_app_bar.dart';
-import '../../faith/presentation/faith_depth_pack_screen.dart';
 import '../../premium/presentation/breakwave_plus_screen.dart';
-import '../../premium/presentation/premium_gate_tile.dart';
 import 'widgets/breakwave_contact_links_card.dart';
 import 'widgets/cbt_informed_support_card.dart';
 import 'widgets/professional_help_card.dart';
@@ -125,28 +123,11 @@ class SupportScreen extends StatelessWidget {
                     eyebrow: 'BreakWave Plus',
                     title: 'Go deeper than emergency interruption',
                     subtitle:
-                        'Explore longer-term insight, guided tools, and premium depth.',
+                        'Preview the longer-term recovery tools being built for a future paid release.',
                     icon: Icons.workspace_premium_outlined,
                     initiallyExpanded: false,
                     children: <Widget>[
                       const _BreakWavePlusPreviewCard(),
-                      const PremiumGateTile(
-                        title: 'Deeper insights and exports',
-                        description:
-                            'Explore longer recovery history, deeper insight surfaces, advanced charts, and export tools in BreakWave Plus.',
-                      ),
-                      PremiumGateTile(
-                        title: 'Faith depth pack',
-                        description:
-                            'Unlock grace-forward Christian depth on shame, secrecy, loneliness, and rebuilding integrity.',
-                        onUnlockedTap: () {
-                          Navigator.of(context).push(
-                            MaterialPageRoute(
-                              builder: (_) => const FaithDepthPackScreen(),
-                            ),
-                          );
-                        },
-                      ),
                     ],
                   ),
 
@@ -313,14 +294,14 @@ class _BreakWavePlusPreviewCard extends StatelessWidget {
           ),
           const SizedBox(height: 8),
           const Text(
-            'Free gives users immediate help. Plus is the deeper transformation layer for insights, guided routines, accountability, premium Christian depth, and longer-term recovery tools.',
+            'BreakWave Plus is being built as a substantial longer-term recovery system. Subscriptions will remain unavailable until those tools are ready and tested.',
           ),
           const SizedBox(height: 14),
           FilledButton(
             onPressed: () => _openPlus(context),
             child: const Padding(
               padding: EdgeInsets.symmetric(vertical: 14),
-              child: Text('View Plus features'),
+              child: Text('Preview Plus roadmap'),
             ),
           ),
         ],

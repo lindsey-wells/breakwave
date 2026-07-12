@@ -2,10 +2,9 @@
 // Cube23 Collaboration Header
 // Project: BreakWave
 // File: breakwave_plus_screen.dart
-// Purpose: Public BreakWave Plus value and subscription screen.
-// Notes: BW-87A1 removes preview unlock and offer-testing controls.
-// Notes: Pricing remains visible while purchases are disabled in testing builds.
-// Notes: BW-87A1B clarifies pricing-preview language.
+// Purpose: Honest BreakWave Plus development preview.
+// Notes: BW-87B1 removes pricing and unavailable-feature sales claims.
+// Notes: Subscriptions remain blocked until the paid launch gate is met.
 // ------------------------------------------------------------
 
 import 'package:flutter/material.dart';
@@ -30,14 +29,14 @@ class BreakWavePlusScreen extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
                   Text(
-                    'Immediate support stays free. Plus builds the longer plan.',
+                    'BreakWave Plus is in development.',
                     style: theme.textTheme.headlineSmall?.copyWith(
                       fontWeight: FontWeight.w800,
                     ),
                   ),
                   const SizedBox(height: 12),
                   const Text(
-                    'BreakWave Plus is designed for people who want to understand their patterns over time, build a personal recovery plan, strengthen accountability, and keep making progress after the immediate wave passes.',
+                    'The free BreakWave experience focuses on immediate interruption, logging, privacy, and practical support. Plus will not be sold until it provides a substantial set of working tools for longer-term recovery.',
                   ),
                 ],
               ),
@@ -48,7 +47,7 @@ class BreakWavePlusScreen extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
                   Text(
-                    'Free vs Plus',
+                    'Available free in this testing build',
                     style: TextStyle(
                       fontSize: 22,
                       fontWeight: FontWeight.w800,
@@ -56,15 +55,15 @@ class BreakWavePlusScreen extends StatelessWidget {
                   ),
                   SizedBox(height: 12),
                   _Bullet(
-                    title: 'Free core',
+                    title: 'Immediate interruption',
                     body:
-                        'Rescue, basic logging, recent history, recovery mode, privacy controls, and support resources remain available without a subscription.',
+                        'Rescue, the wave timer, next-right-action tools, and quick urge logging remain free.',
                   ),
                   SizedBox(height: 12),
                   _Bullet(
-                    title: 'BreakWave Plus',
+                    title: 'Recovery foundations',
                     body:
-                        'Longer history and pattern views, guided routines, custom recovery planning, accountability templates, expanded exports, and Christian depth when Christian mode is selected.',
+                        'Basic logging, recent history, recovery mode, reminders, privacy controls, trusted-contact tools, and educational support remain free.',
                   ),
                 ],
               ),
@@ -75,7 +74,7 @@ class BreakWavePlusScreen extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
                   Text(
-                    'What Plus is built to provide',
+                    'What Plus must deliver before paid launch',
                     style: TextStyle(
                       fontSize: 22,
                       fontWeight: FontWeight.w800,
@@ -83,34 +82,34 @@ class BreakWavePlusScreen extends StatelessWidget {
                   ),
                   SizedBox(height: 14),
                   _FeaturePillar(
-                    title: 'Deeper patterns and summaries',
+                    title: 'Meaningful insights',
                     body:
-                        'Longer history, trigger trends, risky-time patterns, weekly summaries, and clearer views of what commonly happens before a slip.',
+                        'Working 30-day and 90-day history, trigger trends, risky-time patterns, and summaries generated from the user’s real recovery logs.',
                   ),
                   _FeaturePillar(
-                    title: 'Your personal recovery plan',
+                    title: 'A saved personal recovery plan',
                     body:
-                        'Bring together your triggers, danger times, reasons, redirect actions, trusted person, and after-slip reset in one structured plan.',
+                        'A practical plan connecting triggers, danger windows, reasons, redirect actions, trusted support, phone boundaries, and an after-slip reset.',
                   ),
                   _FeaturePillar(
                     title: 'Guided recovery routines',
                     body:
-                        'Use focused routines for mornings, bedtime, stress, loneliness, phone boundaries, and getting back on track after a slip.',
+                        'Repeatable routines for bedtime, stress, loneliness, phone boundaries, mornings, and getting back on track—with progress that can be saved.',
                   ),
                   _FeaturePillar(
-                    title: 'Stronger accountability',
+                    title: 'Useful accountability tools',
                     body:
-                        'Use trusted-person check-ins, shareable summaries, honesty templates, victory reports, and ready-to-send support messages.',
+                        'Shareable recovery summaries, check-in templates, support messages, and controls that let the user decide exactly what leaves the device.',
                   ),
                   _FeaturePillar(
-                    title: 'Christian recovery depth',
+                    title: 'Substantial Christian depth',
                     body:
-                        'When Christian mode is selected, explore grace-forward paths for shame, secrecy, loneliness, integrity, and nighttime temptation.',
+                        'Multi-step Christian recovery journeys with Scripture, reflection, action, prayer, saved progress, and direct connections to Rescue and the personal plan.',
                   ),
                   _FeaturePillar(
-                    title: 'Expanded privacy and exports',
+                    title: 'Meaningful recovery exports',
                     body:
-                        'Access longer export options, deeper data tools, and additional privacy controls as paid access becomes available.',
+                        'Exports of recovery history, summaries, trends, and selected accountability information—not merely email-preference data.',
                   ),
                 ],
               ),
@@ -121,38 +120,7 @@ class BreakWavePlusScreen extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
                   Text(
-                    'Subscription pricing preview',
-                    style: TextStyle(
-                      fontSize: 22,
-                      fontWeight: FontWeight.w800,
-                    ),
-                  ),
-                  SizedBox(height: 12),
-                  _PlanRow(
-                    title: 'BreakWave Plus Annual',
-                    price: '\$59.99/year',
-                    note: 'Best value — about \$5 per month.',
-                  ),
-                  SizedBox(height: 12),
-                  _PlanRow(
-                    title: 'BreakWave Plus Monthly',
-                    price: '\$8.99/month',
-                    note: 'Flexible month-to-month access.',
-                  ),
-                  SizedBox(height: 12),
-                  Text(
-                    'No weekly plan and no lifetime plan at launch. These are the prices currently planned for launch. They may change before subscriptions are enabled.',
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 16),
-            const _PlusCard(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  Text(
-                    'Testing build status',
+                    'Our paid-launch standard',
                     style: TextStyle(
                       fontSize: 22,
                       fontWeight: FontWeight.w800,
@@ -160,7 +128,30 @@ class BreakWavePlusScreen extends StatelessWidget {
                   ),
                   SizedBox(height: 10),
                   Text(
-                    'Subscriptions are not enabled in this testing build. No charge can occur from this screen. Core Rescue and support tools remain free.',
+                    'BreakWave will not enable subscriptions until the core Plus tools work inside the app, survive release testing, and provide value people can use repeatedly—not just read once.',
+                  ),
+                  SizedBox(height: 10),
+                  Text(
+                    'Monthly and annual plans will include the same core recovery features. Annual pricing will be a commitment discount, not a requirement for better recovery tools.',
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 16),
+            const _PlusCard(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  Text(
+                    'Current testing status',
+                    style: TextStyle(
+                      fontSize: 22,
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
+                  SizedBox(height: 10),
+                  Text(
+                    'Subscriptions and purchases are not enabled. No charge can occur from this screen. The items above describe the standard Plus must meet before paid access is offered.',
                   ),
                 ],
               ),
