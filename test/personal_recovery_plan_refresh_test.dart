@@ -1,0 +1,200 @@
+// BreakWave
+// BW-87B3B1 personal recovery plan refresh tests.
+
+import 'package:breakwave/core/reasons/reasons_selection.dart';
+import 'package:breakwave/core/support/support_contact.dart';
+import 'package:breakwave/core/triggers/triggers_selection.dart';
+import 'package:breakwave/core/why/custom_why_entry.dart';
+import 'package:breakwave/features/personal_plan/domain/personal_recovery_plan.dart';
+import 'package:breakwave/features/personal_plan/domain/personal_recovery_plan_prefill.dart';
+import 'package:flutter_test/flutter_test.dart';
+
+void main() {
+  const PersonalRecoveryPlanPrefill prefill =
+      PersonalRecoveryPlanPrefill();
+
+  test(
+    'refreshes imported sections and preserves manual additions',
+    () {
+      final PersonalRecoveryPlan first =
+          prefill.refreshFromCurrentChoices(
+        current: PersonalRecoveryPlan.empty,
+        reasonsSelection:
+            const ReasonsSelection(
+          selectedReasons: <String>['Family'],
+          currentFocus: 'Family',
+        ),
+        triggersSelection:
+            const TriggersSelection(
+          selectedTriggers: <String>['Stress'],
+          selectedRiskyTimes:
+              <String>['Late night'],
+        ),
+        supportContact:
+            const SupportContact(
+          name: 'Alex',
+          phoneNumber: '555-0100',
+          emailAddress: '',
+        ),
+        customWhy: const CustomWhyEntry(
+          whyText: 'I want my life back.',
+          imagePath: '',
+        ),
+        observedTriggers:
+            const <String>['Boredom'],
+        observedDangerWindows:
+            const <String>['Sunday'],
+      );
+
+      final PersonalRecoveryPlan edited =
+          first.copyWith(
+        reasons: <String>[
+          ...first.reasons,
+          'My custom reason',
+        ],
+        triggers: <String>[
+          ...first.triggers,
+          'My custom trigger',
+        ],
+        phoneBoundary:
+            'Charge my phone outside.',
+      );
+
+      final PersonalRecoveryPlan refreshed =
+          prefill.refreshFromCurrentChoices(
+        current: edited,
+        reasonsSelection:
+            const ReasonsSelection(
+          selectedReasons: <String>['Health'],
+          currentFocus: 'Health',
+        ),
+        triggersSelection:
+            const TriggersSelection(
+          selectedTriggers: <String>['Tired'],
+          selectedRiskyTimes:
+              <String>['Home alone'],
+        ),
+        supportContact:
+            const SupportContact(
+          name: 'Sam',
+          phoneNumber: '555-0199',
+          emailAddress: '',
+        ),
+        customWhy: const CustomWhyEntry(
+          whyText: 'A new saved Why',
+          imagePath: '',
+        ),
+        observedTriggers:
+            const <String>['Environment'],
+        observedDangerWindows:
+            const <String>['Evening'],
+      );
+
+      expect(
+        refreshed.reasons,
+        containsAll(<String>[
+          'My custom reason',
+          'Health',
+          'A new saved Why',
+        ]),
+      );
+      expect(
+        refreshed.reasons,
+        isNot(contains('Family')),
+      );
+
+      expect(
+        refreshed.triggers,
+        containsAll(<String>[
+          'My custom trigger',
+          'Tired',
+          'Environment',
+        ]),
+      );
+      expect(
+        refreshed.triggers,
+        isNot(contains('Stress')),
+      );
+
+      expect(
+        refreshed.dangerWindows,
+        containsAll(<String>[
+          'Home alone',
+          'Evening',
+        ]),
+      );
+
+      expect(
+        refreshed.primaryReason,
+        'Health',
+      );
+      expect(
+        refreshed.trustedSupportName,
+        'Sam',
+      );
+      expect(
+        refreshed.phoneBoundary,
+        'Charge my phone outside.',
+      );
+    },
+  );
+
+  test(
+    'manual scalar edits are never replaced by refresh',
+    () {
+      final PersonalRecoveryPlan first =
+          prefill.refreshFromCurrentChoices(
+        current: PersonalRecoveryPlan.empty,
+        reasonsSelection:
+            const ReasonsSelection(
+          selectedReasons: <String>['Family'],
+          currentFocus: 'Family',
+        ),
+        triggersSelection:
+            TriggersSelection.empty,
+        supportContact:
+            const SupportContact(
+          name: 'Alex',
+          phoneNumber: '555-0100',
+          emailAddress: '',
+        ),
+        customWhy: CustomWhyEntry.empty,
+      );
+
+      final PersonalRecoveryPlan edited =
+          first.copyWith(
+        primaryReason:
+            'My own wording',
+        trustedSupportName: 'Jordan',
+      );
+
+      final PersonalRecoveryPlan refreshed =
+          prefill.refreshFromCurrentChoices(
+        current: edited,
+        reasonsSelection:
+            const ReasonsSelection(
+          selectedReasons: <String>['Health'],
+          currentFocus: 'Health',
+        ),
+        triggersSelection:
+            TriggersSelection.empty,
+        supportContact:
+            const SupportContact(
+          name: 'Sam',
+          phoneNumber: '555-0199',
+          emailAddress: '',
+        ),
+        customWhy: CustomWhyEntry.empty,
+      );
+
+      expect(
+        refreshed.primaryReason,
+        'My own wording',
+      );
+      expect(
+        refreshed.trustedSupportName,
+        'Jordan',
+      );
+    },
+  );
+}

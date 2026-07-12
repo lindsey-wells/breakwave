@@ -2,8 +2,8 @@
 // Cube23 Collaboration Header
 // Project: BreakWave
 // File: personal_recovery_plan_prefill.dart
-// Purpose: Safely prefill empty personal-plan sections.
-// Notes: BW-87B3A never overwrites existing plan work.
+// Purpose: Safely import and refresh personal-plan sections.
+// Notes: BW-87B3B1 refreshes imported values without replacing manual work.
 // ------------------------------------------------------------
 
 import '../../../core/reasons/reasons_selection.dart';
@@ -24,28 +24,182 @@ class PersonalRecoveryPlanPrefill {
   }) {
     final String savedFocus =
         reasonsSelection.currentFocus?.trim() ?? '';
-    final String savedWhy = customWhy.whyText.trim();
-
-    final String importedPrimaryReason =
-        savedFocus.isNotEmpty ? savedFocus : savedWhy;
+    final String savedWhy =
+        customWhy.whyText.trim();
 
     return current.copyWith(
       reasons: current.reasons.isEmpty
           ? reasonsSelection.selectedReasons
           : current.reasons,
-      primaryReason: current.primaryReason.trim().isEmpty
-          ? importedPrimaryReason
-          : current.primaryReason,
+      primaryReason:
+          current.primaryReason.trim().isEmpty
+              ? (savedFocus.isNotEmpty
+                  ? savedFocus
+                  : savedWhy)
+              : current.primaryReason,
       triggers: current.triggers.isEmpty
           ? triggersSelection.selectedTriggers
           : current.triggers,
-      dangerWindows: current.dangerWindows.isEmpty
-          ? triggersSelection.selectedRiskyTimes
-          : current.dangerWindows,
+      dangerWindows:
+          current.dangerWindows.isEmpty
+              ? triggersSelection.selectedRiskyTimes
+              : current.dangerWindows,
       trustedSupportName:
           current.trustedSupportName.trim().isEmpty
               ? (supportContact?.name.trim() ?? '')
               : current.trustedSupportName,
     );
+  }
+
+  PersonalRecoveryPlan refreshFromCurrentChoices({
+    required PersonalRecoveryPlan current,
+    required ReasonsSelection reasonsSelection,
+    required TriggersSelection triggersSelection,
+    required SupportContact? supportContact,
+    required CustomWhyEntry customWhy,
+    List<String> observedTriggers =
+        const <String>[],
+    List<String> observedDangerWindows =
+        const <String>[],
+  }) {
+    final String savedWhy =
+        customWhy.whyText.trim();
+    final String savedFocus =
+        reasonsSelection.currentFocus?.trim() ?? '';
+
+    final List<String> importedReasons =
+        _dedupe(<String>[
+      ...reasonsSelection.selectedReasons,
+      if (savedWhy.isNotEmpty) savedWhy,
+    ]);
+
+    final String importedPrimaryReason =
+        savedFocus.isNotEmpty
+            ? savedFocus
+            : savedWhy;
+
+    final List<String> importedTriggers =
+        _dedupe(<String>[
+      ...triggersSelection.selectedTriggers,
+      ...observedTriggers,
+    ]);
+
+    final List<String> importedDangerWindows =
+        _dedupe(<String>[
+      ...triggersSelection.selectedRiskyTimes,
+      ...observedDangerWindows,
+    ]);
+
+    final String importedSupportName =
+        supportContact?.name.trim() ?? '';
+
+    return current.copyWith(
+      reasons: _refreshList(
+        current: current.reasons,
+        previousImported:
+            current.importedReasons,
+        nextImported: importedReasons,
+      ),
+      primaryReason: _refreshText(
+        current: current.primaryReason,
+        previousImported:
+            current.importedPrimaryReason,
+        nextImported: importedPrimaryReason,
+      ),
+      triggers: _refreshList(
+        current: current.triggers,
+        previousImported:
+            current.importedTriggers,
+        nextImported: importedTriggers,
+      ),
+      dangerWindows: _refreshList(
+        current: current.dangerWindows,
+        previousImported:
+            current.importedDangerWindows,
+        nextImported: importedDangerWindows,
+      ),
+      trustedSupportName: _refreshText(
+        current: current.trustedSupportName,
+        previousImported:
+            current.importedTrustedSupportName,
+        nextImported: importedSupportName,
+      ),
+      importedReasons: importedReasons,
+      importedPrimaryReason:
+          importedPrimaryReason,
+      importedTriggers: importedTriggers,
+      importedDangerWindows:
+          importedDangerWindows,
+      importedTrustedSupportName:
+          importedSupportName,
+    );
+  }
+
+  String _refreshText({
+    required String current,
+    required String previousImported,
+    required String nextImported,
+  }) {
+    final String currentTrimmed = current.trim();
+
+    if (currentTrimmed.isEmpty ||
+        _sameText(
+          currentTrimmed,
+          previousImported,
+        )) {
+      return nextImported;
+    }
+
+    return current;
+  }
+
+  List<String> _refreshList({
+    required List<String> current,
+    required List<String> previousImported,
+    required List<String> nextImported,
+  }) {
+    final Set<String> previousKeys =
+        previousImported
+            .map(
+              (String value) =>
+                  value.trim().toLowerCase(),
+            )
+            .where((String value) => value.isNotEmpty)
+            .toSet();
+
+    final List<String> manualItems =
+        current.where((String value) {
+      return !previousKeys.contains(
+        value.trim().toLowerCase(),
+      );
+    }).toList();
+
+    return _dedupe(<String>[
+      ...manualItems,
+      ...nextImported,
+    ]);
+  }
+
+  List<String> _dedupe(List<String> values) {
+    final List<String> result = <String>[];
+    final Set<String> seen = <String>{};
+
+    for (final String raw in values) {
+      final String display = raw.trim();
+      final String key = display.toLowerCase();
+
+      if (display.isEmpty || !seen.add(key)) {
+        continue;
+      }
+
+      result.add(display);
+    }
+
+    return List<String>.unmodifiable(result);
+  }
+
+  bool _sameText(String first, String second) {
+    return first.trim().toLowerCase() ==
+        second.trim().toLowerCase();
   }
 }

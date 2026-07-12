@@ -14,6 +14,8 @@ import '../../../core/recovery/recovery_mode_store.dart';
 import '../../../core/support/support_contact_store.dart';
 import '../../../core/triggers/triggers_store.dart';
 import '../../../core/why/custom_why_store.dart';
+import '../../insights/domain/recovery_insights_calculator.dart';
+import '../../log/data/log_repository.dart';
 import '../data/personal_recovery_plan_store.dart';
 import '../domain/personal_recovery_plan.dart';
 import '../domain/personal_recovery_plan_prefill.dart';
@@ -30,6 +32,10 @@ class _PersonalRecoveryPlanScreenState
     extends State<PersonalRecoveryPlanScreen> {
   final PersonalRecoveryPlanPrefill _prefill =
       const PersonalRecoveryPlanPrefill();
+  final LogRepository _logRepository =
+      const LogRepository();
+  final RecoveryInsightsCalculator _insightsCalculator =
+      const RecoveryInsightsCalculator();
 
   late final TextEditingController _reasonsController;
   late final TextEditingController _primaryReasonController;
@@ -43,6 +49,8 @@ class _PersonalRecoveryPlanScreenState
   late final TextEditingController _faithSupportController;
 
   PersonalRecoveryPlan? _savedPlan;
+  PersonalRecoveryPlan _draftPlan =
+      PersonalRecoveryPlan.empty;
   RecoveryMode _mode = RecoveryMode.secular;
 
   bool _loading = true;
@@ -50,6 +58,7 @@ class _PersonalRecoveryPlanScreenState
   bool _importing = false;
   bool _dirty = false;
   bool _suppressDirty = false;
+  bool _sourceUpdateAvailable = false;
 
   String? _statusMessage;
   String? _loadError;
@@ -166,16 +175,22 @@ class _PersonalRecoveryPlanScreenState
           await RecoveryModeStore.loadMode() ??
               RecoveryMode.secular;
 
+      final PersonalRecoveryPlan basePlan =
+          plan ?? PersonalRecoveryPlan.empty;
+
+      final PersonalRecoveryPlan refreshed =
+          await _refreshFromBreakWave(basePlan);
+
       if (!mounted) return;
 
       _mode = mode;
       _savedPlan = plan;
-      _applyPlan(
-        plan ?? PersonalRecoveryPlan.empty,
-        dirty: false,
-      );
+      _applyPlan(basePlan, dirty: false);
 
       setState(() {
+        _sourceUpdateAvailable =
+            _editableSignature(refreshed) !=
+                _editableSignature(basePlan);
         _loading = false;
       });
     } catch (_) {
@@ -195,6 +210,7 @@ class _PersonalRecoveryPlanScreenState
     required bool dirty,
   }) {
     _suppressDirty = true;
+    _draftPlan = plan;
 
     _writeLines(_reasonsController, plan.reasons);
     _primaryReasonController.text = plan.primaryReason;
@@ -253,7 +269,7 @@ class _PersonalRecoveryPlanScreenState
   }
 
   PersonalRecoveryPlan _currentDraft() {
-    return PersonalRecoveryPlan(
+    return _draftPlan.copyWith(
       reasons: _parseLines(_reasonsController.text),
       primaryReason:
           _primaryReasonController.text.trim(),
@@ -272,8 +288,6 @@ class _PersonalRecoveryPlanScreenState
           _afterSlipResetController.text.trim(),
       faithSupport:
           _faithSupportController.text.trim(),
-      createdAtIso: _savedPlan?.createdAtIso ?? '',
-      updatedAtIso: _savedPlan?.updatedAtIso ?? '',
     );
   }
 
@@ -292,6 +306,58 @@ class _PersonalRecoveryPlanScreenState
     ].join('§');
   }
 
+  Future<PersonalRecoveryPlan>
+      _refreshFromBreakWave(
+    PersonalRecoveryPlan current,
+  ) async {
+    final reasons =
+        await ReasonsStore.loadSelection();
+    final triggers =
+        await TriggersStore.loadSelection();
+    final contact =
+        await SupportContactStore.loadContact();
+    final customWhy =
+        await CustomWhyStore.load();
+    final entries =
+        await _logRepository.loadEntries();
+
+    final snapshot =
+        _insightsCalculator.calculate(
+      entries: entries,
+      now: DateTime.now(),
+    );
+
+    final List<String> observedTriggers =
+        snapshot.topTriggers30Days
+            .map((item) => item.trigger)
+            .where((String value) {
+      final String key =
+          value.trim().toLowerCase();
+
+      return key != 'rescue completion' &&
+          key != 'wave timer';
+    }).toList();
+
+    final List<String> observedDangerWindows =
+        <String>[
+      if (snapshot.busiestWeekday30Days != null)
+        snapshot.busiestWeekday30Days!,
+      if (snapshot.busiestTimeWindow30Days != null)
+        snapshot.busiestTimeWindow30Days!,
+    ];
+
+    return _prefill.refreshFromCurrentChoices(
+      current: current,
+      reasonsSelection: reasons,
+      triggersSelection: triggers,
+      supportContact: contact,
+      customWhy: customWhy,
+      observedTriggers: observedTriggers,
+      observedDangerWindows:
+          observedDangerWindows,
+    );
+  }
+
   Future<void> _importCurrentChoices() async {
     if (_importing) return;
 
@@ -301,22 +367,11 @@ class _PersonalRecoveryPlanScreenState
     });
 
     try {
-      final current = _currentDraft();
-
-      final reasons = await ReasonsStore.loadSelection();
-      final triggers = await TriggersStore.loadSelection();
-      final contact =
-          await SupportContactStore.loadContact();
-      final customWhy = await CustomWhyStore.load();
+      final PersonalRecoveryPlan current =
+          _currentDraft();
 
       final PersonalRecoveryPlan imported =
-          _prefill.fillEmptySections(
-        current: current,
-        reasonsSelection: reasons,
-        triggersSelection: triggers,
-        supportContact: contact,
-        customWhy: customWhy,
-      );
+          await _refreshFromBreakWave(current);
 
       if (!mounted) return;
 
@@ -330,11 +385,12 @@ class _PersonalRecoveryPlanScreenState
 
       setState(() {
         _importing = false;
+        _sourceUpdateAvailable = false;
         _statusMessage = changed
-            ? 'Saved BreakWave choices filled the empty parts '
-                'of your plan. Review them, then save.'
-            : 'No new saved choices were available to add. '
-                'Existing plan work was not replaced.';
+            ? 'Current BreakWave choices and recent log patterns were added or refreshed. Custom plan work was preserved. Review the plan, then save.'
+            : 'Your plan already matches the latest saved choices '
+                'and recent log patterns. Custom plan work was '
+                'not replaced.';
       });
     } catch (_) {
       if (!mounted) return;
@@ -377,8 +433,10 @@ class _PersonalRecoveryPlanScreenState
 
       setState(() {
         _savedPlan = saved;
+        _draftPlan = saved;
         _saving = false;
         _dirty = false;
+        _sourceUpdateAvailable = false;
         _statusMessage =
             'Personal recovery plan saved on this device.';
       });
@@ -539,7 +597,9 @@ class _PersonalRecoveryPlanScreenState
               Text(
                 _dirty
                     ? 'Unsaved changes'
-                    : _updatedLabel(),
+                    : _sourceUpdateAvailable
+                        ? 'New BreakWave choices are available'
+                        : _updatedLabel(),
                 style: Theme.of(context)
                     .textTheme
                     .bodyMedium
@@ -560,9 +620,9 @@ class _PersonalRecoveryPlanScreenState
               ),
               const SizedBox(height: 8),
               const Text(
-                'Fill only empty sections using your saved '
-                'reasons, triggers, risky times, trusted '
-                'support name, and saved Why. Existing plan work will not be replaced.',
+                'Refresh imported parts using your saved reasons, '
+                'triggers, risky times, trusted support name, saved Why, '
+                'and recent log patterns. Existing plan work will not be replaced.',
               ),
               const SizedBox(height: 14),
               SizedBox(
@@ -578,8 +638,8 @@ class _PersonalRecoveryPlanScreenState
                     ),
                     child: Text(
                       _importing
-                          ? 'Adding saved choices...'
-                          : 'Add saved choices to empty sections',
+                          ? 'Refreshing plan...'
+                          : 'Refresh from current BreakWave choices',
                     ),
                   ),
                 ),
