@@ -5,12 +5,23 @@
 // Purpose: Honest BreakWave Plus development preview.
 // Notes: BW-87B1 removes pricing and unavailable-feature sales claims.
 // Notes: Subscriptions remain blocked until the paid launch gate is met.
+// Notes: BW-87B2B adds a working recovery insights preview.
 // ------------------------------------------------------------
 
 import 'package:flutter/material.dart';
 
+import '../../insights/presentation/recovery_insights_screen.dart';
+
 class BreakWavePlusScreen extends StatelessWidget {
   const BreakWavePlusScreen({super.key});
+
+  void _openRecoveryInsights(BuildContext context) {
+    Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder: (_) => const RecoveryInsightsScreen(),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -69,7 +80,7 @@ class BreakWavePlusScreen extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 16),
-            const _PlusCard(
+            _PlusCard(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
@@ -86,6 +97,23 @@ class BreakWavePlusScreen extends StatelessWidget {
                     body:
                         'Working 30-day and 90-day history, trigger trends, risky-time patterns, and summaries generated from the user’s real recovery logs.',
                   ),
+                  const SizedBox(height: 2),
+                  SizedBox(
+                    width: double.infinity,
+                    child: FilledButton.tonal(
+                      onPressed: () =>
+                          _openRecoveryInsights(context),
+                      child: const Padding(
+                        padding: EdgeInsets.symmetric(
+                          vertical: 14,
+                        ),
+                        child: Text(
+                          'Preview recovery insights',
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
                   _FeaturePillar(
                     title: 'A saved personal recovery plan',
                     body:
