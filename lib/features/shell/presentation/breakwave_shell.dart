@@ -4,6 +4,7 @@
 // File: breakwave_shell.dart
 // Purpose: Bottom-tab shell for BreakWave.
 // Notes: BW-41 adds privacy lock gating and relock-on-background.
+// Notes: BW-87B4C connects guided routines to real app destinations.
 // ------------------------------------------------------------
 
 import 'package:flutter/material.dart';
@@ -11,8 +12,10 @@ import 'package:flutter/material.dart';
 import '../../../core/privacy_lock/privacy_lock_mode.dart';
 import '../../../core/privacy_lock/privacy_lock_settings.dart';
 import '../../../core/privacy_lock/privacy_lock_store.dart';
+import '../../guided_routines/domain/recovery_routine.dart';
 import '../../home/presentation/home_screen.dart';
 import '../../log/presentation/log_screen.dart';
+import '../../personal_plan/presentation/personal_recovery_plan_screen.dart';
 import '../../privacy_lock/presentation/privacy_unlock_screen.dart';
 import '../../rescue/presentation/rescue_screen.dart';
 import '../../support/presentation/support_screen.dart';
@@ -152,6 +155,46 @@ class _BreakWaveShellState extends State<BreakWaveShell>
     });
   }
 
+  void _handleRoutineActionRequested(
+    RoutineActionTarget target,
+  ) {
+    final NavigatorState navigator =
+        Navigator.of(context);
+
+    switch (target) {
+      case RoutineActionTarget.rescue:
+        navigator.popUntil(
+          (Route<dynamic> route) => route.isFirst,
+        );
+        _onDestinationSelected(1);
+        return;
+
+      case RoutineActionTarget.log:
+        navigator.popUntil(
+          (Route<dynamic> route) => route.isFirst,
+        );
+        _onDestinationSelected(2);
+        return;
+
+      case RoutineActionTarget.support:
+        navigator.popUntil(
+          (Route<dynamic> route) => route.isFirst,
+        );
+        _onDestinationSelected(3);
+        return;
+
+      case RoutineActionTarget.personalPlan:
+        navigator.push<void>(
+          MaterialPageRoute<void>(
+            builder: (_) =>
+                const PersonalRecoveryPlanScreen(),
+          ),
+        );
+        return;
+    }
+  }
+
+
   @override
   Widget build(BuildContext context) {
     final List<Widget> screens = <Widget>[
@@ -171,7 +214,10 @@ class _BreakWaveShellState extends State<BreakWaveShell>
         onOpenRescue: () => _onDestinationSelected(1),
         onOpenSupport: () => _onDestinationSelected(3),
       ),
-      const SupportScreen(),
+      SupportScreen(
+        onRoutineActionRequested:
+            _handleRoutineActionRequested,
+      ),
     ];
 
     return Scaffold(

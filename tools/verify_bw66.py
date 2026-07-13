@@ -22,7 +22,7 @@ checks = [
     ]),
     ("lib/features/shell/presentation/breakwave_shell.dart", [
         "onOpenSupport: () => _onDestinationSelected(3)",
-        "const SupportScreen()",
+        "SupportScreen(",
         "label: 'Support'",
     ]),
     ("launch/rescue_dead_button_cleanup.md", [

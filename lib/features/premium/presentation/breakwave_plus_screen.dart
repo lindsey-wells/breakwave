@@ -8,16 +8,24 @@
 // Notes: BW-87B2B adds a working recovery insights preview.
 // Notes: BW-87B3B adds a working personal recovery plan preview.
 // Notes: BW-87B4B adds the guided routine library and player preview.
+// Notes: BW-87B4C connects guided routine actions to real destinations.
 // ------------------------------------------------------------
 
 import 'package:flutter/material.dart';
 
+import '../../guided_routines/domain/recovery_routine.dart';
 import '../../guided_routines/presentation/guided_routines_screen.dart';
 import '../../insights/presentation/recovery_insights_screen.dart';
 import '../../personal_plan/presentation/personal_recovery_plan_screen.dart';
 
 class BreakWavePlusScreen extends StatelessWidget {
-  const BreakWavePlusScreen({super.key});
+  const BreakWavePlusScreen({
+    super.key,
+    this.onRoutineActionRequested,
+  });
+
+  final ValueChanged<RoutineActionTarget>?
+      onRoutineActionRequested;
 
   void _openRecoveryInsights(BuildContext context) {
     Navigator.of(context).push(
@@ -38,7 +46,10 @@ class BreakWavePlusScreen extends StatelessWidget {
   void _openGuidedRoutines(BuildContext context) {
     Navigator.of(context).push(
       MaterialPageRoute<void>(
-        builder: (_) => const GuidedRoutinesScreen(),
+        builder: (_) => GuidedRoutinesScreen(
+          onActionRequested:
+              onRoutineActionRequested,
+        ),
       ),
     );
   }

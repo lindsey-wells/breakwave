@@ -72,7 +72,8 @@ for needle in [
 for needle in [
     "guided_routines_screen.dart",
     "_openGuidedRoutines",
-    "const GuidedRoutinesScreen()",
+    "GuidedRoutinesScreen(",
+    "onActionRequested:",
     "Preview guided routines",
     "BW-87B4B adds the guided routine library",
 ]:

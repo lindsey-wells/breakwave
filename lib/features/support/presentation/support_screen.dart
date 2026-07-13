@@ -4,11 +4,13 @@
 // File: support_screen.dart
 // Purpose: BW-55 grouped Support tab cleanup.
 // Notes: BW-73A declutters Support with collapsible launch-ready groups.
+// Notes: BW-87B4C passes real guided-routine navigation actions into Plus.
 // ------------------------------------------------------------
 
 import 'package:flutter/material.dart';
 
 import '../../../core/ui/wave_surface.dart';
+import '../../guided_routines/domain/recovery_routine.dart';
 import '../../../core/ui/breakwave_app_bar.dart';
 import '../../premium/presentation/breakwave_plus_screen.dart';
 import 'widgets/breakwave_contact_links_card.dart';
@@ -31,7 +33,13 @@ import 'widgets/support_quick_actions_card.dart';
 import 'widgets/trusted_accountability_card.dart';
 
 class SupportScreen extends StatelessWidget {
-  const SupportScreen({super.key});
+  const SupportScreen({
+    super.key,
+    this.onRoutineActionRequested,
+  });
+
+  final ValueChanged<RoutineActionTarget>?
+      onRoutineActionRequested;
 
   @override
   Widget build(BuildContext context) {
@@ -127,7 +135,10 @@ class SupportScreen extends StatelessWidget {
                     icon: Icons.workspace_premium_outlined,
                     initiallyExpanded: false,
                     children: <Widget>[
-                      const _BreakWavePlusPreviewCard(),
+                      _BreakWavePlusPreviewCard(
+                        onRoutineActionRequested:
+                            onRoutineActionRequested,
+                      ),
                     ],
                   ),
 
@@ -261,12 +272,20 @@ class _SupportGroup extends StatelessWidget {
 }
 
 class _BreakWavePlusPreviewCard extends StatelessWidget {
-  const _BreakWavePlusPreviewCard();
+  const _BreakWavePlusPreviewCard({
+    this.onRoutineActionRequested,
+  });
+
+  final ValueChanged<RoutineActionTarget>?
+      onRoutineActionRequested;
 
   void _openPlus(BuildContext context) {
     Navigator.of(context).push(
       MaterialPageRoute(
-        builder: (_) => const BreakWavePlusScreen(),
+        builder: (_) => BreakWavePlusScreen(
+          onRoutineActionRequested:
+              onRoutineActionRequested,
+        ),
       ),
     );
   }
