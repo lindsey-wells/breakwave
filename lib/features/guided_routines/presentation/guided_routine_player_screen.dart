@@ -360,7 +360,7 @@ class _GuidedRoutinePlayerScreenState
               ),
               const SizedBox(height: 10),
               Text(
-                'Use when: ${widget.routine.whenToUse}',
+                'Helpful when: ${widget.routine.whenToUse}',
               ),
             ],
           ),

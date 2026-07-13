@@ -129,7 +129,7 @@ class BreakWaveNotifications {
             privacy.discreetNotifications ? 'Check-in' : 'BreakWave check-in',
         body: privacy.discreetNotifications
             ? 'Take a brief pause.'
-            : 'Pause for 20 seconds. Open BreakWave and choose one clean next step.',
+            : 'Pause for 20 seconds. Open BreakWave and take one steady next step.',
         scheduledDate: _nextInstance(settings.dailyHour, settings.dailyMinute),
         notificationDetails: _details(),
         androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
@@ -138,7 +138,7 @@ class BreakWaveNotifications {
     }
 
     if (settings.riskyNudgeEnabled) {
-      const String fullBody = 'Danger window. Pause now. Open BreakWave and choose one clean next step.';
+      const String fullBody = 'Danger window. Pause now. Open BreakWave and take one steady next step.';
 
       await _plugin.zonedSchedule(
         id: riskyNudgeId,

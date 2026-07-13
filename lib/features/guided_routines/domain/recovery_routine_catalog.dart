@@ -50,7 +50,7 @@ class RecoveryRoutineCatalog {
       summary:
           'Begin the day with one clear reason, one boundary, and one plan for the riskiest moment.',
       whenToUse:
-          'Use after waking up or before the day begins pulling your attention in different directions.',
+          'After waking up or before the day begins pulling your attention in different directions.',
       estimatedMinutes: 4,
       steps: <RecoveryRoutineStep>[
         _step(
@@ -105,7 +105,7 @@ class RecoveryRoutineCatalog {
       summary:
           'Lower physical pressure, create distance from the trigger, and choose the next right action.',
       whenToUse:
-          'Use when stress, anger, pressure, or mental overload starts pushing you toward the old pattern.',
+          'When stress, anger, pressure, or mental overload starts pushing you toward the old pattern.',
       estimatedMinutes: 6,
       steps: <RecoveryRoutineStep>[
         _step(
@@ -170,7 +170,7 @@ class RecoveryRoutineCatalog {
       summary:
           'Answer isolation with movement, safe connection, and one grounded action.',
       whenToUse:
-          'Use when loneliness, rejection, secrecy, or isolation begins increasing temptation.',
+          'When loneliness, rejection, secrecy, or isolation begins increasing temptation.',
       estimatedMinutes: 7,
       steps: <RecoveryRoutineStep>[
         _step(
@@ -227,7 +227,7 @@ class RecoveryRoutineCatalog {
       summary:
           'Create physical distance from the device and restore a boundary that can survive the next urge.',
       whenToUse:
-          'Use after risky scrolling, private browsing, boundary drift, or taking the phone somewhere it should not be.',
+          'After risky scrolling, private browsing, boundary drift, or taking the phone somewhere it should not be.',
       estimatedMinutes: 5,
       steps: <RecoveryRoutineStep>[
         _step(
@@ -282,7 +282,7 @@ class RecoveryRoutineCatalog {
       summary:
           'Reduce access, lower stimulation, and prepare a clear response before the late-night wave begins.',
       whenToUse:
-          'Use before bed, especially when tiredness, privacy, or late-night phone use increases risk.',
+          'Before bed, especially when tiredness, privacy, or late-night phone use increases risk.',
       estimatedMinutes: 6,
       steps: <RecoveryRoutineStep>[
         _step(
@@ -345,7 +345,7 @@ class RecoveryRoutineCatalog {
       summary:
           'Stop the shame spiral, record what happened, restore support, and change one condition before restarting.',
       whenToUse:
-          'Use after a slip or when one difficult moment is starting to become a longer return to the old pattern.',
+          'After a slip or when one difficult moment is starting to become a longer return to the old pattern.',
       estimatedMinutes: 8,
       steps: <RecoveryRoutineStep>[
         _step(

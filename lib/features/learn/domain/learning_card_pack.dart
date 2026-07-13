@@ -36,7 +36,7 @@ class LearningCardPack {
       title: 'Shame makes relapse worse',
       meaning: 'Shame often pushes a person deeper into hiding instead of toward recovery.',
       whyItMatters: 'When shame takes over, it becomes harder to log honestly, ask for help, or restart quickly.',
-      nextMove: 'Use plain truthful language after a hard moment and take one clean next step instead of spiraling.',
+      nextMove: 'Use plain truthful language after a hard moment and take one steady next step instead of spiraling.',
     ),
     LearningCardContent(
       id: 'interrupt-beats-negotiate',

@@ -19,8 +19,8 @@ required_reminder = [
 
 required_notifications = [
     "Notes: BW-86B3 strengthens check-in and danger-window nudge copy.",
-    "Pause for 20 seconds. Open BreakWave and choose one clean next step.",
-    "Danger window. Pause now. Open BreakWave and choose one clean next step.",
+    "Pause for 20 seconds. Open BreakWave and take one steady next step.",
+    "Danger window. Pause now. Open BreakWave and take one steady next step.",
     "Pause now.",
     "AndroidScheduleMode.inexactAllowWhileIdle",
 ]
@@ -36,8 +36,8 @@ for needle in required_notifications:
         sys.exit(1)
 
 for old_copy in [
-    "Pause for 20 seconds and choose one clean next step.",
-    "Pause early and choose one clean next step.",
+    "Pause for 20 seconds and take one steady next step.",
+    "Pause early and take one steady next step.",
     "Pause early.",
 ]:
     if old_copy in notifications:
