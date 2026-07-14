@@ -23,7 +23,7 @@ class ChristianRecoveryJourneyCatalog {
       summary:
           'Return to truth without letting shame turn one fall into a longer retreat.',
       whenToUse:
-          'After a slip, or when condemnation is pushing you toward hiding.',
+          'after a slip, or when condemnation is pushing you toward hiding.',
       estimatedMinutes: 9,
       steps: <ChristianJourneyStep>[
         ChristianJourneyStep(
@@ -73,7 +73,7 @@ class ChristianRecoveryJourneyCatalog {
       summary:
           'Interrupt a thought pattern before it gathers momentum and becomes a decision.',
       whenToUse:
-          'When fantasy, bargaining, or repetitive thoughts begin pulling your attention.',
+          'fantasy, bargaining, or repetitive thoughts begin pulling your attention.',
       estimatedMinutes: 8,
       steps: <ChristianJourneyStep>[
         ChristianJourneyStep(
@@ -123,7 +123,7 @@ class ChristianRecoveryJourneyCatalog {
       summary:
           'Reduce secrecy through truth, safer surroundings, and prepared support.',
       whenToUse:
-          'When isolation or secrecy is making the habit feel easier to protect.',
+          'isolation or secrecy makes the habit feel easier to protect.',
       estimatedMinutes: 10,
       steps: <ChristianJourneyStep>[
         ChristianJourneyStep(
@@ -173,7 +173,7 @@ class ChristianRecoveryJourneyCatalog {
       summary:
           'Respond to loneliness as a real need without turning toward false comfort.',
       whenToUse:
-          'When loneliness, rejection, boredom, or disconnection is increasing vulnerability.',
+          'you feel lonely, rejected, bored, or disconnected.',
       estimatedMinutes: 9,
       steps: <ChristianJourneyStep>[
         ChristianJourneyStep(
@@ -223,7 +223,7 @@ class ChristianRecoveryJourneyCatalog {
       summary:
           'Build integrity through repeatable choices rather than dramatic promises.',
       whenToUse:
-          'When you feel pressure to fix everything at once or prove yourself through perfection.',
+          'you feel pressure to fix everything at once or prove yourself through perfection.',
       estimatedMinutes: 8,
       steps: <ChristianJourneyStep>[
         ChristianJourneyStep(
@@ -273,7 +273,7 @@ class ChristianRecoveryJourneyCatalog {
       summary:
           'Prepare for a vulnerable evening before fatigue and isolation narrow your choices.',
       whenToUse:
-          'Before bedtime, late-night scrolling, travel, or another predictable risk window.',
+          'before bedtime, late-night scrolling, travel, or another predictable risk window.',
       estimatedMinutes: 10,
       steps: <ChristianJourneyStep>[
         ChristianJourneyStep(
