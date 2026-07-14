@@ -42,7 +42,8 @@ player = player_path.read_text(
 for needle in [
     "christian_journeys_screen.dart",
     "_openChristianJourneys",
-    "const ChristianJourneysScreen()",
+    "ChristianJourneysScreen(",
+    "onActionRequested:",
     "Preview Christian journeys",
     "Substantial Christian depth",
     "Subscriptions and purchases are not enabled.",
@@ -84,16 +85,23 @@ for needle in [
         )
         sys.exit(1)
 
-if "onActionRequested:" in plus[
-    plus.find("_openChristianJourneys"):
-    plus.find(
-        "@override",
-        plus.find("_openChristianJourneys"),
-    )
-]:
+journey_start = plus.find(
+    "_openChristianJourneys"
+)
+
+journey_end = plus.find(
+    "@override",
+    journey_start,
+)
+
+journey_slice = plus[
+    journey_start:journey_end
+]
+
+if "onActionRequested:" not in journey_slice:
     print(
-        "FAIL BW-87B5B2 Christian journey actions "
-        "must remain unwired until BW-87B5C."
+        "FAIL BW-87B5B2 Christian journey "
+        "callback connection disappeared."
     )
     sys.exit(1)
 

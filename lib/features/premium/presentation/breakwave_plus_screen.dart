@@ -10,10 +10,12 @@
 // Notes: BW-87B4B adds the guided routine library and player preview.
 // Notes: BW-87B4C connects guided routine actions to real destinations.
 // Notes: BW-87B5B2 launches the Christian journey library from Plus.
+// Notes: BW-87B5C connects Christian journey actions to Rescue and the personal plan.
 // ------------------------------------------------------------
 
 import 'package:flutter/material.dart';
 
+import '../../faith/domain/christian_recovery_journey.dart';
 import '../../faith/presentation/christian_journeys_screen.dart';
 import '../../guided_routines/domain/recovery_routine.dart';
 import '../../guided_routines/presentation/guided_routines_screen.dart';
@@ -56,13 +58,38 @@ class BreakWavePlusScreen extends StatelessWidget {
     );
   }
 
+
+  void _handleChristianJourneyActionRequested(
+    ChristianJourneyActionTarget target,
+  ) {
+    final ValueChanged<RoutineActionTarget>? handler =
+        onRoutineActionRequested;
+
+    if (handler == null) return;
+
+    switch (target) {
+      case ChristianJourneyActionTarget.rescue:
+        handler(RoutineActionTarget.rescue);
+        return;
+
+      case ChristianJourneyActionTarget.personalPlan:
+        handler(RoutineActionTarget.personalPlan);
+        return;
+    }
+  }
+
   void _openChristianJourneys(
     BuildContext context,
   ) {
     Navigator.of(context).push(
       MaterialPageRoute<void>(
         builder: (_) =>
-            const ChristianJourneysScreen(),
+            ChristianJourneysScreen(
+              onActionRequested:
+                  onRoutineActionRequested == null
+                      ? null
+                      : _handleChristianJourneyActionRequested,
+            ),
       ),
     );
   }
