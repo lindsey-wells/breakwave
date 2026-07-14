@@ -9,10 +9,12 @@
 // Notes: BW-87B3B adds a working personal recovery plan preview.
 // Notes: BW-87B4B adds the guided routine library and player preview.
 // Notes: BW-87B4C connects guided routine actions to real destinations.
+// Notes: BW-87B5B2 launches the Christian journey library from Plus.
 // ------------------------------------------------------------
 
 import 'package:flutter/material.dart';
 
+import '../../faith/presentation/christian_journeys_screen.dart';
 import '../../guided_routines/domain/recovery_routine.dart';
 import '../../guided_routines/presentation/guided_routines_screen.dart';
 import '../../insights/presentation/recovery_insights_screen.dart';
@@ -53,6 +55,18 @@ class BreakWavePlusScreen extends StatelessWidget {
       ),
     );
   }
+
+  void _openChristianJourneys(
+    BuildContext context,
+  ) {
+    Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder: (_) =>
+            const ChristianJourneysScreen(),
+      ),
+    );
+  }
+
 
 
   @override
@@ -200,6 +214,25 @@ class BreakWavePlusScreen extends StatelessWidget {
                     body:
                         'Multi-step Christian recovery journeys with Scripture, reflection, action, prayer, saved progress, and direct connections to Rescue and the personal plan.',
                   ),
+                  const SizedBox(height: 2),
+                  SizedBox(
+                    width: double.infinity,
+                    child: FilledButton.tonal(
+                      onPressed: () =>
+                          _openChristianJourneys(
+                        context,
+                      ),
+                      child: const Padding(
+                        padding: EdgeInsets.symmetric(
+                          vertical: 14,
+                        ),
+                        child: Text(
+                          'Preview Christian journeys',
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
                   _FeaturePillar(
                     title: 'Meaningful recovery exports',
                     body:
