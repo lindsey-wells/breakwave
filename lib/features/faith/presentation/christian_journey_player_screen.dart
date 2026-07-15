@@ -5,6 +5,7 @@
 // Purpose: One-step-at-a-time Christian journey player.
 // Notes: BW-87B5B1 saves progress after every completed step.
 // Notes: Restarting preserves prior completion history.
+// Notes: BW-87B5C1 strengthens Journey Path text contrast.
 // ------------------------------------------------------------
 
 import 'package:flutter/material.dart';
@@ -887,6 +888,13 @@ class _PathRow extends StatelessWidget {
                 : colors
                     .surfaceContainerHighest;
 
+    final Color foreground =
+        isCompleted
+            ? colors.onPrimaryContainer
+            : isCurrent
+                ? colors.onSecondaryContainer
+                : colors.onSurfaceVariant;
+
     final IconData icon =
         isCompleted
             ? Icons.check
@@ -911,12 +919,14 @@ class _PathRow extends StatelessWidget {
                 ? Icon(
                     icon,
                     size: 19,
+                    color: colors.onSurface,
                   )
                 : Text(
                     number.toString(),
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontWeight:
                           FontWeight.w800,
+                      color: colors.onSurface,
                     ),
                   ),
           ),
@@ -934,10 +944,19 @@ class _PathRow extends StatelessWidget {
                       ?.copyWith(
                         fontWeight:
                             FontWeight.w800,
+                        color: foreground,
                       ),
                 ),
                 const SizedBox(height: 2),
-                Text(kindLabel),
+                Text(
+                  kindLabel,
+                  style: theme
+                      .textTheme
+                      .bodyMedium
+                      ?.copyWith(
+                        color: foreground,
+                      ),
+                ),
               ],
             ),
           ),
