@@ -175,7 +175,7 @@ void main() {
 
       expect(
         text,
-        isNot(contains('phone number')),
+        contains('phone numbers'),
       );
     },
   );
