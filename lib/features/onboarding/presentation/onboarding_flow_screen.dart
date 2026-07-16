@@ -9,9 +9,13 @@
 import 'package:flutter/material.dart';
 
 import '../../../core/onboarding/onboarding_completion_service.dart';
+import '../../../core/onboarding/onboarding_draft.dart';
+import '../../../core/onboarding/onboarding_draft_store.dart';
 import '../../../core/onboarding/onboarding_state.dart';
 import '../../../core/onboarding/onboarding_state_store.dart';
+import '../../../core/recovery/recovery_mode.dart';
 import '../../../core/ui/wave_surface.dart';
+import 'onboarding_intro_step_details.dart';
 import 'onboarding_rescue_route.dart';
 
 class OnboardingFlowScreen
@@ -123,6 +127,9 @@ class _OnboardingFlowScreenState
 
   late int _step;
   bool _busy = false;
+  bool _draftLoading = true;
+  OnboardingDraft _draft =
+      OnboardingDraft.empty;
 
   @override
   void initState() {
@@ -132,6 +139,120 @@ class _OnboardingFlowScreenState
       0,
       OnboardingState.totalSteps - 1,
     );
+
+    _loadDraft();
+  }
+
+  Future<void> _loadDraft() async {
+    try {
+      final OnboardingDraft loaded =
+          await OnboardingDraftStore.load();
+
+      if (!mounted) return;
+
+      setState(() {
+        _draft = loaded;
+        _draftLoading = false;
+      });
+    } catch (_) {
+      if (!mounted) return;
+
+      setState(() {
+        _draft = OnboardingDraft.empty;
+        _draftLoading = false;
+      });
+    }
+  }
+
+  Future<void> _replaceDraft(
+    OnboardingDraft next,
+  ) async {
+    if (_busy || _draftLoading) return;
+
+    final OnboardingDraft previous =
+        _draft;
+
+    setState(() {
+      _draft = next;
+      _busy = true;
+    });
+
+    try {
+      final OnboardingDraft saved =
+          await OnboardingDraftStore.save(
+        next,
+      );
+
+      if (!mounted) return;
+
+      setState(() {
+        _draft = saved;
+      });
+    } catch (_) {
+      if (!mounted) return;
+
+      setState(() {
+        _draft = previous;
+      });
+
+      _showError(
+        'BreakWave could not save that setup '
+        'choice. Please try again.',
+      );
+    } finally {
+      if (mounted) {
+        setState(() {
+          _busy = false;
+        });
+      }
+    }
+  }
+
+  Future<void> _setRecoveryMode(
+    RecoveryMode mode,
+  ) async {
+    await _replaceDraft(
+      _draft.copyWith(
+        recoveryMode: mode,
+      ),
+    );
+  }
+
+  Future<void> _setSupportNeed(
+    String value,
+    bool selected,
+  ) async {
+    final List<String> updated =
+        List<String>.from(
+      _draft.supportNeeds,
+    );
+
+    if (selected) {
+      if (!updated.contains(value)) {
+        updated.add(value);
+      }
+    } else {
+      updated.remove(value);
+    }
+
+    await _replaceDraft(
+      _draft.copyWith(
+        supportNeeds: updated,
+      ),
+    );
+  }
+
+  bool get _canContinueCurrentStep {
+    if (_draftLoading) return false;
+
+    switch (_step) {
+      case 2:
+        return _draft.recoveryMode != null;
+      case 3:
+        return _draft.supportNeeds.isNotEmpty;
+      default:
+        return true;
+    }
   }
 
   bool get _isLastStep =>
@@ -442,6 +563,21 @@ class _OnboardingFlowScreenState
                               height: 1.5,
                             ),
                           ),
+                          if (_step <= 3) ...<Widget>[
+                            const SizedBox(height: 22),
+                            OnboardingIntroStepDetails(
+                              step: _step,
+                              draft: _draft,
+                              loading: _draftLoading,
+                              enabled:
+                                  !_busy &&
+                                  !_draftLoading,
+                              onModeChanged:
+                                  _setRecoveryMode,
+                              onSupportNeedChanged:
+                                  _setSupportNeed,
+                            ),
+                          ],
                           const SizedBox(height: 20),
                           Text(
                             'You can review and change '
@@ -515,8 +651,11 @@ class _OnboardingFlowScreenState
                   Expanded(
                     flex: _step > 0 ? 1 : 2,
                     child: FilledButton.icon(
-                      onPressed:
-                          _busy ? null : _continue,
+                        onPressed:
+                            (_busy ||
+                                    !_canContinueCurrentStep)
+                                ? null
+                                : _continue,
                       icon: Icon(
                         _isLastStep
                             ? Icons.check_rounded

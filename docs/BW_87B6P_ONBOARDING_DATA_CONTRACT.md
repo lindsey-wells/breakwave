@@ -107,3 +107,28 @@ accidentally dismiss the flow.
 
 If onboarding-state storage fails during launch, onboarding must never
 prevent the existing recovery-mode gate or app shell from opening.
+
+## Introductory setup screens
+
+The first four onboarding screens provide real setup content:
+
+1. BreakWave purpose and scope
+2. Privacy and local-data expectations
+3. Explicit secular or Christian recovery-mode choice
+4. Broad support-needs selection
+
+Recovery mode and support-needs answers are saved only to the temporary
+onboarding draft while setup is in progress.
+
+The recovery-mode screen explains that both paths retain access to
+Rescue. Christian mode is explicit and optional.
+
+The support-needs screen does not diagnose the user or describe its
+answers as medical treatment.
+
+A recovery mode and at least one support need are required before the
+user advances from their respective screens.
+
+These draft answers do not write RecoveryModeStore, PremiumStateStore,
+billing state, logs, or other live recovery stores before final
+onboarding completion.
