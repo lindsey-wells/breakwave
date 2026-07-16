@@ -132,3 +132,28 @@ user advances from their respective screens.
 These draft answers do not write RecoveryModeStore, PremiumStateStore,
 billing state, logs, or other live recovery stores before final
 onboarding completion.
+
+## Reasons, current focus, and written Why
+
+Onboarding Step 5 allows the user to:
+
+- select one or more preset reasons
+- add custom reasons
+- choose one selected reason as the current focus
+- optionally write a short personal Why
+
+At least one reason and a valid current focus are required before
+advancing.
+
+The written Why is optional and is limited to a short local statement.
+
+Reason selections, current focus, and Why text remain in
+OnboardingDraftStore while onboarding is unfinished.
+
+Onboarding saves the current draft before saving the next onboarding
+step. Finishing onboarding also saves the current draft before the
+completion service merges supported answers.
+
+Step 5 must not write ReasonsStore, CustomWhyStore, PremiumStateStore,
+billing state, recovery logs, or contact information before final
+completion.

@@ -16,6 +16,7 @@ import '../../../core/onboarding/onboarding_state_store.dart';
 import '../../../core/recovery/recovery_mode.dart';
 import '../../../core/ui/wave_surface.dart';
 import 'onboarding_intro_step_details.dart';
+import 'onboarding_reasons_step_details.dart';
 import 'onboarding_rescue_route.dart';
 
 class OnboardingFlowScreen
@@ -242,6 +243,45 @@ class _OnboardingFlowScreenState
     );
   }
 
+  Future<void> _setReasons(
+    List<String> reasons,
+    String currentFocus,
+  ) async {
+    await _replaceDraft(
+      _draft.copyWith(
+        reasons: reasons,
+        currentFocus: currentFocus,
+      ),
+    );
+  }
+
+  void _setWhyText(
+    String value,
+  ) {
+    if (_busy || _draftLoading) return;
+
+    setState(() {
+      _draft = _draft.copyWith(
+        whyText: value,
+      );
+    });
+  }
+
+  bool _isCurrentFocusValid() {
+    final String requested =
+        _draft.currentFocus
+            .trim()
+            .toLowerCase();
+
+    if (requested.isEmpty) return false;
+
+    return _draft.reasons.any(
+      (String reason) =>
+          reason.trim().toLowerCase() ==
+          requested,
+    );
+  }
+
   bool get _canContinueCurrentStep {
     if (_draftLoading) return false;
 
@@ -250,6 +290,9 @@ class _OnboardingFlowScreenState
         return _draft.recoveryMode != null;
       case 3:
         return _draft.supportNeeds.isNotEmpty;
+      case 4:
+        return _draft.reasons.isNotEmpty &&
+            _isCurrentFocusValid();
       default:
         return true;
     }
@@ -271,6 +314,16 @@ class _OnboardingFlowScreenState
     });
 
     try {
+      OnboardingDraft savedDraft =
+          _draft;
+
+      if (_draft.hasAnyAnswer) {
+        savedDraft =
+            await OnboardingDraftStore.save(
+          _draft,
+        );
+      }
+
       await OnboardingStateStore.saveProgress(
         step: nextStep,
       );
@@ -278,6 +331,7 @@ class _OnboardingFlowScreenState
       if (!mounted) return;
 
       setState(() {
+        _draft = savedDraft;
         _step = nextStep;
       });
     } catch (_) {
@@ -329,6 +383,12 @@ class _OnboardingFlowScreenState
     });
 
     try {
+      if (_draft.hasAnyAnswer) {
+        await OnboardingDraftStore.save(
+          _draft,
+        );
+      }
+
       await _completionService.complete();
 
       if (!mounted) return;
@@ -576,6 +636,19 @@ class _OnboardingFlowScreenState
                                   _setRecoveryMode,
                               onSupportNeedChanged:
                                   _setSupportNeed,
+                            ),
+                          ],
+                          if (_step == 4) ...<Widget>[
+                            const SizedBox(height: 22),
+                            OnboardingReasonsStepDetails(
+                              draft: _draft,
+                              enabled:
+                                  !_busy &&
+                                  !_draftLoading,
+                              onReasonsChanged:
+                                  _setReasons,
+                              onWhyChanged:
+                                  _setWhyText,
                             ),
                           ],
                           const SizedBox(height: 20),
