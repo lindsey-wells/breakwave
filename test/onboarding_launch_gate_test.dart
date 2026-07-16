@@ -223,14 +223,29 @@ void main() {
       await tester.pumpWidget(buildGate());
       await tester.pumpAndSettle();
 
-      await tester.tap(
-        find.text(
-          'Need help now? Open Rescue',
+      final Finder rescueButton =
+          find.byKey(
+        const Key(
+          'onboarding-open-rescue-button',
         ),
       );
 
+      expect(
+        rescueButton,
+        findsOneWidget,
+      );
+
+      await tester.ensureVisible(
+        rescueButton,
+      );
+
+      await tester.tap(
+        rescueButton,
+      );
+
+      await tester.pump();
       await tester.pump(
-        const Duration(milliseconds: 500),
+        const Duration(seconds: 1),
       );
 
       expect(
@@ -245,13 +260,26 @@ void main() {
 
       Navigator.of(rescueContext).pop();
 
+      await tester.pump();
       await tester.pump(
-        const Duration(milliseconds: 500),
+        const Duration(seconds: 1),
+      );
+
+      expect(
+        find.byType(RescueScreen),
+        findsNothing,
       );
 
       expect(
         find.text('Step 1 of 10'),
         findsOneWidget,
+      );
+
+      expect(
+        (
+          await OnboardingStateStore.load()
+        )?.currentStep,
+        0,
       );
     },
   );

@@ -478,10 +478,13 @@ class _OnboardingFlowScreenState
               SizedBox(
                 width: double.infinity,
                 child: OutlinedButton.icon(
+                  key: const Key(
+                    'onboarding-open-rescue-button',
+                  ),
                   onPressed: _busy
                       ? null
-                      : () {
-                          openOnboardingRescue(
+                      : () async {
+                          await openOnboardingRescue(
                             context,
                           );
                         },
