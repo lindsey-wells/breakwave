@@ -11,6 +11,7 @@
 // Notes: BW-87B4C connects guided routine actions to real destinations.
 // Notes: BW-87B5B2 launches the Christian journey library from Plus.
 // Notes: BW-87B5C connects Christian journey actions to Rescue and the personal plan.
+// Notes: BW-87B6B1 launches the privacy-first recovery report builder.
 // ------------------------------------------------------------
 
 import 'package:flutter/material.dart';
@@ -21,6 +22,7 @@ import '../../guided_routines/domain/recovery_routine.dart';
 import '../../guided_routines/presentation/guided_routines_screen.dart';
 import '../../insights/presentation/recovery_insights_screen.dart';
 import '../../personal_plan/presentation/personal_recovery_plan_screen.dart';
+import '../../recovery_report/presentation/recovery_report_builder_screen.dart';
 
 class BreakWavePlusScreen extends StatelessWidget {
   const BreakWavePlusScreen({
@@ -95,6 +97,17 @@ class BreakWavePlusScreen extends StatelessWidget {
   }
 
 
+
+  void _openRecoveryReport(
+    BuildContext context,
+  ) {
+    Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder: (_) =>
+            const RecoveryReportBuilderScreen(),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -278,6 +291,24 @@ class BreakWavePlusScreen extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 22,
                       fontWeight: FontWeight.w800,
+                    ),
+                    const SizedBox(height: 2),
+                    SizedBox(
+                      width: double.infinity,
+                      child: FilledButton.tonal(
+                        onPressed: () =>
+                            _openRecoveryReport(
+                          context,
+                        ),
+                        child: const Padding(
+                          padding: EdgeInsets.symmetric(
+                            vertical: 14,
+                          ),
+                          child: Text(
+                            'Preview recovery report',
+                          ),
+                        ),
+                      ),
                     ),
                   ),
                   SizedBox(height: 10),
