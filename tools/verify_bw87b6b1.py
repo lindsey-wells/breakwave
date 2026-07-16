@@ -92,6 +92,29 @@ for needle in [
         )
         sys.exit(1)
 
+
+export_index = plus.find(
+    "title: 'Meaningful recovery exports'"
+)
+button_index = plus.find(
+    "'Preview recovery report'"
+)
+paid_standard_index = plus.find(
+    "'Our paid-launch standard'"
+)
+
+if not (
+    export_index >= 0
+    and button_index > export_index
+    and paid_standard_index > button_index
+):
+    print(
+        "FAIL BW-87B6B1 recovery-report button "
+        "must appear after the export pillar and "
+        "before the paid-launch standard card."
+    )
+    sys.exit(1)
+
 print(
     "PASS: BW-87B6B1 privacy-first report "
     "selection, preview UI, and Plus launch verified."

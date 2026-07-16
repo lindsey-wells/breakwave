@@ -278,6 +278,24 @@ class BreakWavePlusScreen extends StatelessWidget {
                     body:
                         'Exports of recovery history, summaries, trends, and selected accountability information—not merely email-preference data.',
                   ),
+                  const SizedBox(height: 2),
+                  SizedBox(
+                    width: double.infinity,
+                    child: FilledButton.tonal(
+                      onPressed: () =>
+                          _openRecoveryReport(
+                        context,
+                      ),
+                      child: const Padding(
+                        padding: EdgeInsets.symmetric(
+                          vertical: 14,
+                        ),
+                        child: Text(
+                          'Preview recovery report',
+                        ),
+                      ),
+                    ),
+                  ),
                 ],
               ),
             ),
@@ -291,24 +309,6 @@ class BreakWavePlusScreen extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 22,
                       fontWeight: FontWeight.w800,
-                    ),
-                    const SizedBox(height: 2),
-                    SizedBox(
-                      width: double.infinity,
-                      child: FilledButton.tonal(
-                        onPressed: () =>
-                            _openRecoveryReport(
-                          context,
-                        ),
-                        child: const Padding(
-                          padding: EdgeInsets.symmetric(
-                            vertical: 14,
-                          ),
-                          child: Text(
-                            'Preview recovery report',
-                          ),
-                        ),
-                      ),
                     ),
                   ),
                   SizedBox(height: 10),
