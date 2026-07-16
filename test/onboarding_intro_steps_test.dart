@@ -134,12 +134,26 @@ void main() {
         isNull,
       );
 
-      await tester.tap(
-        find.byKey(
-          const ValueKey<String>(
-            'onboarding-mode-christian',
-          ),
+      final Finder christianMode =
+          find.byKey(
+        const ValueKey<String>(
+          'onboarding-mode-christian',
         ),
+      );
+
+      expect(
+        christianMode,
+        findsOneWidget,
+      );
+
+      await tester.ensureVisible(
+        christianMode,
+      );
+
+      await tester.pumpAndSettle();
+
+      await tester.tap(
+        christianMode,
       );
 
       await tester.pumpAndSettle();
@@ -232,7 +246,16 @@ void main() {
         findsOneWidget,
       );
 
-      await tester.tap(supportChip);
+      await tester.ensureVisible(
+        supportChip,
+      );
+
+      await tester.pumpAndSettle();
+
+      await tester.tap(
+        supportChip,
+      );
+
       await tester.pumpAndSettle();
 
       final OnboardingDraft draft =
