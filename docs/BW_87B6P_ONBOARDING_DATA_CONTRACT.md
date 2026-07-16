@@ -81,3 +81,29 @@ succeeds. The temporary draft is then cleared.
 
 Skipping onboarding changes only onboarding status and temporary draft
 storage. It does not clear or replace recovery data.
+
+## Launch and navigation behavior
+
+Fresh users enter the versioned onboarding flow.
+
+Established users and users who already completed or skipped onboarding
+continue directly into the normal BreakWave launch path.
+
+An interrupted onboarding session resumes at its last saved step.
+
+Every onboarding step provides:
+
+- Visible step progress
+- Continue
+- Back after the first step
+- Skip setup
+- Need help now? Open Rescue
+
+Opening Rescue does not complete, skip, or reset onboarding. Closing
+Rescue returns the user to the same onboarding step.
+
+System Back moves to the previous onboarding step and does not
+accidentally dismiss the flow.
+
+If onboarding-state storage fails during launch, onboarding must never
+prevent the existing recovery-mode gate or app shell from opening.

@@ -1,0 +1,558 @@
+// ------------------------------------------------------------
+// Cube23 Collaboration Header
+// Project: BreakWave
+// File: onboarding_flow_screen.dart
+// Purpose: Resumable ten-step onboarding navigation shell.
+// Notes: BW-87B6P3B1 adds progress, back, skip, and Rescue.
+// ------------------------------------------------------------
+
+import 'package:flutter/material.dart';
+
+import '../../../core/onboarding/onboarding_completion_service.dart';
+import '../../../core/onboarding/onboarding_state.dart';
+import '../../../core/onboarding/onboarding_state_store.dart';
+import '../../../core/ui/wave_surface.dart';
+import 'onboarding_rescue_route.dart';
+
+class OnboardingFlowScreen
+    extends StatefulWidget {
+  const OnboardingFlowScreen({
+    super.key,
+    required this.initialStep,
+    required this.onFinished,
+  });
+
+  final int initialStep;
+  final ValueChanged<OnboardingStatus>
+      onFinished;
+
+  @override
+  State<OnboardingFlowScreen> createState() =>
+      _OnboardingFlowScreenState();
+}
+
+class _OnboardingFlowScreenState
+    extends State<OnboardingFlowScreen> {
+  static const OnboardingCompletionService
+      _completionService =
+      OnboardingCompletionService();
+
+  static const List<_OnboardingShellStep>
+      _steps = <_OnboardingShellStep>[
+    _OnboardingShellStep(
+      icon: Icons.waving_hand_outlined,
+      title: 'Welcome to BreakWave',
+      body:
+          'BreakWave is built for the moment an urge '
+          'starts rising—not after it has already '
+          'taken over.',
+    ),
+    _OnboardingShellStep(
+      icon: Icons.shield_outlined,
+      title: 'Privacy comes first',
+      body:
+          'Your recovery setup stays local to this '
+          'device. You remain in control of what '
+          'you save and share.',
+    ),
+    _OnboardingShellStep(
+      icon: Icons.record_voice_over_outlined,
+      title: 'Your recovery voice',
+      body:
+          'Choose whether BreakWave should support '
+          'you with practical secular language or '
+          'an explicitly Christian approach.',
+    ),
+    _OnboardingShellStep(
+      icon: Icons.support_agent_outlined,
+      title: 'What support helps?',
+      body:
+          'BreakWave can focus on fast interruption, '
+          'pattern awareness, planning, encouragement, '
+          'or a combination of those needs.',
+    ),
+    _OnboardingShellStep(
+      icon: Icons.favorite_border,
+      title: 'What are you protecting?',
+      body:
+          'Your reasons matter most when the wave '
+          'starts bargaining. Keep the important '
+          'things close and specific.',
+    ),
+    _OnboardingShellStep(
+      icon: Icons.visibility_outlined,
+      title: 'Notice your triggers',
+      body:
+          'Seeing stress, loneliness, boredom, '
+          'scrolling, fatigue, and other signals '
+          'earlier creates room to choose differently.',
+    ),
+    _OnboardingShellStep(
+      icon: Icons.schedule_outlined,
+      title: 'Find your risky windows',
+      body:
+          'Certain times, places, and situations may '
+          'make the old pattern easier to enter. '
+          'Preparation reduces surprise.',
+    ),
+    _OnboardingShellStep(
+      icon: Icons.alt_route_outlined,
+      title: 'Choose interruption moves',
+      body:
+          'Simple physical actions can break momentum: '
+          'leave the room, put down the phone, walk, '
+          'reset, or contact someone safe.',
+    ),
+    _OnboardingShellStep(
+      icon: Icons.assignment_outlined,
+      title: 'Build your starter plan',
+      body:
+          'BreakWave will bring your reasons, '
+          'triggers, risky windows, and next actions '
+          'together into one practical starting plan.',
+    ),
+    _OnboardingShellStep(
+      icon: Icons.water_outlined,
+      title: 'Choose how to continue',
+      body:
+          'Core Rescue and recovery tools remain '
+          'available free. BreakWave Plus will add '
+          'deeper planning, insights, and guided tools.',
+    ),
+  ];
+
+  late int _step;
+  bool _busy = false;
+
+  @override
+  void initState() {
+    super.initState();
+
+    _step = widget.initialStep.clamp(
+      0,
+      OnboardingState.totalSteps - 1,
+    );
+  }
+
+  bool get _isLastStep =>
+      _step == _steps.length - 1;
+
+  double get _progress =>
+      (_step + 1) / _steps.length;
+
+  Future<void> _moveToStep(
+    int nextStep,
+  ) async {
+    if (_busy) return;
+
+    setState(() {
+      _busy = true;
+    });
+
+    try {
+      await OnboardingStateStore.saveProgress(
+        step: nextStep,
+      );
+
+      if (!mounted) return;
+
+      setState(() {
+        _step = nextStep;
+      });
+    } catch (_) {
+      if (!mounted) return;
+
+      _showError(
+        'BreakWave could not save your '
+        'setup progress. Please try again.',
+      );
+    } finally {
+      if (mounted) {
+        setState(() {
+          _busy = false;
+        });
+      }
+    }
+  }
+
+  Future<void> _continue() async {
+    if (_isLastStep) {
+      await _finish();
+      return;
+    }
+
+    await _moveToStep(_step + 1);
+  }
+
+  Future<void> _back() async {
+    if (_step == 0 || _busy) return;
+
+    await _moveToStep(_step - 1);
+  }
+
+  Future<bool> _handleSystemBack() async {
+    if (_busy) return false;
+
+    if (_step > 0) {
+      await _back();
+    }
+
+    return false;
+  }
+
+  Future<void> _finish() async {
+    if (_busy) return;
+
+    setState(() {
+      _busy = true;
+    });
+
+    try {
+      await _completionService.complete();
+
+      if (!mounted) return;
+
+      widget.onFinished(
+        OnboardingStatus.completed,
+      );
+    } catch (_) {
+      if (!mounted) return;
+
+      _showError(
+        'BreakWave could not finish setup yet. '
+        'Your progress is still saved.',
+      );
+
+      setState(() {
+        _busy = false;
+      });
+    }
+  }
+
+  Future<void> _confirmSkip() async {
+    if (_busy) return;
+
+    final bool? confirmed =
+        await showDialog<bool>(
+      context: context,
+      builder: (
+        BuildContext dialogContext,
+      ) {
+        return AlertDialog(
+          title: const Text(
+            'Skip setup for now?',
+          ),
+          content: const Text(
+            'You can continue into BreakWave '
+            'without finishing onboarding. '
+            'Previously saved recovery data '
+            'will not be erased.',
+          ),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.of(
+                  dialogContext,
+                ).pop(false);
+              },
+              child: const Text('Keep setting up'),
+            ),
+            FilledButton(
+              onPressed: () {
+                Navigator.of(
+                  dialogContext,
+                ).pop(true);
+              },
+              child: const Text('Skip onboarding'),
+            ),
+          ],
+        );
+      },
+    );
+
+    if (confirmed != true || !mounted) {
+      return;
+    }
+
+    setState(() {
+      _busy = true;
+    });
+
+    try {
+      await _completionService.skip();
+
+      if (!mounted) return;
+
+      widget.onFinished(
+        OnboardingStatus.skipped,
+      );
+    } catch (_) {
+      if (!mounted) return;
+
+      _showError(
+        'BreakWave could not skip setup yet. '
+        'Please try again.',
+      );
+
+      setState(() {
+        _busy = false;
+      });
+    }
+  }
+
+  void _showError(
+    String message,
+  ) {
+    final ScaffoldMessengerState messenger =
+        ScaffoldMessenger.of(context);
+
+    messenger.hideCurrentSnackBar();
+
+    messenger.showSnackBar(
+      SnackBar(
+        content: Text(message),
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final ThemeData theme =
+        Theme.of(context);
+
+    final ColorScheme colorScheme =
+        theme.colorScheme;
+
+    final _OnboardingShellStep current =
+        _steps[_step];
+
+    return WillPopScope(
+      onWillPop: _handleSystemBack,
+      child: Scaffold(
+        appBar: AppBar(
+          title: const Text('BreakWave setup'),
+          actions: <Widget>[
+            TextButton(
+              onPressed:
+                  _busy ? null : _confirmSkip,
+              child: const Text('Skip setup'),
+            ),
+            const SizedBox(width: 8),
+          ],
+        ),
+        body: SafeArea(
+          bottom: false,
+          child: Column(
+            children: <Widget>[
+              Padding(
+                padding:
+                    const EdgeInsets.fromLTRB(
+                  20,
+                  8,
+                  20,
+                  0,
+                ),
+                child: Column(
+                  crossAxisAlignment:
+                      CrossAxisAlignment.start,
+                  children: <Widget>[
+                    Row(
+                      children: <Widget>[
+                        Expanded(
+                          child: Text(
+                            'Step ${_step + 1} '
+                            'of ${_steps.length}',
+                            style: theme
+                                .textTheme
+                                .labelLarge
+                                ?.copyWith(
+                              color:
+                                  colorScheme.primary,
+                              fontWeight:
+                                  FontWeight.w800,
+                            ),
+                          ),
+                        ),
+                        Text(
+                          '${(_progress * 100).round()}%',
+                          style:
+                              theme.textTheme.labelLarge,
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 10),
+                    LinearProgressIndicator(
+                      value: _progress,
+                      minHeight: 9,
+                      borderRadius:
+                          BorderRadius.circular(20),
+                    ),
+                  ],
+                ),
+              ),
+              Expanded(
+                child: ListView(
+                  padding:
+                      const EdgeInsets.fromLTRB(
+                    20,
+                    24,
+                    20,
+                    24,
+                  ),
+                  children: <Widget>[
+                    WaveSurface(
+                      child: Column(
+                        crossAxisAlignment:
+                            CrossAxisAlignment.start,
+                        children: <Widget>[
+                          Container(
+                            width: 58,
+                            height: 58,
+                            decoration: BoxDecoration(
+                              color: colorScheme
+                                  .primary
+                                  .withOpacity(0.18),
+                              shape: BoxShape.circle,
+                            ),
+                            child: Icon(
+                              current.icon,
+                              size: 31,
+                              color:
+                                  colorScheme.secondary,
+                            ),
+                          ),
+                          const SizedBox(height: 22),
+                          Text(
+                            current.title,
+                            style: theme
+                                .textTheme
+                                .headlineSmall
+                                ?.copyWith(
+                              fontWeight:
+                                  FontWeight.w900,
+                            ),
+                          ),
+                          const SizedBox(height: 12),
+                          Text(
+                            current.body,
+                            style: theme
+                                .textTheme
+                                .bodyLarge
+                                ?.copyWith(
+                              height: 1.5,
+                            ),
+                          ),
+                          const SizedBox(height: 20),
+                          Text(
+                            'You can review and change '
+                            'your setup later.',
+                            style: theme
+                                .textTheme
+                                .bodyMedium
+                                ?.copyWith(
+                              color: colorScheme
+                                  .onSurface
+                                  .withOpacity(0.72),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+        bottomNavigationBar: SafeArea(
+          minimum:
+              const EdgeInsets.fromLTRB(
+            20,
+            10,
+            20,
+            16,
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              SizedBox(
+                width: double.infinity,
+                child: OutlinedButton.icon(
+                  onPressed: _busy
+                      ? null
+                      : () {
+                          openOnboardingRescue(
+                            context,
+                          );
+                        },
+                  icon: const Icon(
+                    Icons.waves_rounded,
+                  ),
+                  label: const Text(
+                    'Need help now? Open Rescue',
+                  ),
+                ),
+              ),
+              const SizedBox(height: 10),
+              Row(
+                children: <Widget>[
+                  if (_step > 0) ...<Widget>[
+                    Expanded(
+                      child: OutlinedButton.icon(
+                        onPressed:
+                            _busy ? null : _back,
+                        icon: const Icon(
+                          Icons.arrow_back,
+                        ),
+                        label: const Text('Back'),
+                      ),
+                    ),
+                    const SizedBox(width: 10),
+                  ],
+                  Expanded(
+                    flex: _step > 0 ? 1 : 2,
+                    child: FilledButton.icon(
+                      onPressed:
+                          _busy ? null : _continue,
+                      icon: Icon(
+                        _isLastStep
+                            ? Icons.check_rounded
+                            : Icons
+                                .arrow_forward_rounded,
+                      ),
+                      label: Padding(
+                        padding:
+                            const EdgeInsets.symmetric(
+                          vertical: 3,
+                        ),
+                        child: Text(
+                          _busy
+                              ? 'Saving...'
+                              : _isLastStep
+                                  ? 'Finish setup'
+                                  : 'Continue',
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _OnboardingShellStep {
+  const _OnboardingShellStep({
+    required this.icon,
+    required this.title,
+    required this.body,
+  });
+
+  final IconData icon;
+  final String title;
+  final String body;
+}
