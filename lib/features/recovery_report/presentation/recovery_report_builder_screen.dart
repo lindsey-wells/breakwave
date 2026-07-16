@@ -4,7 +4,8 @@
 // File: recovery_report_builder_screen.dart
 // Purpose: Privacy-first recovery report selection and preview.
 // Notes: BW-87B6B1 previews exactly what the user selected.
-// Notes: This pass creates no file and opens no share sheet.
+// Notes: BW-87B6B2 shares only the exact snapshot the user previewed.
+// Notes: Export files use temporary storage and neutral filenames.
 // ------------------------------------------------------------
 
 import 'package:flutter/material.dart';
@@ -19,6 +20,7 @@ import '../../log/data/log_repository.dart';
 import '../../log/domain/log_entry.dart';
 import '../../personal_plan/data/personal_recovery_plan_store.dart';
 import '../../personal_plan/domain/personal_recovery_plan.dart';
+import '../data/recovery_report_export_service.dart';
 import '../domain/recovery_report_formatter.dart';
 import '../domain/recovery_report_selection.dart';
 import '../domain/recovery_report_snapshot.dart';
@@ -77,9 +79,11 @@ class _RecoveryReportBuilderScreenState
 
   bool _loading = true;
   bool _buildingPreview = false;
+  bool _sharing = false;
 
   String? _loadError;
   String? _previewText;
+  RecoveryReportSnapshot? _previewSnapshot;
 
   @override
   void initState() {
@@ -128,6 +132,8 @@ class _RecoveryReportBuilderScreenState
       setState(() {
         _loading = true;
         _loadError = null;
+        _previewText = null;
+        _previewSnapshot = null;
       });
     }
 
@@ -191,6 +197,7 @@ class _RecoveryReportBuilderScreenState
     setState(() {
       update();
       _previewText = null;
+      _previewSnapshot = null;
     });
   }
 
@@ -225,6 +232,7 @@ class _RecoveryReportBuilderScreenState
 
       setState(() {
         _previewText = preview;
+        _previewSnapshot = snapshot;
         _buildingPreview = false;
       });
     } catch (_) {
@@ -242,6 +250,98 @@ class _RecoveryReportBuilderScreenState
           ),
         ),
       );
+    }
+  }
+
+  Future<void> _sharePreviewedReport() async {
+    if (_sharing) return;
+
+    final RecoveryReportSnapshot? snapshot =
+        _previewSnapshot;
+
+    if (snapshot == null) {
+      return;
+    }
+
+    final bool confirmed =
+        await showDialog<bool>(
+          context: context,
+          builder: (
+            BuildContext dialogContext,
+          ) {
+            return AlertDialog(
+              title: const Text(
+                'Share this recovery report?',
+              ),
+              content: const Text(
+                'BreakWave will create temporary text '
+                'and JSON files from the exact preview '
+                'you reviewed. Nothing is uploaded by BreakWave. '
+                'After you choose another app, '
+                'that app controls any copy you share.',
+              ),
+              actions: <Widget>[
+                TextButton(
+                  onPressed: () =>
+                      Navigator.of(
+                    dialogContext,
+                  ).pop(false),
+                  child: const Text('Cancel'),
+                ),
+                FilledButton(
+                  onPressed: () =>
+                      Navigator.of(
+                    dialogContext,
+                  ).pop(true),
+                  child: const Text(
+                    'Open share sheet',
+                  ),
+                ),
+              ],
+            );
+          },
+        ) ??
+        false;
+
+    if (!confirmed || !mounted) {
+      return;
+    }
+
+    setState(() {
+      _sharing = true;
+    });
+
+    try {
+      await RecoveryReportExportService
+          .shareSnapshot(snapshot);
+
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+            'Opened the system share sheet. '
+            'BreakWave did not upload your report.',
+          ),
+        ),
+      );
+    } catch (_) {
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+            'BreakWave could not create or share '
+            'the report files right now.',
+          ),
+        ),
+      );
+    } finally {
+      if (mounted) {
+        setState(() {
+          _sharing = false;
+        });
+      }
     }
   }
 
@@ -328,9 +428,8 @@ class _RecoveryReportBuilderScreenState
               SizedBox(height: 10),
               Text(
                 'BreakWave builds this report on your device. '
-                'Nothing is uploaded or shared from this screen. '
-                'Review the complete preview before creating '
-                'or sending anything.',
+                'Nothing is uploaded automatically. Review the '
+                'complete preview before choosing to share it.',
               ),
             ],
           ),
@@ -662,8 +761,8 @@ class _RecoveryReportBuilderScreenState
                     ? 'Your selections changed. Generate '
                         'the preview again to see exactly '
                         'what the report will contain.'
-                    : 'Read this carefully before creating '
-                        'or sharing a report in a later step.',
+                    : 'This is the exact report that will '
+                        'be placed in the temporary share files.',
               ),
               const SizedBox(height: 14),
               Container(
@@ -687,10 +786,37 @@ class _RecoveryReportBuilderScreenState
                       'No current preview.',
                 ),
               ),
+              const SizedBox(height: 16),
+              SizedBox(
+                width: double.infinity,
+                child: FilledButton.icon(
+                  onPressed:
+                      _previewSnapshot == null ||
+                              _sharing
+                          ? null
+                          : _sharePreviewedReport,
+                  icon: const Icon(
+                    Icons.share_outlined,
+                  ),
+                  label: Padding(
+                    padding:
+                        const EdgeInsets.symmetric(
+                      vertical: 14,
+                    ),
+                    child: Text(
+                      _sharing
+                          ? 'Opening share sheet...'
+                          : 'Share this report',
+                    ),
+                  ),
+                ),
+              ),
               const SizedBox(height: 12),
               const Text(
-                'This testing pass does not create a file '
-                'or open the system share sheet.',
+                'Sharing creates temporary TXT and JSON '
+                'files from this exact preview. BreakWave '
+                'does not upload them. The receiving app '
+                'controls any copy after you share it.',
               ),
             ],
           ),
