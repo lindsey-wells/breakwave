@@ -279,18 +279,14 @@ void main() {
       expect(prefs.containsKey('bw_support_contact_v1'), isFalse);
       expect(prefs.containsKey('bw_premium_state_v1'), isFalse);
 
-      final Finder other = find.byKey(
-        const ValueKey<String>(
-          'onboarding-action-Other',
+      expect(
+        find.byKey(
+          const ValueKey<String>(
+            'onboarding-action-Other',
+          ),
         ),
+        findsNothing,
       );
-
-      await bringIntoTapZone(
-        tester,
-        other,
-      );
-      await tester.tap(other);
-      await flushDraftWrites(tester);
 
       final Finder otherField = find.byKey(
         const Key('onboarding-other-action-field'),

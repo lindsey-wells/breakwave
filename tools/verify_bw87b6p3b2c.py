@@ -56,7 +56,7 @@ for needle in [
     "Add custom action",
     "Update custom action",
     "Edit custom action",
-    "Tap Add custom action before continuing.",
+    "Tap Add custom action",
     "Other: ",
 ]:
     if needle not in text["actions"]:

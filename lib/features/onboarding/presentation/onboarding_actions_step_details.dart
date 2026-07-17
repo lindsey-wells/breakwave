@@ -41,7 +41,6 @@ class _OnboardingActionsStepDetailsState
     'Take a short walk',
     'Cold water reset',
     'Put the phone down',
-    _otherLabel,
   ];
 
   final TextEditingController _otherController =
@@ -307,10 +306,25 @@ class _OnboardingActionsStepDetailsState
           children: <Widget>[
             for (final String action in _availableActions)
               _buildActionChip(action),
+            if (_hasCustomOther)
+              _ActionChip(
+                key: ValueKey<String>(
+                  'onboarding-custom-action-'
+                  '${_customOtherLabel!}',
+                ),
+                action: _customOtherLabel!,
+                selected: true,
+                enabled: widget.enabled,
+                onSelected: (bool selected) {
+                  _toggle(
+                    _otherLabel,
+                    selected,
+                  );
+                },
+              ),
           ],
         ),
-        if (_isOtherSelected &&
-            (_editingOther || !_hasCustomOther))
+        if (!_hasCustomOther || _editingOther)
           ...<Widget>[
           const SizedBox(height: 18),
           TextField(
@@ -328,11 +342,11 @@ class _OnboardingActionsStepDetailsState
             },
             decoration: const InputDecoration(
               labelText:
-                  'Name your other interruption action',
+                  'Add your own interruption action',
               hintText:
                   'Example: Step outside for fresh air',
               helperText:
-                  'Tap Add custom action before continuing.',
+                  'Tap Add custom action to save it.',
             ),
           ),
           const SizedBox(height: 4),
