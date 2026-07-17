@@ -29,6 +29,31 @@ void main() {
     );
   }
 
+  Future<void> bringIntoTapZone(
+    WidgetTester tester,
+    Finder finder,
+  ) async {
+    final BuildContext targetContext =
+        tester.element(finder);
+
+    await Scrollable.ensureVisible(
+      targetContext,
+      alignment: 0.15,
+      duration: Duration.zero,
+    );
+
+    await tester.pump();
+  }
+
+  Future<void> flushDraftWrites(
+    WidgetTester tester,
+  ) async {
+    await tester.pump();
+    await tester.pump(
+      const Duration(milliseconds: 300),
+    );
+  }
+
   setUp(() {
     SharedPreferences.setMockInitialValues(
       <String, Object>{},
@@ -50,10 +75,14 @@ void main() {
         const ValueKey<String>('onboarding-trigger-Scrolling'),
       );
 
-      await tester.ensureVisible(stress);
+      await bringIntoTapZone(
+        tester,
+        scrolling,
+      );
+
       await tester.tap(stress);
       await tester.tap(scrolling);
-      await tester.pumpAndSettle();
+      await flushDraftWrites(tester);
 
       OnboardingDraft draft =
           await OnboardingDraftStore.load();
@@ -84,9 +113,13 @@ void main() {
         ),
       );
 
-      await tester.ensureVisible(lateNight);
+      await bringIntoTapZone(
+        tester,
+        lateNight,
+      );
+
       await tester.tap(lateNight);
-      await tester.pumpAndSettle();
+      await flushDraftWrites(tester);
 
       draft = await OnboardingDraftStore.load();
       expect(draft.riskyTimes, <String>['Late night']);
@@ -133,10 +166,14 @@ void main() {
         ),
       );
 
-      await tester.ensureVisible(openRescue);
+      await bringIntoTapZone(
+        tester,
+        textSafe,
+      );
+
       await tester.tap(openRescue);
       await tester.tap(textSafe);
-      await tester.pumpAndSettle();
+      await flushDraftWrites(tester);
 
       final OnboardingDraft draft =
           await OnboardingDraftStore.load();
@@ -264,9 +301,13 @@ void main() {
         const Key('onboarding-access-review-plus'),
       );
 
-      await tester.ensureVisible(reviewPlus);
+      await bringIntoTapZone(
+        tester,
+        reviewPlus,
+      );
+
       await tester.tap(reviewPlus);
-      await tester.pumpAndSettle();
+      await flushDraftWrites(tester);
 
       expect(
         tester.widget<FilledButton>(finish).onPressed,
