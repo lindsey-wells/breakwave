@@ -63,7 +63,7 @@ class _ReasonsFocusCardState extends State<ReasonsFocusCard> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Your why right now',
+                  'Current focus',
                   style: theme.textTheme.titleMedium?.copyWith(
                     fontWeight: FontWeight.w700,
                   ),
@@ -71,7 +71,7 @@ class _ReasonsFocusCardState extends State<ReasonsFocusCard> {
                 const SizedBox(height: 10),
                 Text(
                   _currentFocus ??
-                      'Choose the reason that matters most right now. This keeps Home anchored to something real.',
+                      'Choose the reason that matters most right now.',
                   style: theme.textTheme.bodyMedium,
                 ),
                 const SizedBox(height: 16),

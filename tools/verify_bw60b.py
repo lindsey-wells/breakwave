@@ -11,7 +11,7 @@ checks = [
     ]),
     ("lib/features/home/presentation/home_screen.dart", [
         "FastUrgeEntryCard",
-        "title: 'Your why and risk signals'",
+        "title: 'Your focus and risk signals'",
         "ReasonsFocusCard",
         "TriggersWatchCard",
         "DailyEncouragementCard",
@@ -59,7 +59,7 @@ for rel_path, needle in blocked:
 home_text = Path("lib/features/home/presentation/home_screen.dart").read_text(encoding="utf-8")
 order = [
     "FastUrgeEntryCard",
-    "title: 'Your why and risk signals'",
+    "title: 'Your focus and risk signals'",
     "ReasonsFocusCard",
     "TriggersWatchCard",
     "DailyEncouragementCard",

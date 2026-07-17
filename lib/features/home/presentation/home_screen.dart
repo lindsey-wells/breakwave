@@ -188,7 +188,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       const SizedBox(height: 12),
                       const SectionHeader(
                         eyebrow: 'Your setup',
-                        title: 'Your why and risk signals',
+                        title: 'Your focus and risk signals',
                       ),
                       const ReasonsFocusCard(),
                       const SizedBox(height: 12),

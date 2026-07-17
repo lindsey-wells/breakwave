@@ -6,7 +6,7 @@ text = path.read_text(encoding="utf-8")
 
 checks = [
     "FastUrgeEntryCard",
-    "title: 'Your why and risk signals'",
+    "title: 'Your focus and risk signals'",
     "ReasonsFocusCard",
     "TriggersWatchCard",
     "DailyEncouragementCard",
@@ -38,7 +38,7 @@ for needle in blocked:
 
 order = [
     "FastUrgeEntryCard",
-    "title: 'Your why and risk signals'",
+    "title: 'Your focus and risk signals'",
     "ReasonsFocusCard",
     "TriggersWatchCard",
     "DailyEncouragementCard",

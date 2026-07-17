@@ -7,7 +7,7 @@ checks = [
         "'Today'",
         "'Start here'",
         "Check in each day. If the wave is rising, open Rescue. Afterward, use Log to honestly record what happened.",
-        "title: 'Your why and risk signals'",
+        "title: 'Your focus and risk signals'",
         "title: 'Check in'",
         "eyebrow: 'Progress'",
         "title: 'Your recent pattern'",
@@ -16,8 +16,8 @@ checks = [
         "const DailyCheckInCard()",
     ]),
     ("lib/features/reasons/presentation/reasons_focus_card.dart", [
-        "Your why right now",
-        "This keeps Home anchored to something real.",
+        "Current focus",
+        "Choose the reason that matters most right now.",
     ]),
     ("lib/features/home/presentation/widgets/recovery_cycle_preview_card.dart", [
         "Learn the Wave Pattern",

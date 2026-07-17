@@ -7,7 +7,7 @@ text = path.read_text(encoding="utf-8")
 checks = [
     "If the wave is rising, open Rescue.",
     "FastUrgeEntryCard(",
-    "title: 'Your why and risk signals'",
+    "title: 'Your focus and risk signals'",
     "const ReasonsFocusCard()",
     "const TriggersWatchCard()",
     "DailyEncouragementCard()",

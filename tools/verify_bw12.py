@@ -10,8 +10,8 @@ checks = [
     ]),
     ("lib/features/reasons/presentation/reasons_focus_card.dart", [
         "class ReasonsFocusCard",
-        "Your why right now",
-        "This keeps Home anchored to something real.",
+        "Current focus",
+        "Choose the reason that matters most right now.",
         "ReasonsStore.loadSelection",
         "Edit reasons",
         "Set reasons",
@@ -36,4 +36,4 @@ for rel_path, needles in checks:
 if failed:
     sys.exit(1)
 
-print("PASS: BW-12 reasons to change verified.")
+print("PASS: BW-12 reasons and Current Focus verified.")
