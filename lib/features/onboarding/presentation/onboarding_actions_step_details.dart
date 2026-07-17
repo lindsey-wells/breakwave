@@ -46,10 +46,13 @@ class _OnboardingActionsStepDetailsState
 
   final TextEditingController _otherController =
       TextEditingController();
+  late List<String> _selectedActions;
 
   @override
   void initState() {
     super.initState();
+    _selectedActions =
+        List<String>.from(widget.draft.interruptionActions);
     _syncOtherController();
   }
 
@@ -61,6 +64,8 @@ class _OnboardingActionsStepDetailsState
 
     if (oldWidget.draft.interruptionActions !=
         widget.draft.interruptionActions) {
+      _selectedActions =
+          List<String>.from(widget.draft.interruptionActions);
       _syncOtherController();
     }
   }
@@ -87,7 +92,7 @@ class _OnboardingActionsStepDetailsState
   }
 
   String? get _savedOtherAction {
-    for (final String action in widget.draft.interruptionActions) {
+    for (final String action in _selectedActions) {
       if (_isOther(action)) return action;
     }
 
@@ -128,7 +133,7 @@ class _OnboardingActionsStepDetailsState
     bool selected,
   ) {
     final List<String> updated =
-        List<String>.from(widget.draft.interruptionActions);
+        List<String>.from(_selectedActions);
 
     if (action == _otherLabel) {
       updated.removeWhere(_isOther);
@@ -148,18 +153,26 @@ class _OnboardingActionsStepDetailsState
       );
     }
 
+    setState(() {
+      _selectedActions = updated;
+    });
+
     widget.onChanged(updated);
   }
 
   void _setOtherText(String value) {
     final String custom = value.trim();
     final List<String> updated =
-        List<String>.from(widget.draft.interruptionActions)
+        List<String>.from(_selectedActions)
           ..removeWhere(_isOther);
 
     updated.add(
       custom.isEmpty ? _otherLabel : '$_otherPrefix$custom',
     );
+
+    setState(() {
+      _selectedActions = updated;
+    });
 
     widget.onChanged(updated);
   }
@@ -205,7 +218,7 @@ class _OnboardingActionsStepDetailsState
                 selected: action == _otherLabel
                     ? _isOtherSelected
                     : _containsIgnoreCase(
-                        widget.draft.interruptionActions,
+                        _selectedActions,
                         action,
                       ),
                 enabled: widget.enabled,

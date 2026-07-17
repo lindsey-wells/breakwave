@@ -33,6 +33,7 @@ class _OnboardingLaunchGateState
     extends State<OnboardingLaunchGate> {
   bool _loading = true;
   bool _showOnboarding = false;
+  bool _reviewPlusPending = false;
   int _initialStep = 0;
 
   @override
@@ -82,24 +83,33 @@ class _OnboardingLaunchGateState
   ) {
     if (!mounted) return;
 
+    final bool openPlus =
+        status == OnboardingStatus.completed &&
+        _reviewPlusPending;
+
     setState(() {
       _showOnboarding = false;
+      _reviewPlusPending = false;
     });
+
+    if (openPlus) {
+      WidgetsBinding.instance.addPostFrameCallback(
+        (_) {
+          if (!mounted) return;
+
+          Navigator.of(context).push(
+            MaterialPageRoute<void>(
+              builder: (_) =>
+                  const BreakWavePlusScreen(),
+            ),
+          );
+        },
+      );
+    }
   }
 
   void _handleReviewPlusRequested() {
-    WidgetsBinding.instance.addPostFrameCallback(
-      (_) {
-        if (!mounted) return;
-
-        Navigator.of(context).push(
-          MaterialPageRoute<void>(
-            builder: (_) =>
-                const BreakWavePlusScreen(),
-          ),
-        );
-      },
-    );
+    _reviewPlusPending = true;
   }
 
   Widget _buildChild() {

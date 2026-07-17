@@ -61,6 +61,8 @@ for needle in [
     "await _draftSaveQueue",
     "result.shouldReviewPlus",
     "onReviewPlusRequested",
+    "widget.onReviewPlusRequested?.call();",
+    "widget.onFinished(",
 ]:
     if needle not in text["flow"]:
         print(f"FAIL BW-87B6P3B2B flow missing: {needle}")
@@ -75,6 +77,10 @@ for needle in [
     "These choices do not predict a relapse.",
     "Semantics(",
     "selectedColor:",
+    "late List<String> _selectedTriggers",
+    "late List<String> _selectedRiskyTimes",
+    "List<String>.from(_selectedTriggers)",
+    "List<String>.from(_selectedRiskyTimes)",
 ]:
     if needle not in text["patterns"]:
         print(f"FAIL BW-87B6P3B2B patterns missing: {needle}")
@@ -119,6 +125,8 @@ for needle in [
     "No phone number or contact information is requested.",
     "recoveryMode == RecoveryMode.christian",
     "onboarding-other-action-field",
+    "late List<String> _selectedActions",
+    "List<String>.from(_selectedActions)",
 ]:
     if needle not in text["actions"]:
         print(f"FAIL BW-87B6P3B2B actions missing: {needle}")
@@ -153,12 +161,29 @@ for needle in [
 for needle in [
     "BreakWavePlusScreen",
     "_handleReviewPlusRequested",
+    "_reviewPlusPending",
+    "status == OnboardingStatus.completed",
     "addPostFrameCallback",
     "onReviewPlusRequested:",
 ]:
     if needle not in text["gate"]:
         print(f"FAIL BW-87B6P3B2B Plus routing missing: {needle}")
         sys.exit(1)
+
+review_index = text["flow"].find(
+    "widget.onReviewPlusRequested?.call();"
+)
+finished_index = text["flow"].find(
+    "widget.onFinished(",
+    review_index,
+)
+
+if review_index < 0 or finished_index < review_index:
+    print(
+        "FAIL BW-87B6P3B2B Plus intent must be recorded "
+        "before onboarding is removed."
+    )
+    sys.exit(1)
 
 for forbidden in [
     "PremiumStateStore",

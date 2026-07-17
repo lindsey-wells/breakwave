@@ -460,13 +460,13 @@ class _OnboardingFlowScreenState
 
       if (!mounted) return;
 
-      widget.onFinished(
-        OnboardingStatus.completed,
-      );
-
       if (result.shouldReviewPlus) {
         widget.onReviewPlusRequested?.call();
       }
+
+      widget.onFinished(
+        OnboardingStatus.completed,
+      );
     } catch (_) {
       if (!mounted) return;
 

@@ -32,6 +32,27 @@ class _OnboardingTriggersStepDetailsState
     extends State<OnboardingTriggersStepDetails> {
   final TextEditingController _customController =
       TextEditingController();
+  late List<String> _selectedTriggers;
+
+  @override
+  void initState() {
+    super.initState();
+    _selectedTriggers =
+        List<String>.from(widget.draft.triggers);
+  }
+
+  @override
+  void didUpdateWidget(
+    covariant OnboardingTriggersStepDetails oldWidget,
+  ) {
+    super.didUpdateWidget(oldWidget);
+
+    if (oldWidget.draft.triggers !=
+        widget.draft.triggers) {
+      _selectedTriggers =
+          List<String>.from(widget.draft.triggers);
+    }
+  }
 
   @override
   void dispose() {
@@ -55,7 +76,7 @@ class _OnboardingTriggersStepDetailsState
     bool selected,
   ) {
     final List<String> updated =
-        List<String>.from(widget.draft.triggers);
+        List<String>.from(_selectedTriggers);
 
     if (selected) {
       if (!_containsIgnoreCase(updated, value)) {
@@ -69,6 +90,10 @@ class _OnboardingTriggersStepDetailsState
       );
     }
 
+    setState(() {
+      _selectedTriggers = updated;
+    });
+
     widget.onChanged(updated);
   }
 
@@ -79,19 +104,22 @@ class _OnboardingTriggersStepDetailsState
 
     if (value.isEmpty) return;
 
-    if (_containsIgnoreCase(widget.draft.triggers, value)) {
+    if (_containsIgnoreCase(_selectedTriggers, value)) {
       _customController.clear();
       _showMessage('That trigger is already selected.');
       return;
     }
 
-    widget.onChanged(
-      <String>[
-        ...widget.draft.triggers,
-        value,
-      ],
-    );
+    final List<String> updated = <String>[
+      ..._selectedTriggers,
+      value,
+    ];
 
+    setState(() {
+      _selectedTriggers = updated;
+    });
+
+    widget.onChanged(updated);
     _customController.clear();
   }
 
@@ -110,7 +138,7 @@ class _OnboardingTriggersStepDetailsState
     final ThemeData theme = Theme.of(context);
 
     final List<String> customTriggers =
-        widget.draft.triggers.where(
+        _selectedTriggers.where(
       (String trigger) => !_containsIgnoreCase(
         BreakWaveTriggerCatalog.triggers,
         trigger,
@@ -149,7 +177,7 @@ class _OnboardingTriggersStepDetailsState
                 label: trigger,
                 semanticLabel: '$trigger trigger',
                 selected: _containsIgnoreCase(
-                  widget.draft.triggers,
+                  _selectedTriggers,
                   trigger,
                 ),
                 enabled: widget.enabled,
@@ -202,7 +230,7 @@ class _OnboardingTriggersStepDetailsState
   }
 }
 
-class OnboardingRiskyTimesStepDetails extends StatelessWidget {
+class OnboardingRiskyTimesStepDetails extends StatefulWidget {
   const OnboardingRiskyTimesStepDetails({
     super.key,
     required this.draft,
@@ -213,6 +241,35 @@ class OnboardingRiskyTimesStepDetails extends StatelessWidget {
   final OnboardingDraft draft;
   final bool enabled;
   final ValueChanged<List<String>> onChanged;
+
+  @override
+  State<OnboardingRiskyTimesStepDetails> createState() =>
+      _OnboardingRiskyTimesStepDetailsState();
+}
+
+class _OnboardingRiskyTimesStepDetailsState
+    extends State<OnboardingRiskyTimesStepDetails> {
+  late List<String> _selectedRiskyTimes;
+
+  @override
+  void initState() {
+    super.initState();
+    _selectedRiskyTimes =
+        List<String>.from(widget.draft.riskyTimes);
+  }
+
+  @override
+  void didUpdateWidget(
+    covariant OnboardingRiskyTimesStepDetails oldWidget,
+  ) {
+    super.didUpdateWidget(oldWidget);
+
+    if (oldWidget.draft.riskyTimes !=
+        widget.draft.riskyTimes) {
+      _selectedRiskyTimes =
+          List<String>.from(widget.draft.riskyTimes);
+    }
+  }
 
   bool _containsIgnoreCase(
     Iterable<String> values,
@@ -230,7 +287,7 @@ class OnboardingRiskyTimesStepDetails extends StatelessWidget {
     bool selected,
   ) {
     final List<String> updated =
-        List<String>.from(draft.riskyTimes);
+        List<String>.from(_selectedRiskyTimes);
 
     if (selected) {
       if (!_containsIgnoreCase(updated, value)) {
@@ -244,7 +301,11 @@ class OnboardingRiskyTimesStepDetails extends StatelessWidget {
       );
     }
 
-    onChanged(updated);
+    setState(() {
+      _selectedRiskyTimes = updated;
+    });
+
+    widget.onChanged(updated);
   }
 
   @override
@@ -284,10 +345,10 @@ class OnboardingRiskyTimesStepDetails extends StatelessWidget {
                 label: riskyTime,
                 semanticLabel: '$riskyTime risky time',
                 selected: _containsIgnoreCase(
-                  draft.riskyTimes,
+                  _selectedRiskyTimes,
                   riskyTime,
                 ),
-                enabled: enabled,
+                enabled: widget.enabled,
                 onSelected: (bool selected) {
                   _toggle(riskyTime, selected);
                 },
