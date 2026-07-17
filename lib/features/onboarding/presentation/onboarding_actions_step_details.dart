@@ -47,12 +47,15 @@ class _OnboardingActionsStepDetailsState
   final TextEditingController _otherController =
       TextEditingController();
   late List<String> _selectedActions;
+  bool _editingOther = false;
 
   @override
   void initState() {
     super.initState();
     _selectedActions =
         List<String>.from(widget.draft.interruptionActions);
+    _editingOther =
+        _savedOtherAction == _otherLabel;
     _syncOtherController();
   }
 
@@ -66,6 +69,13 @@ class _OnboardingActionsStepDetailsState
         widget.draft.interruptionActions) {
       _selectedActions =
           List<String>.from(widget.draft.interruptionActions);
+
+      if (_savedOtherAction == _otherLabel) {
+        _editingOther = true;
+      } else if (_savedOtherAction == null) {
+        _editingOther = false;
+      }
+
       _syncOtherController();
     }
   }
@@ -100,6 +110,23 @@ class _OnboardingActionsStepDetailsState
   }
 
   bool get _isOtherSelected => _savedOtherAction != null;
+
+  String? get _customOtherLabel {
+    final String? saved = _savedOtherAction;
+
+    if (saved == null ||
+        !saved.startsWith(_otherPrefix)) {
+      return null;
+    }
+
+    final String custom =
+        saved.substring(_otherPrefix.length).trim();
+
+    return custom.isEmpty ? null : custom;
+  }
+
+  bool get _hasCustomOther =>
+      _customOtherLabel != null;
 
   void _syncOtherController() {
     final String? saved = _savedOtherAction;
@@ -155,26 +182,95 @@ class _OnboardingActionsStepDetailsState
 
     setState(() {
       _selectedActions = updated;
+
+      if (action == _otherLabel) {
+        _editingOther = selected;
+
+        if (!selected) {
+          _otherController.clear();
+        }
+      }
     });
 
     widget.onChanged(updated);
   }
 
-  void _setOtherText(String value) {
-    final String custom = value.trim();
+  void _saveOtherAction() {
+    if (!widget.enabled) return;
+
+    final String custom =
+        _otherController.text.trim();
+
+    if (custom.isEmpty) {
+      _showMessage(
+        'Enter the interruption action you want to add.',
+      );
+      return;
+    }
+
     final List<String> updated =
         List<String>.from(_selectedActions)
-          ..removeWhere(_isOther);
+          ..removeWhere(_isOther)
+          ..add('$_otherPrefix$custom');
 
-    updated.add(
-      custom.isEmpty ? _otherLabel : '$_otherPrefix$custom',
-    );
+    FocusScope.of(context).unfocus();
 
     setState(() {
       _selectedActions = updated;
+      _editingOther = false;
     });
 
     widget.onChanged(updated);
+  }
+
+  void _editOtherAction() {
+    if (!widget.enabled) return;
+
+    _syncOtherController();
+
+    setState(() {
+      _editingOther = true;
+    });
+  }
+
+  void _showMessage(String message) {
+    final ScaffoldMessengerState messenger =
+        ScaffoldMessenger.of(context);
+
+    messenger.hideCurrentSnackBar();
+    messenger.showSnackBar(
+      SnackBar(content: Text(message)),
+    );
+  }
+
+  Widget _buildActionChip(String action) {
+    final String? customOther =
+        action == _otherLabel
+            ? _customOtherLabel
+            : null;
+
+    final String displayAction =
+        customOther ?? action;
+
+    final String chipKey =
+        customOther == null
+            ? 'onboarding-action-$action'
+            : 'onboarding-custom-action-$customOther';
+
+    return _ActionChip(
+      key: ValueKey<String>(chipKey),
+      action: displayAction,
+      selected: action == _otherLabel
+          ? _isOtherSelected
+          : _containsIgnoreCase(
+              _selectedActions,
+              action,
+            ),
+      enabled: widget.enabled,
+      onSelected: (bool selected) {
+        _toggle(action, selected);
+      },
+    );
   }
 
   @override
@@ -210,38 +306,75 @@ class _OnboardingActionsStepDetailsState
           runSpacing: 10,
           children: <Widget>[
             for (final String action in _availableActions)
-              _ActionChip(
-                key: ValueKey<String>(
-                  'onboarding-action-$action',
-                ),
-                action: action,
-                selected: action == _otherLabel
-                    ? _isOtherSelected
-                    : _containsIgnoreCase(
-                        _selectedActions,
-                        action,
-                      ),
-                enabled: widget.enabled,
-                onSelected: (bool selected) {
-                  _toggle(action, selected);
-                },
-              ),
+              _buildActionChip(action),
           ],
         ),
-        if (_isOtherSelected) ...<Widget>[
+        if (_isOtherSelected &&
+            (_editingOther || !_hasCustomOther))
+          ...<Widget>[
           const SizedBox(height: 18),
           TextField(
-            key: const Key('onboarding-other-action-field'),
+            key: const Key(
+              'onboarding-other-action-field',
+            ),
             controller: _otherController,
             enabled: widget.enabled,
             maxLength: 80,
-            textCapitalization: TextCapitalization.sentences,
+            textCapitalization:
+                TextCapitalization.sentences,
+            textInputAction: TextInputAction.done,
+            onSubmitted: (_) {
+              _saveOtherAction();
+            },
             decoration: const InputDecoration(
-              labelText: 'Name your other interruption action',
-              hintText: 'Example: Step outside for fresh air',
-              helperText: 'Optional. Blank keeps the choice as Other.',
+              labelText:
+                  'Name your other interruption action',
+              hintText:
+                  'Example: Step outside for fresh air',
+              helperText:
+                  'Tap Add custom action before continuing.',
             ),
-            onChanged: _setOtherText,
+          ),
+          const SizedBox(height: 4),
+          SizedBox(
+            width: double.infinity,
+            child: OutlinedButton.icon(
+              key: const Key(
+                'onboarding-add-custom-action',
+              ),
+              onPressed: widget.enabled
+                  ? _saveOtherAction
+                  : null,
+              icon: Icon(
+                _hasCustomOther
+                    ? Icons.save_outlined
+                    : Icons.add_rounded,
+              ),
+              label: Text(
+                _hasCustomOther
+                    ? 'Update custom action'
+                    : 'Add custom action',
+              ),
+            ),
+          ),
+        ],
+        if (_hasCustomOther &&
+            !_editingOther) ...<Widget>[
+          const SizedBox(height: 8),
+          Align(
+            alignment: Alignment.centerLeft,
+            child: TextButton.icon(
+              key: const Key(
+                'onboarding-edit-custom-action',
+              ),
+              onPressed: widget.enabled
+                  ? _editOtherAction
+                  : null,
+              icon: const Icon(Icons.edit_outlined),
+              label: const Text(
+                'Edit custom action',
+              ),
+            ),
           ),
         ],
         const SizedBox(height: 16),

@@ -31,6 +31,21 @@ class OnboardingSummaryStepDetails extends StatelessWidget {
     return 'Not selected';
   }
 
+  String _displayInterruptionAction(
+    String value,
+  ) {
+    const String otherPrefix = 'Other: ';
+
+    if (!value.startsWith(otherPrefix)) {
+      return value;
+    }
+
+    final String custom =
+        value.substring(otherPrefix.length).trim();
+
+    return custom.isEmpty ? 'Other' : custom;
+  }
+
   @override
   Widget build(BuildContext context) {
     final ThemeData theme = Theme.of(context);
@@ -103,7 +118,9 @@ class OnboardingSummaryStepDetails extends StatelessWidget {
         _SummarySection(
           title: 'Interruption actions',
           child: _SummaryValues(
-            values: draft.interruptionActions,
+            values: draft.interruptionActions
+                .map(_displayInterruptionAction)
+                .toList(),
             emptyText: 'None selected yet (optional).',
           ),
         ),

@@ -48,6 +48,9 @@ class _OnboardingFlowScreenState
       _completionService =
       OnboardingCompletionService();
 
+  final ScrollController _contentScrollController =
+      ScrollController();
+
   static const List<_OnboardingShellStep>
       _steps = <_OnboardingShellStep>[
     _OnboardingShellStep(
@@ -151,6 +154,25 @@ class _OnboardingFlowScreenState
     );
 
     _loadDraft();
+  }
+
+  @override
+  void dispose() {
+    _contentScrollController.dispose();
+    super.dispose();
+  }
+
+  void _resetContentScroll() {
+    WidgetsBinding.instance.addPostFrameCallback(
+      (_) {
+        if (!mounted ||
+            !_contentScrollController.hasClients) {
+          return;
+        }
+
+        _contentScrollController.jumpTo(0);
+      },
+    );
   }
 
   Future<void> _loadDraft() async {
@@ -398,6 +420,8 @@ class _OnboardingFlowScreenState
         _draft = savedDraft;
         _step = nextStep;
       });
+
+      _resetContentScroll();
     } catch (_) {
       if (!mounted) return;
 
@@ -644,6 +668,11 @@ class _OnboardingFlowScreenState
               ),
               Expanded(
                 child: ListView(
+                  key: const Key(
+                    'onboarding-content-list',
+                  ),
+                  controller:
+                      _contentScrollController,
                   padding:
                       const EdgeInsets.fromLTRB(
                     20,

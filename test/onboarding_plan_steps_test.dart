@@ -61,6 +61,93 @@ void main() {
   });
 
   testWidgets(
+    'changing onboarding steps resets content scroll to the top',
+    (WidgetTester tester) async {
+      await OnboardingDraftStore.save(
+        OnboardingDraft.empty.copyWith(
+          recoveryMode: RecoveryMode.secular,
+          supportNeeds: const <String>[
+            'Interrupt urges quickly',
+          ],
+          reasons: const <String>[
+            'I want mental clarity.',
+          ],
+          currentFocus: 'I want mental clarity.',
+          whyText: 'I want to live free of shame.',
+          triggers: const <String>[
+            'Stress',
+            'Scrolling',
+            'Loneliness',
+          ],
+          riskyTimes: const <String>[
+            'Late night',
+            'When alone',
+            'After stress',
+          ],
+          interruptionActions: const <String>[
+            'Open Rescue',
+            'Text someone safe',
+            'Put the phone down',
+            'Other: Step outside for fresh air',
+          ],
+        ),
+      );
+
+      await tester.pumpWidget(
+        buildFlow(initialStep: 8),
+      );
+      await tester.pumpAndSettle();
+
+      final Finder contentList = find.byKey(
+        const Key('onboarding-content-list'),
+      );
+
+      final Finder scrollable = find.descendant(
+        of: contentList,
+        matching: find.byType(Scrollable),
+      );
+
+      expect(contentList, findsOneWidget);
+      expect(scrollable, findsOneWidget);
+
+      await tester.drag(
+        contentList,
+        const Offset(0, -700),
+      );
+      await tester.pump();
+
+      expect(
+        tester
+            .state<ScrollableState>(scrollable)
+            .position
+            .pixels,
+        greaterThan(0),
+      );
+
+      await tester.tap(
+        find.widgetWithText(
+          FilledButton,
+          'Continue',
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.text('Step 10 of 10'), findsOneWidget);
+      expect(
+        tester
+            .state<ScrollableState>(scrollable)
+            .position
+            .pixels,
+        moreOrLessEquals(0, epsilon: 0.1),
+      );
+      expect(
+        find.text('Choose how to continue'),
+        findsOneWidget,
+      );
+    },
+  );
+
+  testWidgets(
     'Steps 6 and 7 accept rapid optional selections and write only draft data',
     (WidgetTester tester) async {
       await tester.pumpWidget(
@@ -175,7 +262,7 @@ void main() {
       await tester.tap(textSafe);
       await flushDraftWrites(tester);
 
-      final OnboardingDraft draft =
+      OnboardingDraft draft =
           await OnboardingDraftStore.load();
 
       expect(
@@ -191,6 +278,84 @@ void main() {
 
       expect(prefs.containsKey('bw_support_contact_v1'), isFalse);
       expect(prefs.containsKey('bw_premium_state_v1'), isFalse);
+
+      final Finder other = find.byKey(
+        const ValueKey<String>(
+          'onboarding-action-Other',
+        ),
+      );
+
+      await bringIntoTapZone(
+        tester,
+        other,
+      );
+      await tester.tap(other);
+      await flushDraftWrites(tester);
+
+      final Finder otherField = find.byKey(
+        const Key('onboarding-other-action-field'),
+      );
+
+      expect(otherField, findsOneWidget);
+
+      await bringIntoTapZone(
+        tester,
+        otherField,
+      );
+      await tester.enterText(
+        otherField,
+        'Step outside for fresh air',
+      );
+
+      final Finder addCustom = find.byKey(
+        const Key('onboarding-add-custom-action'),
+      );
+
+      await bringIntoTapZone(
+        tester,
+        addCustom,
+      );
+      await tester.tap(addCustom);
+      await flushDraftWrites(tester);
+
+      expect(
+        find.byKey(
+          const ValueKey<String>(
+            'onboarding-custom-action-Step outside for fresh air',
+          ),
+        ),
+        findsOneWidget,
+      );
+      expect(otherField, findsNothing);
+
+      draft = await OnboardingDraftStore.load();
+
+      expect(
+        draft.interruptionActions,
+        contains(
+          'Other: Step outside for fresh air',
+        ),
+      );
+
+      final Finder editCustom = find.byKey(
+        const Key('onboarding-edit-custom-action'),
+      );
+
+      await bringIntoTapZone(
+        tester,
+        editCustom,
+      );
+      await tester.tap(editCustom);
+      await tester.pump();
+
+      expect(otherField, findsOneWidget);
+      expect(
+        tester
+            .widget<TextField>(otherField)
+            .controller
+            ?.text,
+        'Step outside for fresh air',
+      );
     },
   );
 
@@ -212,6 +377,7 @@ void main() {
           riskyTimes: const <String>['Late night'],
           interruptionActions: const <String>[
             'Open Rescue',
+            'Other: Step outside for fresh air',
           ],
         ),
       );
@@ -231,6 +397,16 @@ void main() {
       expect(
         find.text('I want to live free of shame.'),
         findsOneWidget,
+      );
+      expect(
+        find.text('Step outside for fresh air'),
+        findsOneWidget,
+      );
+      expect(
+        find.text(
+          'Other: Step outside for fresh air',
+        ),
+        findsNothing,
       );
       expect(find.textContaining('diagnosis'), findsOneWidget);
       expect(find.textContaining('guarantee'), findsOneWidget);
