@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../core/triggers/trigger_catalog.dart';
 import '../../../core/triggers/triggers_selection.dart';
 import '../../../core/triggers/triggers_store.dart';
 
@@ -11,23 +12,11 @@ class TriggersRiskyTimesScreen extends StatefulWidget {
 }
 
 class _TriggersRiskyTimesScreenState extends State<TriggersRiskyTimesScreen> {
-  static const List<String> _presetTriggers = <String>[
-    'Stress',
-    'Conflict',
-    'Loneliness',
-    'Boredom',
-    'Scrolling',
-    'Fatigue',
-    'Shame spiral',
-  ];
+  static const List<String> _presetTriggers =
+      BreakWaveTriggerCatalog.triggers;
 
-  static const List<String> _presetRiskyTimes = <String>[
-    'Late night',
-    'When alone',
-    'After stress',
-    'After conflict',
-    'Bored and scrolling',
-  ];
+  static const List<String> _presetRiskyTimes =
+      BreakWaveTriggerCatalog.riskyTimes;
 
   final TextEditingController _customTriggerController = TextEditingController();
 

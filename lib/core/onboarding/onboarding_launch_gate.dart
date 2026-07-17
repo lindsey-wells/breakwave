@@ -11,6 +11,7 @@ import 'package:flutter/material.dart';
 import '../../features/onboarding/presentation/onboarding_flow_screen.dart';
 import '../../features/onboarding/presentation/onboarding_launch_loading.dart';
 import '../../features/onboarding/presentation/onboarding_rescue_route.dart';
+import '../../features/premium/presentation/breakwave_plus_screen.dart';
 import 'onboarding_state.dart';
 import 'onboarding_state_store.dart';
 
@@ -86,6 +87,21 @@ class _OnboardingLaunchGateState
     });
   }
 
+  void _handleReviewPlusRequested() {
+    WidgetsBinding.instance.addPostFrameCallback(
+      (_) {
+        if (!mounted) return;
+
+        Navigator.of(context).push(
+          MaterialPageRoute<void>(
+            builder: (_) =>
+                const BreakWavePlusScreen(),
+          ),
+        );
+      },
+    );
+  }
+
   Widget _buildChild() {
     return widget.child;
   }
@@ -104,6 +120,8 @@ class _OnboardingLaunchGateState
       return OnboardingFlowScreen(
         initialStep: _initialStep,
         onFinished: _handleFinished,
+        onReviewPlusRequested:
+            _handleReviewPlusRequested,
       );
     }
 

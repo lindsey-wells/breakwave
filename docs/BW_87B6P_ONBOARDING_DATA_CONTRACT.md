@@ -157,3 +157,75 @@ completion service merges supported answers.
 Step 5 must not write ReasonsStore, CustomWhyStore, PremiumStateStore,
 billing state, recovery logs, or contact information before final
 completion.
+
+## Triggers, risky times, and interruption actions
+
+Onboarding Steps 6 through 8 use the established BreakWave trigger,
+risky-time, and replacement-action vocabulary.
+
+These selections are optional. A user may continue without choosing one,
+because the existing live trigger and action tools do not require a
+selection and onboarding must not invent a new blocking rule.
+
+Selections are saved immediately to OnboardingDraftStore so rapid taps,
+Back navigation, force-close, and restart preserve the latest choices.
+Rapid repeated chip taps remain responsive while draft writes are queued
+in order.
+
+Custom triggers and one custom Other interruption action may be stored as
+short labels. These steps do not store phone numbers, email addresses,
+trusted-contact information, or any action execution result.
+
+Choosing Open Rescue or Text someone safe during onboarding prepares a
+future plan only. It does not open Rescue, send a message, or require a
+saved contact from the onboarding screen.
+
+Pray for one minute is offered only when the explicitly selected recovery
+mode is Christian. Changing the draft back to secular removes that
+Christian-only interruption action.
+
+Steps 6 through 8 must not write TriggersStore,
+PersonalRecoveryPlanStore, SupportContactStore, PremiumStateStore,
+billing state, or entitlement state before final completion.
+
+## Starter recovery setup summary
+
+Onboarding Step 9 reads only the temporary draft and presents the user's
+starting plan.
+
+The summary keeps Current Focus and Personal Why as separate concepts and
+labels. Optional unanswered sections are shown honestly as not selected
+or not added.
+
+The summary does not fabricate insights, risk scores, trends,
+predictions, diagnoses, treatment claims, or recovery guarantees. Back
+remains available for edits, and the summary does not call the completion
+service or write live stores.
+
+## Honest Free-versus-Plus completion choice
+
+Onboarding Step 10 requires one explicit choice:
+
+- Continue Free
+- Review BreakWave Plus
+
+Continue Free always remains available. Rescue, basic logging, privacy
+controls, essential support resources, access to personal recovery data,
+and base secular or Christian language remain part of the protected free
+core.
+
+Review BreakWave Plus saves navigation intent only. It does not set
+PremiumState, unlock Plus, begin a trial, start checkout, restore a
+purchase, or create entitlement.
+
+While billing is not implemented, Step 10 shows no price, discount,
+countdown, purchase-success message, restore-success message, or fake
+checkout control. It states plainly that Plus purchasing is not yet
+available.
+
+Final completion saves the latest draft, runs the merge-safe completion
+service, marks onboarding complete only after successful merges, and
+clears the draft last. When Review BreakWave Plus was selected, the app
+may open the existing honest Plus information screen after onboarding has
+completed. Closing that screen enters the normal app; Plus remains
+locked.

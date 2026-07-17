@@ -15,9 +15,13 @@ import '../../../core/onboarding/onboarding_state.dart';
 import '../../../core/onboarding/onboarding_state_store.dart';
 import '../../../core/recovery/recovery_mode.dart';
 import '../../../core/ui/wave_surface.dart';
+import 'onboarding_access_step_details.dart';
+import 'onboarding_actions_step_details.dart';
 import 'onboarding_intro_step_details.dart';
+import 'onboarding_patterns_step_details.dart';
 import 'onboarding_reasons_step_details.dart';
 import 'onboarding_rescue_route.dart';
+import 'onboarding_summary_step_details.dart';
 
 class OnboardingFlowScreen
     extends StatefulWidget {
@@ -25,11 +29,13 @@ class OnboardingFlowScreen
     super.key,
     required this.initialStep,
     required this.onFinished,
+    this.onReviewPlusRequested,
   });
 
   final int initialStep;
   final ValueChanged<OnboardingStatus>
       onFinished;
+  final VoidCallback? onReviewPlusRequested;
 
   @override
   State<OnboardingFlowScreen> createState() =>
@@ -129,6 +135,9 @@ class _OnboardingFlowScreenState
   late int _step;
   bool _busy = false;
   bool _draftLoading = true;
+  int _draftRevision = 0;
+  Future<void> _draftSaveQueue =
+      Future<void>.value();
   OnboardingDraft _draft =
       OnboardingDraft.empty;
 
@@ -168,53 +177,65 @@ class _OnboardingFlowScreenState
   Future<void> _replaceDraft(
     OnboardingDraft next,
   ) async {
-    if (_busy || _draftLoading) return;
+    if (_draftLoading) return;
 
-    final OnboardingDraft previous =
-        _draft;
+    final int revision = ++_draftRevision;
 
     setState(() {
       _draft = next;
-      _busy = true;
     });
 
-    try {
-      final OnboardingDraft saved =
-          await OnboardingDraftStore.save(
-        next,
-      );
+    _draftSaveQueue = _draftSaveQueue.then(
+      (_) async {
+        try {
+          final OnboardingDraft saved =
+              await OnboardingDraftStore.save(
+            next,
+          );
 
-      if (!mounted) return;
+          if (!mounted ||
+              revision != _draftRevision) {
+            return;
+          }
 
-      setState(() {
-        _draft = saved;
-      });
-    } catch (_) {
-      if (!mounted) return;
+          setState(() {
+            _draft = saved;
+          });
+        } catch (_) {
+          if (!mounted ||
+              revision != _draftRevision) {
+            return;
+          }
 
-      setState(() {
-        _draft = previous;
-      });
+          _showError(
+            'BreakWave could not save that setup '
+            'choice yet. Your current choices remain '
+            'on this screen; please try Continue again.',
+          );
+        }
+      },
+    );
 
-      _showError(
-        'BreakWave could not save that setup '
-        'choice. Please try again.',
-      );
-    } finally {
-      if (mounted) {
-        setState(() {
-          _busy = false;
-        });
-      }
-    }
+    await _draftSaveQueue;
   }
 
   Future<void> _setRecoveryMode(
     RecoveryMode mode,
   ) async {
+    final List<String> actions =
+        mode == RecoveryMode.christian
+            ? _draft.interruptionActions
+            : _draft.interruptionActions
+                .where(
+                  (String action) =>
+                      action != 'Pray for one minute',
+                )
+                .toList();
+
     await _replaceDraft(
       _draft.copyWith(
         recoveryMode: mode,
+        interruptionActions: actions,
       ),
     );
   }
@@ -243,6 +264,40 @@ class _OnboardingFlowScreenState
     );
   }
 
+  Future<void> _setTriggers(
+    List<String> values,
+  ) async {
+    await _replaceDraft(
+      _draft.copyWith(triggers: values),
+    );
+  }
+
+  Future<void> _setRiskyTimes(
+    List<String> values,
+  ) async {
+    await _replaceDraft(
+      _draft.copyWith(riskyTimes: values),
+    );
+  }
+
+  Future<void> _setInterruptionActions(
+    List<String> values,
+  ) async {
+    await _replaceDraft(
+      _draft.copyWith(
+        interruptionActions: values,
+      ),
+    );
+  }
+
+  Future<void> _setAccessChoice(
+    OnboardingAccessChoice value,
+  ) async {
+    await _replaceDraft(
+      _draft.copyWith(accessChoice: value),
+    );
+  }
+
   Future<void> _setReasons(
     List<String> reasons,
     String currentFocus,
@@ -258,7 +313,11 @@ class _OnboardingFlowScreenState
   void _setWhyText(
     String value,
   ) {
-    if (_busy || _draftLoading) return;
+    if (_draftLoading) return;
+
+    // Invalidate any older queued save snapshot so it
+    // cannot overwrite text typed after that save began.
+    _draftRevision++;
 
     setState(() {
       _draft = _draft.copyWith(
@@ -293,6 +352,9 @@ class _OnboardingFlowScreenState
       case 4:
         return _draft.reasons.isNotEmpty &&
             _isCurrentFocusValid();
+      case 9:
+        return _draft.accessChoice !=
+            OnboardingAccessChoice.undecided;
       default:
         return true;
     }
@@ -314,6 +376,8 @@ class _OnboardingFlowScreenState
     });
 
     try {
+      await _draftSaveQueue;
+
       OnboardingDraft savedDraft =
           _draft;
 
@@ -383,19 +447,26 @@ class _OnboardingFlowScreenState
     });
 
     try {
+      await _draftSaveQueue;
+
       if (_draft.hasAnyAnswer) {
         await OnboardingDraftStore.save(
           _draft,
         );
       }
 
-      await _completionService.complete();
+      final OnboardingCompletionResult result =
+          await _completionService.complete();
 
       if (!mounted) return;
 
       widget.onFinished(
         OnboardingStatus.completed,
       );
+
+      if (result.shouldReviewPlus) {
+        widget.onReviewPlusRequested?.call();
+      }
     } catch (_) {
       if (!mounted) return;
 
@@ -649,6 +720,53 @@ class _OnboardingFlowScreenState
                                   _setReasons,
                               onWhyChanged:
                                   _setWhyText,
+                            ),
+                          ],
+                          if (_step == 5) ...<Widget>[
+                            const SizedBox(height: 22),
+                            OnboardingTriggersStepDetails(
+                              draft: _draft,
+                              enabled:
+                                  !_busy &&
+                                  !_draftLoading,
+                              onChanged: _setTriggers,
+                            ),
+                          ],
+                          if (_step == 6) ...<Widget>[
+                            const SizedBox(height: 22),
+                            OnboardingRiskyTimesStepDetails(
+                              draft: _draft,
+                              enabled:
+                                  !_busy &&
+                                  !_draftLoading,
+                              onChanged: _setRiskyTimes,
+                            ),
+                          ],
+                          if (_step == 7) ...<Widget>[
+                            const SizedBox(height: 22),
+                            OnboardingActionsStepDetails(
+                              draft: _draft,
+                              enabled:
+                                  !_busy &&
+                                  !_draftLoading,
+                              onChanged:
+                                  _setInterruptionActions,
+                            ),
+                          ],
+                          if (_step == 8) ...<Widget>[
+                            const SizedBox(height: 22),
+                            OnboardingSummaryStepDetails(
+                              draft: _draft,
+                            ),
+                          ],
+                          if (_step == 9) ...<Widget>[
+                            const SizedBox(height: 22),
+                            OnboardingAccessStepDetails(
+                              draft: _draft,
+                              enabled:
+                                  !_busy &&
+                                  !_draftLoading,
+                              onChanged: _setAccessChoice,
                             ),
                           ],
                           const SizedBox(height: 20),

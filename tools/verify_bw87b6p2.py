@@ -127,14 +127,12 @@ for needle in [
 for forbidden in [
     "Scaffold(",
     "CircularProgressIndicator",
-    "Navigator.",
-    "MaterialPageRoute",
     "OnboardingScreen",
 ]:
     if forbidden in gate:
         print(
-            "FAIL BW-87B6P2 passive gate adds "
-            f"visible routing: {forbidden}"
+            "FAIL BW-87B6P2 passive launch gate adds "
+            f"blocking launch UI: {forbidden}"
         )
         sys.exit(1)
 
