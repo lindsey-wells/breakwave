@@ -340,13 +340,15 @@ class _OnboardingActionsStepDetailsState
             onSubmitted: (_) {
               _saveOtherAction();
             },
-            decoration: const InputDecoration(
-              labelText:
-                  'Add your own interruption action',
+            decoration: InputDecoration(
+              labelText: _hasCustomOther
+                  ? 'Edit your interruption action'
+                  : 'Add your own interruption action',
               hintText:
                   'Example: Step outside for fresh air',
-              helperText:
-                  'Tap Add custom action to save it.',
+              helperText: _hasCustomOther
+                  ? 'Tap Update custom action to save your changes.'
+                  : 'Tap Add custom action to save it.',
             ),
           ),
           const SizedBox(height: 4),

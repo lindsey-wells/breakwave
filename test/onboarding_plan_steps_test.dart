@@ -293,6 +293,21 @@ void main() {
       );
 
       expect(otherField, findsOneWidget);
+      expect(
+        find.text('Add your own interruption action'),
+        findsOneWidget,
+      );
+      expect(
+        find.text('Tap Add custom action to save it.'),
+        findsOneWidget,
+      );
+      expect(
+        find.widgetWithText(
+          OutlinedButton,
+          'Add custom action',
+        ),
+        findsOneWidget,
+      );
 
       await bringIntoTapZone(
         tester,
@@ -345,6 +360,27 @@ void main() {
       await tester.pump();
 
       expect(otherField, findsOneWidget);
+      expect(
+        find.text('Edit your interruption action'),
+        findsOneWidget,
+      );
+      expect(
+        find.text(
+          'Tap Update custom action to save your changes.',
+        ),
+        findsOneWidget,
+      );
+      expect(
+        find.widgetWithText(
+          OutlinedButton,
+          'Update custom action',
+        ),
+        findsOneWidget,
+      );
+      expect(
+        find.text('Tap Add custom action to save it.'),
+        findsNothing,
+      );
       expect(
         tester
             .widget<TextField>(otherField)
