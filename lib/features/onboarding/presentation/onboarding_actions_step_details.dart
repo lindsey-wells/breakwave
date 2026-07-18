@@ -347,8 +347,8 @@ class _OnboardingActionsStepDetailsState
               hintText:
                   'Example: Step outside for fresh air',
               helperText: _hasCustomOther
-                  ? 'Tap Update custom action to save your changes.'
-                  : 'Tap Add custom action to save it.',
+                  ? 'Tap Update custom action.'
+                  : 'Tap Add custom action.',
             ),
           ),
           const SizedBox(height: 4),

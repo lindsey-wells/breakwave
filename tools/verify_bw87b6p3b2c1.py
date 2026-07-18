@@ -70,7 +70,7 @@ for needle in [
     "static const String _otherPrefix = 'Other: ';",
     "if (!_hasCustomOther || _editingOther)",
     "Add your own interruption action",
-    "Tap Add custom action to save it.",
+    "Tap Add custom action.",
     "onboarding-add-custom-action",
     "onboarding-edit-custom-action",
     "onboarding-custom-action-",

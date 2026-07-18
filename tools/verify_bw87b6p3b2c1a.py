@@ -33,8 +33,8 @@ for needle in [
     "decoration: InputDecoration(",
     "? 'Edit your interruption action'",
     ": 'Add your own interruption action'",
-    "? 'Tap Update custom action to save your changes.'",
-    ": 'Tap Add custom action to save it.'",
+    "? 'Tap Update custom action.'",
+    ": 'Tap Add custom action.'",
     "? 'Update custom action'",
     ": 'Add custom action'",
 ]:
@@ -47,10 +47,10 @@ for needle in [
 
 for needle in [
     "find.text('Add your own interruption action')",
-    "find.text('Tap Add custom action to save it.')",
+    "find.text('Tap Add custom action.')",
     "'Add custom action'",
     "find.text('Edit your interruption action')",
-    "'Tap Update custom action to save your changes.'",
+    "'Tap Update custom action.'",
     "'Update custom action'",
     "findsNothing",
 ]:

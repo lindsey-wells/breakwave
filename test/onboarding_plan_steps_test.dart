@@ -298,7 +298,7 @@ void main() {
         findsOneWidget,
       );
       expect(
-        find.text('Tap Add custom action to save it.'),
+        find.text('Tap Add custom action.'),
         findsOneWidget,
       );
       expect(
@@ -366,7 +366,7 @@ void main() {
       );
       expect(
         find.text(
-          'Tap Update custom action to save your changes.',
+          'Tap Update custom action.',
         ),
         findsOneWidget,
       );
@@ -378,7 +378,7 @@ void main() {
         findsOneWidget,
       );
       expect(
-        find.text('Tap Add custom action to save it.'),
+        find.text('Tap Add custom action.'),
         findsNothing,
       );
       expect(
