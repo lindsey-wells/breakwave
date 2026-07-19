@@ -25,6 +25,11 @@ class BreakWaveNotifications {
   static const int dailyReminderId = 2201;
   static const int riskyNudgeId = 2202;
 
+  static const String notificationIconName =
+      'ic_stat_breakwave';
+  static const String fallbackNotificationIconName =
+      '@mipmap/ic_launcher';
+
   static bool _initialized = false;
   static bool _timeZoneReady = false;
 
@@ -34,10 +39,12 @@ class BreakWaveNotifications {
     tz.initializeTimeZones();
     await _configureLocalTimeZone();
 
-    const AndroidInitializationSettings androidSettings =
-        AndroidInitializationSettings('@mipmap/ic_launcher');
+    final AndroidInitializationSettings androidSettings =
+        AndroidInitializationSettings(
+      fallbackNotificationIconName,
+    );
 
-    const InitializationSettings initializationSettings =
+    final InitializationSettings initializationSettings =
         InitializationSettings(android: androidSettings);
 
     await _plugin.initialize(
@@ -123,41 +130,91 @@ class BreakWaveNotifications {
     await _plugin.cancel(id: riskyNudgeId);
 
     if (settings.dailyReminderEnabled) {
-      await _plugin.zonedSchedule(
+      await _scheduleWithIconFallback(
         id: dailyReminderId,
         title:
             privacy.discreetNotifications ? 'Check-in' : 'BreakWave check-in',
         body: privacy.discreetNotifications
             ? 'Take a brief pause.'
             : 'Pause for 20 seconds. Open BreakWave and take one steady next step.',
-        scheduledDate: _nextInstance(settings.dailyHour, settings.dailyMinute),
-        notificationDetails: _details(),
-        androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
-        matchDateTimeComponents: DateTimeComponents.time,
+        scheduledDate: _nextInstance(
+          settings.dailyHour,
+          settings.dailyMinute,
+        ),
       );
     }
 
     if (settings.riskyNudgeEnabled) {
       const String fullBody = 'Danger window. Pause now. Open BreakWave and take one steady next step.';
 
-      await _plugin.zonedSchedule(
+      await _scheduleWithIconFallback(
         id: riskyNudgeId,
         title: privacy.discreetNotifications ? 'Nudge' : 'BreakWave nudge',
         body: privacy.discreetNotifications ? 'Pause now.' : fullBody,
-        scheduledDate: _nextInstance(settings.riskyHour, settings.riskyMinute),
-        notificationDetails: _details(),
-        androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
-        matchDateTimeComponents: DateTimeComponents.time,
+        scheduledDate: _nextInstance(
+          settings.riskyHour,
+          settings.riskyMinute,
+        ),
       );
     }
   }
 
-  static NotificationDetails _details() {
-    return const NotificationDetails(
+  static Future<void> _scheduleWithIconFallback({
+    required int id,
+    required String title,
+    required String body,
+    required tz.TZDateTime scheduledDate,
+  }) async {
+    try {
+      await _schedule(
+        id: id,
+        title: title,
+        body: body,
+        scheduledDate: scheduledDate,
+        useCustomIcon: true,
+      );
+    } catch (_) {
+      await _schedule(
+        id: id,
+        title: title,
+        body: body,
+        scheduledDate: scheduledDate,
+        useCustomIcon: false,
+      );
+    }
+  }
+
+  static Future<void> _schedule({
+    required int id,
+    required String title,
+    required String body,
+    required tz.TZDateTime scheduledDate,
+    required bool useCustomIcon,
+  }) {
+    return _plugin.zonedSchedule(
+      id: id,
+      title: title,
+      body: body,
+      scheduledDate: scheduledDate,
+      notificationDetails: _details(
+        useCustomIcon: useCustomIcon,
+      ),
+      androidScheduleMode:
+          AndroidScheduleMode.inexactAllowWhileIdle,
+      matchDateTimeComponents: DateTimeComponents.time,
+    );
+  }
+
+  static NotificationDetails _details({
+    required bool useCustomIcon,
+  }) {
+    return NotificationDetails(
       android: AndroidNotificationDetails(
         'breakwave_reminders',
         'BreakWave Reminders',
-        channelDescription: 'Daily check-ins and neutral recovery nudges',
+        channelDescription:
+            'Daily check-ins and neutral recovery nudges',
+        icon: useCustomIcon ? notificationIconName : null,
         importance: Importance.defaultImportance,
         priority: Priority.defaultPriority,
       ),

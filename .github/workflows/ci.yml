@@ -95,6 +95,11 @@ jobs:
       - name: Build release APK
         run: flutter build apk --release
 
+      - name: Verify branded resources in release APK
+        run: |
+          python3 tools/verify_bw88rc1a.py \
+            --artifact build/app/outputs/flutter-apk/app-release.apk
+
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
         with:
@@ -105,9 +110,21 @@ jobs:
       - name: Build release AAB
         run: flutter build appbundle --release
 
+      - name: Verify branded resources in release AAB
+        run: |
+          python3 tools/verify_bw88rc1a.py \
+            --artifact build/app/outputs/bundle/release/app-release.aab
+
       - name: Upload AAB artifact
         uses: actions/upload-artifact@v4
         with:
           name: breakwave-release-aab
           path: build/app/outputs/bundle/release/app-release.aab
+          if-no-files-found: error
+
+      - name: Upload Play Store icon artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: breakwave-play-store-icon
+          path: assets/branding/play_store_icon_512.png
           if-no-files-found: error

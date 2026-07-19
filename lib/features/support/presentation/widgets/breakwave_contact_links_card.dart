@@ -17,6 +17,7 @@ class BreakWaveContactLinksCard extends StatelessWidget {
   static const MethodChannel _socialLinksChannel =
       MethodChannel('breakwave/social_links');
 
+  static const String websiteUrl = 'https://breakwaveapp.com';
   static const String emailAddress = 'support@breakwaveapp.com';
   static const String privacyEmailAddress = 'privacy@breakwaveapp.com';
   static const String tikTokHandle = '@BreakWaveapp';
@@ -48,6 +49,13 @@ class BreakWaveContactLinksCard extends StatelessWidget {
         ),
       );
     }
+  }
+
+  Future<void> _openWebsite(BuildContext context) {
+    return _openSocialInDefaultBrowser(
+      context,
+      Uri.parse(websiteUrl),
+    );
   }
 
   Future<void> _openEmail(BuildContext context) {
@@ -359,6 +367,11 @@ class BreakWaveContactLinksCard extends StatelessWidget {
             spacing: 10,
             runSpacing: 10,
             children: <Widget>[
+              OutlinedButton.icon(
+                onPressed: () => _openWebsite(context),
+                icon: const Icon(Icons.language),
+                label: const Text('Visit breakwaveapp.com'),
+              ),
               FilledButton.tonalIcon(
                 onPressed: () => _openEmail(context),
                 icon: const Icon(Icons.email_outlined),
