@@ -8,7 +8,10 @@ void main() {
   testWidgets('BreakWave renders home shell', (tester) async {
     await tester.pumpWidget(const BreakWaveApp());
 
-    expect(find.text('BreakWave'), findsOneWidget);
+    expect(
+      find.bySemanticsLabel('BreakWave brand wordmark'),
+      findsOneWidget,
+    );
     expect(find.text('Open Rescue'), findsOneWidget);
   });
 }

@@ -100,6 +100,11 @@ jobs:
           python3 tools/verify_bw88rc1a.py \
             --artifact build/app/outputs/flutter-apk/app-release.apk
 
+      - name: Verify BW-88RC1B in release APK
+        run: |
+          python3 tools/verify_bw88rc1b.py \
+            --artifact build/app/outputs/flutter-apk/app-release.apk
+
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
         with:
@@ -113,6 +118,11 @@ jobs:
       - name: Verify branded resources in release AAB
         run: |
           python3 tools/verify_bw88rc1a.py \
+            --artifact build/app/outputs/bundle/release/app-release.aab
+
+      - name: Verify BW-88RC1B in release AAB
+        run: |
+          python3 tools/verify_bw88rc1b.py \
             --artifact build/app/outputs/bundle/release/app-release.aab
 
       - name: Upload AAB artifact

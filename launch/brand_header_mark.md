@@ -1,17 +1,27 @@
-# BreakWave — BW-64 Header Brand Mark
+# BreakWave — Header Brand Mark
 
-## Purpose
+## BW-64 history
 
-BW-64 replaces the top app bar wave icon with a custom BreakWave ocean mark.
+BW-64 replaced the menu-like Material wave icon with a
+Flutter-drawn circular ocean badge.
 
-## Reason
+That was an intentional temporary MVP decision while the final
+BreakWave branding assets were still being prepared.
 
-The previous Material wave icon could read like a three-line menu icon when placed beside the BreakWave wordmark.
+## BW-88RC1B finalization
 
-## MVP decision
+BW-88RC1B replaces the temporary painted badge and separate
+BreakWave text with the approved bundled horizontal wordmark.
 
-Use a Flutter-drawn circular ocean badge for the header instead of adding an image asset during MVP polish.
+The production header now uses:
 
-## Future option
+- `assets/branding/breakwave_in_app_header.png`
+- A transparent, tightly cropped UI derivative
+- The approved user-provided wave and BreakWave lettering
+- The existing Home, Rescue, Log, and Support section label
+- An accessible semantic label
+- A text fallback if the image asset cannot load
 
-When final brand assets are ready, this mark can be replaced with a bundled app icon or horizontal wordmark asset.
+The original supplied 2172×724 source is retained as:
+
+- `assets/branding/breakwave_in_app_header_source.png`

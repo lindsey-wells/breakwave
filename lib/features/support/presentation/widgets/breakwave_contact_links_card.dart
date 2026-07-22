@@ -5,6 +5,7 @@
 // Purpose: BW-48B BreakWave contact and social links.
 // Notes: BW-80E uses default browser first, with browser fallback choices.
 // Notes: BW-86D1 wires official BreakWave email and social links.
+// Notes: BW-88RC1B adds direct in-app Privacy Policy access.
 // ------------------------------------------------------------
 
 import 'package:flutter/material.dart';
@@ -18,6 +19,8 @@ class BreakWaveContactLinksCard extends StatelessWidget {
       MethodChannel('breakwave/social_links');
 
   static const String websiteUrl = 'https://breakwaveapp.com';
+  static const String privacyPolicyUrl =
+      'https://breakwaveapp.com/#privacy';
   static const String emailAddress = 'support@breakwaveapp.com';
   static const String privacyEmailAddress = 'privacy@breakwaveapp.com';
   static const String tikTokHandle = '@BreakWaveapp';
@@ -55,6 +58,13 @@ class BreakWaveContactLinksCard extends StatelessWidget {
     return _openSocialInDefaultBrowser(
       context,
       Uri.parse(websiteUrl),
+    );
+  }
+
+  Future<void> _openPrivacyPolicy(BuildContext context) {
+    return _openSocialInDefaultBrowser(
+      context,
+      Uri.parse(privacyPolicyUrl),
     );
   }
 
@@ -371,6 +381,11 @@ class BreakWaveContactLinksCard extends StatelessWidget {
                 onPressed: () => _openWebsite(context),
                 icon: const Icon(Icons.language),
                 label: const Text('Visit breakwaveapp.com'),
+              ),
+              OutlinedButton.icon(
+                onPressed: () => _openPrivacyPolicy(context),
+                icon: const Icon(Icons.policy_outlined),
+                label: const Text('Read Privacy Policy'),
               ),
               FilledButton.tonalIcon(
                 onPressed: () => _openEmail(context),

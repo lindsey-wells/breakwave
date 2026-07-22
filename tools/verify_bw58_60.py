@@ -4,8 +4,10 @@ import sys
 checks = [
     ("lib/core/ui/breakwave_app_bar.dart", [
         "class BreakWaveAppBar",
-        "_BreakWaveBrandMark",
-        "BreakWave",
+        "_brandAssetPath",
+        "assets/branding/breakwave_in_app_header.png",
+        "Image.asset(",
+        "BreakWave brand wordmark",
         "fontWeight: FontWeight.w900",
         "letterSpacing: -0.8",
         "sectionTitle",
@@ -73,4 +75,4 @@ for rel_path, needle in blocked:
 if failed:
     sys.exit(1)
 
-print("PASS: BW-58/59/60 brand header, Home copy, and screenshot QA verified.")
+print("PASS: BW-58/59/60 brand-header intent, Home copy, and screenshot QA verified through the approved BW-88RC1B wordmark.")
