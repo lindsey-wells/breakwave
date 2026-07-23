@@ -2,8 +2,18 @@ from pathlib import Path
 import struct
 import sys
 
-app_bar = Path("lib/core/ui/breakwave_app_bar.dart")
-note = Path("launch/brand_header_mark.md")
+app_bar = Path(
+    "lib/core/ui/breakwave_app_bar.dart"
+)
+
+wordmark = Path(
+    "lib/core/branding/breakwave_wordmark.dart"
+)
+
+note = Path(
+    "launch/brand_header_mark.md"
+)
+
 asset = Path(
     "assets/branding/breakwave_in_app_header.png"
 )
@@ -12,14 +22,34 @@ checks = [
     (
         app_bar,
         [
-            "Purpose: BW-88RC1B approved asset-based BreakWave header.",
-            "_brandAssetPath",
-            "assets/branding/breakwave_in_app_header.png",
-            "Image.asset(",
+            (
+                "Purpose: BW-88RC1B approved "
+                "asset-based BreakWave header."
+            ),
+            (
+                "import '../branding/"
+                "breakwave_wordmark.dart';"
+            ),
+            "BreakWaveWordmark(",
+            "sectionTitle",
+        ],
+    ),
+    (
+        wordmark,
+        [
+            "class BreakWaveWordmark",
+            "assetPath",
+            (
+                "assets/branding/"
+                "breakwave_in_app_header.png"
+            ),
+            "semanticLabel",
             "BreakWave brand wordmark",
             "Semantics(",
+            "container: true",
+            "excludeSemantics: true",
+            "Image.asset(",
             "errorBuilder:",
-            "sectionTitle",
         ],
     ),
     (
@@ -55,15 +85,21 @@ else:
     data = asset.read_bytes()
 
     if data[:8] != b"\x89PNG\r\n\x1a\n":
-        print("FAIL in-app header asset is not PNG")
+        print(
+            "FAIL in-app header asset is not PNG"
+        )
         failed = True
     elif data[12:16] != b"IHDR":
-        print("FAIL in-app header asset lacks PNG IHDR")
+        print(
+            "FAIL in-app header asset lacks PNG IHDR"
+        )
         failed = True
     else:
-        width, height, bit_depth, color_type = struct.unpack(
-            ">IIBB",
-            data[16:26],
+        width, height, bit_depth, color_type = (
+            struct.unpack(
+                ">IIBB",
+                data[16:26],
+            )
         )
 
         if (width, height) != (1392, 304):
@@ -75,15 +111,18 @@ else:
 
         if bit_depth != 8 or color_type != 6:
             print(
-                "FAIL in-app header should be 8-bit RGBA PNG"
+                "FAIL in-app header should be "
+                "8-bit RGBA PNG"
             )
             failed = True
 
-app_text = (
-    app_bar.read_text(encoding="utf-8")
-    if app_bar.exists()
-    else ""
-)
+combined_text = ""
+
+for path in (app_bar, wordmark):
+    if path.exists():
+        combined_text += path.read_text(
+            encoding="utf-8"
+        )
 
 for obsolete in [
     "_BreakWaveBrandMark",
@@ -91,9 +130,9 @@ for obsolete in [
     "CustomPaint",
     "canvas.drawCircle",
 ]:
-    if obsolete in app_text:
+    if obsolete in combined_text:
         print(
-            "FAIL app bar retains obsolete painter: "
+            "FAIL header retains obsolete painter: "
             f"{obsolete}"
         )
         failed = True
@@ -103,5 +142,6 @@ if failed:
 
 print(
     "PASS: BW-64 header intent is preserved "
-    "through the approved BW-88RC1B wordmark asset."
+    "through the isolated approved "
+    "BW-88RC1B wordmark helper."
 )

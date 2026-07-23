@@ -12,6 +12,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../../../../core/privacy/breakwave_privacy_policy.dart';
+
 class BreakWaveContactLinksCard extends StatelessWidget {
   const BreakWaveContactLinksCard({super.key});
 
@@ -19,8 +21,6 @@ class BreakWaveContactLinksCard extends StatelessWidget {
       MethodChannel('breakwave/social_links');
 
   static const String websiteUrl = 'https://breakwaveapp.com';
-  static const String privacyPolicyUrl =
-      'https://breakwaveapp.com/#privacy';
   static const String emailAddress = 'support@breakwaveapp.com';
   static const String privacyEmailAddress = 'privacy@breakwaveapp.com';
   static const String tikTokHandle = '@BreakWaveapp';
@@ -64,7 +64,7 @@ class BreakWaveContactLinksCard extends StatelessWidget {
   Future<void> _openPrivacyPolicy(BuildContext context) {
     return _openSocialInDefaultBrowser(
       context,
-      Uri.parse(privacyPolicyUrl),
+      BreakWavePrivacyPolicy.uri,
     );
   }
 
@@ -382,10 +382,8 @@ class BreakWaveContactLinksCard extends StatelessWidget {
                 icon: const Icon(Icons.language),
                 label: const Text('Visit breakwaveapp.com'),
               ),
-              OutlinedButton.icon(
+              BreakWavePrivacyPolicyButton(
                 onPressed: () => _openPrivacyPolicy(context),
-                icon: const Icon(Icons.policy_outlined),
-                label: const Text('Read Privacy Policy'),
               ),
               FilledButton.tonalIcon(
                 onPressed: () => _openEmail(context),

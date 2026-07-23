@@ -3,10 +3,12 @@
 // Project: BreakWave
 // File: breakwave_app_bar.dart
 // Purpose: BW-88RC1B approved asset-based BreakWave header.
-// Notes: Replaces the BW-64 painted placeholder with the real wordmark.
+// Notes: Uses the isolated approved BreakWaveWordmark helper.
 // ------------------------------------------------------------
 
 import 'package:flutter/material.dart';
+
+import '../branding/breakwave_wordmark.dart';
 
 class BreakWaveAppBar extends StatelessWidget
     implements PreferredSizeWidget {
@@ -14,9 +16,6 @@ class BreakWaveAppBar extends StatelessWidget
     super.key,
     required this.sectionTitle,
   });
-
-  static const String _brandAssetPath =
-      'assets/branding/breakwave_in_app_header.png';
 
   final String sectionTitle;
 
@@ -35,39 +34,9 @@ class BreakWaveAppBar extends StatelessWidget
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
-          Semantics(
-            label: 'BreakWave brand wordmark',
-            image: true,
-            excludeSemantics: true,
-            child: SizedBox(
-              width: 240,
-              height: 52,
-              child: Image.asset(
-                _brandAssetPath,
-                fit: BoxFit.contain,
-                alignment: Alignment.centerLeft,
-                filterQuality: FilterQuality.high,
-                gaplessPlayback: true,
-                errorBuilder: (
-                  BuildContext context,
-                  Object error,
-                  StackTrace? stackTrace,
-                ) {
-                  return Align(
-                    alignment: Alignment.centerLeft,
-                    child: Text(
-                      'BreakWave',
-                      style:
-                          theme.textTheme.headlineSmall?.copyWith(
-                        fontWeight: FontWeight.w900,
-                        letterSpacing: -0.8,
-                        color: colorScheme.onSurface,
-                      ),
-                    ),
-                  );
-                },
-              ),
-            ),
+          const BreakWaveWordmark(
+            width: 240,
+            height: 52,
           ),
           const SizedBox(height: 2),
           Text(

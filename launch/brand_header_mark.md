@@ -15,6 +15,7 @@ BreakWave text with the approved bundled horizontal wordmark.
 
 The production header now uses:
 
+- `lib/core/branding/breakwave_wordmark.dart` owns the reusable widget
 - `assets/branding/breakwave_in_app_header.png`
 - A transparent, tightly cropped UI derivative
 - The approved user-provided wave and BreakWave lettering

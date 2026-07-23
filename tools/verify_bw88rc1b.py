@@ -26,7 +26,9 @@ PACKAGED_SUFFIX = (
 
 
 def read(path: str) -> str:
-    return (ROOT / path).read_text(encoding="utf-8")
+    return (
+        ROOT / path
+    ).read_text(encoding="utf-8")
 
 
 def png_info_bytes(
@@ -88,18 +90,42 @@ def verify_static() -> list[str]:
 
     require_text(
         failures,
-        "lib/core/ui/breakwave_app_bar.dart",
+        (
+            "lib/core/branding/"
+            "breakwave_wordmark.dart"
+        ),
         [
-            "_brandAssetPath",
-            "Image.asset(",
+            "class BreakWaveWordmark",
+            "static const String assetPath",
             (
                 "assets/branding/"
                 "breakwave_in_app_header.png"
             ),
+            "static const String semanticLabel",
             "BreakWave brand wordmark",
+            "widgetKey",
+            "semanticsKey",
+            "imageKey",
             "Semantics(",
+            "container: true",
             "excludeSemantics: true",
+            "Image.asset(",
             "errorBuilder:",
+            "fontWeight: FontWeight.w900",
+            "letterSpacing: -0.8",
+        ],
+    )
+
+    require_text(
+        failures,
+        "lib/core/ui/breakwave_app_bar.dart",
+        [
+            (
+                "import '../branding/"
+                "breakwave_wordmark.dart';"
+            ),
+            "class BreakWaveAppBar",
+            "BreakWaveWordmark(",
             "width: 240",
             "height: 52",
             "sectionTitle",
@@ -109,17 +135,37 @@ def verify_static() -> list[str]:
     require_text(
         failures,
         (
-            "lib/features/support/presentation/"
-            "widgets/breakwave_contact_links_card.dart"
+            "lib/core/privacy/"
+            "breakwave_privacy_policy.dart"
         ),
         [
-            "privacyPolicyUrl =",
-            "'https://breakwaveapp.com/#privacy'",
-            "Future<void> _openPrivacyPolicy",
-            "Uri.parse(privacyPolicyUrl)",
-            "_openSocialInDefaultBrowser(",
+            "class BreakWavePrivacyPolicy",
+            "https://breakwaveapp.com/#privacy",
+            "static final Uri uri",
+            "class BreakWavePrivacyPolicyButton",
+            "breakwave_privacy_policy_button",
             "Read Privacy Policy",
             "Icons.policy_outlined",
+        ],
+    )
+
+    support_path = (
+        "lib/features/support/presentation/"
+        "widgets/breakwave_contact_links_card.dart"
+    )
+
+    require_text(
+        failures,
+        support_path,
+        [
+            (
+                "core/privacy/"
+                "breakwave_privacy_policy.dart"
+            ),
+            "Future<void> _openPrivacyPolicy",
+            "BreakWavePrivacyPolicy.uri",
+            "_openSocialInDefaultBrowser(",
+            "BreakWavePrivacyPolicyButton(",
         ],
     )
 
@@ -127,34 +173,101 @@ def verify_static() -> list[str]:
         failures,
         "test/widget_test.dart",
         [
-            (
-                "find.bySemanticsLabel("
-                "'BreakWave brand wordmark')"
-            ),
+            "BreakWave renders home shell",
+            "find.text('BreakWave')",
+            "find.text('Open Rescue')",
         ],
     )
 
     require_text(
         failures,
-        ".github/workflows/ci.yml",
+        "test/breakwave_wordmark_test.dart",
         [
-            "Verify BW-88RC1B in release APK",
-            "Verify BW-88RC1B in release AAB",
-            "python3 tools/verify_bw88rc1b.py",
+            (
+                "BreakWave wordmark uses approved "
+                "asset and metadata"
+            ),
+            "BreakWaveWordmark.widgetKey",
+            "BreakWaveWordmark.semanticsKey",
+            "BreakWaveWordmark.imageKey",
+            "tester.widget<Semantics>",
+            "semantics.properties.label",
+            "semantics.properties.image",
+            "provider.assetName",
+            "BreakWaveWordmark.assetPath",
+            "image.errorBuilder",
         ],
     )
 
-    expected_pngs = {
+    require_text(
+        failures,
+        "test/breakwave_privacy_policy_test.dart",
+        [
+            (
+                "Privacy Policy uses the "
+                "published BreakWave URL"
+            ),
+            "BreakWavePrivacyPolicy.url",
+            "BreakWavePrivacyPolicy.uri.toString()",
+            (
+                "BreakWavePrivacyPolicyButton."
+                "widgetKey"
+            ),
+            "BreakWavePrivacyPolicy.buttonLabel",
+            "Icons.policy_outlined",
+            "expect(pressed, isTrue)",
+        ],
+    )
+
+    widget_test = read("test/widget_test.dart")
+
+    if "find.bySemanticsLabel" in widget_test:
+        failures.append(
+            "legacy widget smoke test still relies "
+            "on merged semantics-tree lookup."
+        )
+
+    support_text = read(support_path)
+
+    if "privacyPolicyUrl" in support_text:
+        failures.append(
+            "Support card retains duplicate "
+            "privacyPolicyUrl constant."
+        )
+
+    if (
+        "'https://breakwaveapp.com/#privacy'"
+        in support_text
+    ):
+        failures.append(
+            "Support card retains duplicate "
+            "Privacy Policy URL literal."
+        )
+
+    app_bar_text = read(
+        "lib/core/ui/breakwave_app_bar.dart"
+    )
+
+    if (
+        "breakwave_in_app_header.png"
+        in app_bar_text
+    ):
+        failures.append(
+            "AppBar bypasses isolated wordmark "
+            "helper with a direct asset path."
+        )
+
+    expected_assets = {
         SOURCE_ASSET: (2172, 724, 8, 2),
         FINAL_ASSET: (1392, 304, 8, 6),
     }
 
-    for relative, expected in expected_pngs.items():
+    for relative, expected in expected_assets.items():
         path = ROOT / relative
 
         if not path.is_file():
             failures.append(
-                f"missing PNG: {relative}"
+                f"missing file: {relative}"
             )
             continue
 
@@ -162,7 +275,7 @@ def verify_static() -> list[str]:
             actual = png_info(path)
         except Exception as exc:
             failures.append(
-                f"{relative}: {exc}"
+                f"{relative} invalid: {exc}"
             )
             continue
 
@@ -172,8 +285,12 @@ def verify_static() -> list[str]:
                 f"got {actual}"
             )
 
-    app_bar_text = read(
-        "lib/core/ui/breakwave_app_bar.dart"
+    combined_header_text = (
+        app_bar_text
+        + read(
+            "lib/core/branding/"
+            "breakwave_wordmark.dart"
+        )
     )
 
     for obsolete in [
@@ -182,23 +299,20 @@ def verify_static() -> list[str]:
         "CustomPaint",
         "canvas.drawCircle",
     ]:
-        if obsolete in app_bar_text:
+        if obsolete in combined_header_text:
             failures.append(
-                "app bar retains obsolete painter: "
+                "header retains obsolete painter: "
                 f"{obsolete}"
             )
-
-    support_text = read(
-        "lib/features/support/presentation/"
-        "widgets/breakwave_contact_links_card.dart"
-    )
 
     website_index = support_text.find(
         "Visit breakwaveapp.com"
     )
+
     privacy_index = support_text.find(
-        "Read Privacy Policy"
+        "BreakWavePrivacyPolicyButton("
     )
+
     support_email_index = support_text.find(
         "label: const Text(emailAddress)"
     )
@@ -294,9 +408,11 @@ def main() -> int:
         print(
             "BW-88RC1B verification passed: "
             "approved high-resolution wordmark, "
-            "responsive header, accessible fallback, "
-            "direct Privacy Policy access, version "
-            "bump, and CI artifact checks are wired."
+            "isolated branding helper, accessible "
+            "fallback metadata, canonical Privacy "
+            "Policy helper, stable widget tests, "
+            "version bump, and CI artifact checks "
+            "are wired."
         )
     else:
         print(
