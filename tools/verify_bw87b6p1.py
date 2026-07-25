@@ -1,8 +1,13 @@
 from pathlib import Path
 import sys
 
+
 feature_path = Path(
     "lib/core/access/breakwave_feature.dart"
+)
+
+access_class_path = Path(
+    "lib/core/access/breakwave_access_class.dart"
 )
 
 policy_path = Path(
@@ -19,6 +24,7 @@ contract_path = Path(
 
 for path in [
     feature_path,
+    access_class_path,
     policy_path,
     test_path,
     contract_path,
@@ -30,6 +36,10 @@ for path in [
         sys.exit(1)
 
 feature = feature_path.read_text(
+    encoding="utf-8"
+)
+
+access_class = access_class_path.read_text(
     encoding="utf-8"
 )
 
@@ -45,22 +55,31 @@ contract = contract_path.read_text(
     encoding="utf-8"
 )
 
-# Validate the human-readable Markdown wording rather
-# than failing because a product name uses code styling.
+# Validate human-readable Markdown wording rather than
+# failing because a product name uses code styling.
 semantic_contract = contract.replace("`", "")
 
 for needle in [
-    "enum BreakWaveAccessTier",
     "enum BreakWaveFeature",
     "rescueNow",
+    "rescueActions",
+    "onboarding",
     "basicLogging",
     "privacySettings",
-    "supportResources",
-    "recoveryInsights",
-    "personalRecoveryPlan",
+    "privacyPolicy",
+    "emergencyHelp",
+    "humanSupportActions",
+    "basicSecularSupport",
+    "basicChristianSupport",
+    "personalDataControl",
+    "basicRecoverySnapshot",
+    "advancedRecoveryInsights",
+    "starterRecoveryPlan",
+    "savedPersonalRecoveryPlan",
     "guidedRoutines",
     "christianJourneys",
-    "recoveryReports",
+    "enhancedRecoveryReports",
+    "extendedChristianDepth",
 ]:
     if needle not in feature:
         print(
@@ -70,15 +89,44 @@ for needle in [
         sys.exit(1)
 
 for needle in [
-    "protectedFreeCore",
+    "enum BreakWaveAccessTier",
+    "enum BreakWaveAccessClass",
+    "BreakWaveAccessTier.free",
+    "BreakWaveAccessTier.plus",
+    "BreakWaveAccessClass.neverPaywalled",
+    "BreakWaveAccessClass.protectedFreeCore",
+    "BreakWaveAccessClass.freeSupport",
+    "BreakWaveAccessClass.plusCandidate",
+]:
+    if needle not in access_class:
+        print(
+            "FAIL BW-87B6P1 access classification "
+            f"missing: {needle}"
+        )
+        sys.exit(1)
+
+for needle in [
+    "class BreakWaveAccessPolicy",
     "BreakWaveFeature.rescueNow",
+    "BreakWaveFeature.rescueActions",
+    "BreakWaveFeature.onboarding",
     "BreakWaveFeature.basicLogging",
     "BreakWaveFeature.logHistory",
     "BreakWaveFeature.privacySettings",
-    "BreakWaveFeature.supportResources",
-    "BreakWaveAccessTier.free",
-    "BreakWaveAccessTier.plus",
+    "BreakWaveFeature.privacyPolicy",
+    "BreakWaveFeature.emergencyHelp",
+    "BreakWaveFeature.humanSupportActions",
+    "BreakWaveFeature.basicSecularSupport",
+    "BreakWaveFeature.basicChristianSupport",
+    "BreakWaveFeature.personalDataControl",
+    "BreakWaveAccessClass.neverPaywalled",
+    "BreakWaveAccessClass.protectedFreeCore",
+    "BreakWaveAccessClass.freeSupport",
+    "BreakWaveAccessClass.plusCandidate",
+    "accessClassFor",
+    "minimumTierFor",
     "required bool isPlusUnlocked",
+    "plusCandidates",
 ]:
     if needle not in policy:
         print(
@@ -88,10 +136,15 @@ for needle in [
         sys.exit(1)
 
 for needle in [
-    "every feature is classified exactly once",
-    "protected recovery core always remains free",
-    "Rescue remains available without Plus",
-    "Plus tools require a verified entitlement",
+    "every feature has exactly one classification",
+    "required protections are explicitly never paywalled",
+    "Rescue screen and Rescue actions are separately protected",
+    "protected Free core remains available without Plus",
+    "Free support remains available without Plus",
+    "starter plan is Free and saved deeper plan is Plus",
+    "personal-data control is Free and reports are Plus",
+    "basic Christian support is Free and depth is Plus",
+    "approved Plus candidates require entitlement",
 ]:
     if needle not in tests:
         print(
@@ -115,14 +168,22 @@ for needle in [
         )
         sys.exit(1)
 
+combined = "\n".join(
+    [
+        feature,
+        access_class,
+        policy,
+        tests,
+        contract,
+    ]
+)
+
 for forbidden in [
     "in_app_purchase",
     "purchaseStream",
     "buyNonConsumable",
     "buyConsumable",
 ]:
-    combined = feature + policy + tests + contract
-
     if forbidden in combined:
         print(
             "FAIL BW-87B6P1 prematurely adds "
@@ -131,6 +192,6 @@ for forbidden in [
         sys.exit(1)
 
 print(
-    "PASS: BW-87B6P1 Free-versus-Plus "
+    "PASS: BW-87B6P1 modular Free-versus-Plus "
     "product and safety contract verified."
 )
