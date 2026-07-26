@@ -435,7 +435,7 @@ class _LogScreenState extends State<LogScreen> {
 
       setState(() {
         _savedEntryCount = entries.length;
-        _recentEntries = entries.take(5).toList();
+        _recentEntries = _visibleEntries(entries);
         _clearDraft();
           _recentlyUpdatedEntryId = editingId;
         _lastSaveMessage = saveMessage;
