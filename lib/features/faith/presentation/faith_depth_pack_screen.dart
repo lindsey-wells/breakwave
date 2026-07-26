@@ -4,12 +4,14 @@
 // File: faith_depth_pack_screen.dart
 // Purpose: BW-26 faith depth pack v1.
 // Notes: Premium Christian depth screen for BreakWave Plus.
+// Notes: BW-88RC1D delegates feature access to the central service.
 // ------------------------------------------------------------
 
 import 'package:flutter/material.dart';
 
-import '../../../core/premium/premium_state.dart';
-import '../../../core/premium/premium_state_store.dart';
+import '../../../core/access/breakwave_access_decision.dart';
+import '../../../core/access/breakwave_access_service.dart';
+import '../../../core/access/breakwave_feature.dart';
 import '../../../core/recovery/recovery_mode.dart';
 import '../../../core/recovery/recovery_mode_store.dart';
 import '../../premium/presentation/breakwave_plus_screen.dart';
@@ -17,7 +19,13 @@ import '../domain/faith_depth_content.dart';
 import '../domain/faith_depth_pack.dart';
 
 class FaithDepthPackScreen extends StatefulWidget {
-  const FaithDepthPackScreen({super.key});
+  const FaithDepthPackScreen({
+    super.key,
+    this.accessService =
+        BreakWaveAccessService.localTesting,
+  });
+
+  final BreakWaveAccessService accessService;
 
   @override
   State<FaithDepthPackScreen> createState() => _FaithDepthPackScreenState();
@@ -25,35 +33,44 @@ class FaithDepthPackScreen extends StatefulWidget {
 
 class _FaithDepthPackScreenState extends State<FaithDepthPackScreen> {
   bool _loading = true;
-  bool _isPlusUnlocked = false;
+  bool _hasFeatureAccess = false;
   RecoveryMode _mode = RecoveryMode.secular;
 
   @override
   void initState() {
     super.initState();
-    PremiumStateStore.changes.addListener(_handlePremiumChange);
+    widget.accessService.changes.addListener(
+      _handleEntitlementChange,
+    );
     _load();
   }
 
   @override
   void dispose() {
-    PremiumStateStore.changes.removeListener(_handlePremiumChange);
+    widget.accessService.changes.removeListener(
+      _handleEntitlementChange,
+    );
     super.dispose();
   }
 
-  void _handlePremiumChange() {
+  void _handleEntitlementChange() {
     _load();
   }
 
   Future<void> _load() async {
-    final PremiumState premium = await PremiumStateStore.load();
+    final BreakWaveAccessDecision decision =
+        await widget.accessService.decisionFor(
+      BreakWaveFeature.extendedChristianDepth,
+    );
+
     final RecoveryMode mode =
-        await RecoveryModeStore.loadMode() ?? RecoveryMode.secular;
+        await RecoveryModeStore.loadMode() ??
+            RecoveryMode.secular;
 
     if (!mounted) return;
 
     setState(() {
-      _isPlusUnlocked = premium.isPlusUnlocked;
+      _hasFeatureAccess = decision.isAvailable;
       _mode = mode;
       _loading = false;
     });
@@ -109,7 +126,7 @@ class _FaithDepthPackScreenState extends State<FaithDepthPackScreen> {
                     ),
                   ),
                   const SizedBox(height: 16),
-                  if (!_isPlusUnlocked)
+                  if (!_hasFeatureAccess)
                     Container(
                       padding: const EdgeInsets.all(18),
                       decoration: BoxDecoration(

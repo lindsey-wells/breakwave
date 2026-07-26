@@ -2,61 +2,78 @@
 // Cube23 Collaboration Header
 // Project: BreakWave
 // File: premium_gate_tile.dart
-// Purpose: BW-25 premium gate helper.
-// Notes: Simple tile that routes locked depth features into BreakWave Plus.
+// Purpose: Feature-aware BreakWave Plus gate helper.
+// Notes: Presentation delegates access decisions to the
+//        centralized BreakWaveAccessService.
 // ------------------------------------------------------------
 
 import 'package:flutter/material.dart';
 
-import '../../../core/premium/premium_state.dart';
-import '../../../core/premium/premium_state_store.dart';
+import '../../../core/access/breakwave_access_decision.dart';
+import '../../../core/access/breakwave_access_service.dart';
+import '../../../core/access/breakwave_feature.dart';
 import 'breakwave_plus_screen.dart';
 
 class PremiumGateTile extends StatefulWidget {
   const PremiumGateTile({
     super.key,
+    required this.feature,
     required this.title,
     required this.description,
     this.unlockedText = 'Available in BreakWave Plus',
     this.onUnlockedTap,
+    this.accessService =
+        BreakWaveAccessService.localTesting,
   });
 
+  final BreakWaveFeature feature;
   final String title;
   final String description;
   final String unlockedText;
   final VoidCallback? onUnlockedTap;
+  final BreakWaveAccessService accessService;
 
   @override
-  State<PremiumGateTile> createState() => _PremiumGateTileState();
+  State<PremiumGateTile> createState() =>
+      _PremiumGateTileState();
 }
 
-class _PremiumGateTileState extends State<PremiumGateTile> {
+class _PremiumGateTileState
+    extends State<PremiumGateTile> {
   bool _loading = true;
-  bool _isUnlocked = false;
+  BreakWaveAccessDecision? _decision;
 
   @override
   void initState() {
     super.initState();
-    PremiumStateStore.changes.addListener(_handleStoreChange);
+    widget.accessService.changes.addListener(
+      _handleEntitlementChange,
+    );
     _load();
   }
 
   @override
   void dispose() {
-    PremiumStateStore.changes.removeListener(_handleStoreChange);
+    widget.accessService.changes.removeListener(
+      _handleEntitlementChange,
+    );
     super.dispose();
   }
 
-  void _handleStoreChange() {
+  void _handleEntitlementChange() {
     _load();
   }
 
   Future<void> _load() async {
-    final PremiumState state = await PremiumStateStore.load();
+    final BreakWaveAccessDecision decision =
+        await widget.accessService.decisionFor(
+      widget.feature,
+    );
+
     if (!mounted) return;
 
     setState(() {
-      _isUnlocked = state.isPlusUnlocked;
+      _decision = decision;
       _loading = false;
     });
   }
@@ -64,7 +81,7 @@ class _PremiumGateTileState extends State<PremiumGateTile> {
   Future<void> _handleTap() async {
     if (_loading) return;
 
-    if (_isUnlocked) {
+    if (_decision?.isAvailable == true) {
       widget.onUnlockedTap?.call();
       return;
     }
@@ -82,7 +99,8 @@ class _PremiumGateTileState extends State<PremiumGateTile> {
   @override
   Widget build(BuildContext context) {
     final ThemeData theme = Theme.of(context);
-    final ColorScheme colorScheme = theme.colorScheme;
+    final ColorScheme colorScheme =
+        theme.colorScheme;
 
     return InkWell(
       borderRadius: BorderRadius.circular(20),
@@ -90,18 +108,26 @@ class _PremiumGateTileState extends State<PremiumGateTile> {
       child: Ink(
         padding: const EdgeInsets.all(18),
         decoration: BoxDecoration(
-          color: colorScheme.surfaceContainerHighest.withOpacity(0.45),
+          color: colorScheme
+              .surfaceContainerHighest
+              .withOpacity(0.45),
           borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: colorScheme.outlineVariant),
+          border: Border.all(
+            color: colorScheme.outlineVariant,
+          ),
         ),
         child: _loading
-            ? const Center(child: CircularProgressIndicator())
+            ? const Center(
+                child: CircularProgressIndicator(),
+              )
             : Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+                crossAxisAlignment:
+                    CrossAxisAlignment.start,
                 children: <Widget>[
                   Text(
                     widget.title,
-                    style: theme.textTheme.titleMedium?.copyWith(
+                    style:
+                        theme.textTheme.titleMedium?.copyWith(
                       fontWeight: FontWeight.w700,
                     ),
                   ),
@@ -112,7 +138,9 @@ class _PremiumGateTileState extends State<PremiumGateTile> {
                   ),
                   const SizedBox(height: 10),
                   Text(
-                    _isUnlocked ? 'Unlocked' : widget.unlockedText,
+                    _decision?.isAvailable == true
+                        ? 'Unlocked'
+                        : widget.unlockedText,
                     style: theme.textTheme.bodySmall,
                   ),
                 ],

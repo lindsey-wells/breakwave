@@ -88,9 +88,13 @@ A Plus gate must:
 `PremiumStateStore` is a local testing scaffold. It is not a production
 billing authority.
 
-BW-87B7 will place an entitlement service between presentation code and
-Google Play Billing. The verified entitlement service will become the
-only production source of Plus access.
+BW-88RC1D places `BreakWaveAccessService` between presentation code
+and a replaceable entitlement source. The current local adapter reads
+`PremiumStateStore` only for testing-build compatibility.
+
+BW-87B7 will replace that local adapter with the verified production
+entitlement source. Presentation code must not read billing or local
+premium state directly.
 
 No billing dependency, purchase button, trial claim, price, or automatic
 entitlement change is introduced by BW-87B6P1.
