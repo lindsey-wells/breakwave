@@ -352,3 +352,20 @@ The following remain deferred:
 
 Current official Google Play Billing and Android Publisher documentation
 must be checked again when implementation begins.
+
+## Audit D lifecycle decision
+
+BW-88RC1G defines the exact state, restoration, failure, and offline
+behavior in BW_88_AUDIT_D_SUBSCRIPTION_LIFECYCLE_MATRIX.md.
+
+The lifecycle contract grants Plus during Active, Grace Period, and a
+canceled-but-unexpired paid term. It suspends Plus during an effective
+Pause or Account Hold and revokes Plus after Expiration, Revocation, or
+a verified voided purchase.
+
+A signed Active or canceled-but-unexpired snapshot may authorize offline
+Plus for at most 72 hours and never beyond verified expiry. A signed
+Grace Period snapshot may authorize offline Plus for at most 24 hours.
+
+A first-time grant always requires online verification. Billing messages
+must never block or appear inside Rescue.

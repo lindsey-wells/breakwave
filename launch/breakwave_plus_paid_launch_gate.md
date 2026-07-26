@@ -111,3 +111,26 @@ Before paid launch:
 
 The approved design is documented in
 docs/BW_88_AUDIT_C_BILLING_ARCHITECTURE_DECISION.md.
+
+### 9. Subscription lifecycle readiness
+
+Before paid launch:
+
+- Active, Grace Period, Canceled, Paused, Account Hold, Expired,
+  Revoked, Pending, and unknown states must follow the Audit D matrix
+- Pending purchases must never grant Plus
+- A pending plan change must preserve the verified old entitlement
+- Canceled subscriptions must retain access only through verified expiry
+- Effective pauses and account hold must suspend Plus
+- Expiration and revocation must remove Plus
+- Restore Purchases must report success only after verification
+- Active offline access must stop after its 72-hour authorization limit
+- Grace Period offline access must stop after its 24-hour limit
+- Clock rollback must not extend offline access
+- Duplicate and out-of-order RTDN must be safe
+- Billing status must refresh without blocking app launch or Rescue
+- Every state must preserve Free and never-paywalled features
+- Audit E must test every lifecycle and failure row
+
+The approved lifecycle matrix is documented in
+docs/BW_88_AUDIT_D_SUBSCRIPTION_LIFECYCLE_MATRIX.md.
