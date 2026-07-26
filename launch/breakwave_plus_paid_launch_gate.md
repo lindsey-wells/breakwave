@@ -90,3 +90,24 @@ Before billing is enabled:
 A Plus subscriber should receive value they can return to weekly.
 
 Static copy, placeholder gates, future-feature promises, or a small collection of reading cards are not sufficient grounds for charging a subscription.
+
+### 8. Verified billing architecture
+
+Before paid launch:
+
+- The Android client must not be the production entitlement authority
+- Purchase tokens must be verified through a minimal secure backend
+- Initial purchases must be acknowledged only after verification and
+  entitlement recording
+- Pending purchases must not grant Plus
+- RTDN must trigger an authoritative Google Play API refresh
+- RTDN processing must be idempotent
+- Restore Purchases must re-verify current Play purchases
+- A signed entitlement snapshot must replace local premium authority
+- Raw purchase tokens and backend credentials must not enter app logs
+- No recovery data may enter billing infrastructure
+- Free and never-paywalled features must survive every billing failure
+- Audit D lifecycle rules and Audit E test coverage must be complete
+
+The approved design is documented in
+docs/BW_88_AUDIT_C_BILLING_ARCHITECTURE_DECISION.md.

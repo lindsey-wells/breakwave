@@ -98,3 +98,21 @@ premium state directly.
 
 No billing dependency, purchase button, trial claim, price, or automatic
 entitlement change is introduced by BW-87B6P1.
+
+## Audit C production billing decision
+
+BW-88RC1F selects a privacy-first minimal-backend architecture.
+
+The Android client may launch Google Play purchase flows, but it must not
+become the production billing authority. Purchase verification, initial
+acknowledgement, lifecycle synchronization, and entitlement issuance
+belong to the minimal verification backend defined in
+BW_88_AUDIT_C_BILLING_ARCHITECTURE_DECISION.md.
+
+PremiumStateStore remains test-build compatibility only and must be
+replaced by a production BreakWaveEntitlementSource backed by a
+verified, signed entitlement snapshot.
+
+No recovery data may enter billing or entitlement infrastructure.
+
+Billing failure must never become recovery failure.
