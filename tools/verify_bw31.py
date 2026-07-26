@@ -16,7 +16,8 @@ checks = [
     ]),
     ("lib/features/faith/presentation/faith_depth_pack_screen.dart", [
         "grace-forward Christian reflection",
-        "deeper transformation layer inside BreakWave Plus",
+        "Core Rescue and basic Christian support stay free.",
+        "Purchasing is not available yet.",
         "Switch BreakWave to the Christian recovery path to use the full content as written.",
     ]),
     ("lib/features/learn/presentation/educate_me_screen.dart", [

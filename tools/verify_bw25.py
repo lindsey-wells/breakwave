@@ -28,8 +28,10 @@ checks = [
     ("lib/features/premium/presentation/premium_gate_tile.dart", [
         "class PremiumGateTile",
         "BreakWavePlusScreen",
-        "Unlocked",
-        "Available in BreakWave Plus",
+        "Preview available",
+        "Planned for BreakWave Plus",
+        "availableText",
+        "unavailableText",
     ]),
 ]
 

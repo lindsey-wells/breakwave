@@ -5,6 +5,8 @@
 // Purpose: Feature-aware BreakWave Plus gate helper.
 // Notes: Presentation delegates access decisions to the
 //        centralized BreakWaveAccessService.
+// Notes: Pre-billing states describe previews and future plans;
+//        they never imply that purchasing is operational.
 // ------------------------------------------------------------
 
 import 'package:flutter/material.dart';
@@ -20,7 +22,8 @@ class PremiumGateTile extends StatefulWidget {
     required this.feature,
     required this.title,
     required this.description,
-    this.unlockedText = 'Available in BreakWave Plus',
+    this.availableText = 'Preview available',
+    this.unavailableText = 'Planned for BreakWave Plus',
     this.onUnlockedTap,
     this.accessService =
         BreakWaveAccessService.localTesting,
@@ -29,7 +32,8 @@ class PremiumGateTile extends StatefulWidget {
   final BreakWaveFeature feature;
   final String title;
   final String description;
-  final String unlockedText;
+  final String availableText;
+  final String unavailableText;
   final VoidCallback? onUnlockedTap;
   final BreakWaveAccessService accessService;
 
@@ -139,8 +143,8 @@ class _PremiumGateTileState
                   const SizedBox(height: 10),
                   Text(
                     _decision?.isAvailable == true
-                        ? 'Unlocked'
-                        : widget.unlockedText,
+                        ? widget.availableText
+                        : widget.unavailableText,
                     style: theme.textTheme.bodySmall,
                   ),
                 ],

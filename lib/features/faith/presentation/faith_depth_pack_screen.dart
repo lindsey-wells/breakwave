@@ -5,6 +5,7 @@
 // Purpose: BW-26 faith depth pack v1.
 // Notes: Premium Christian depth screen for BreakWave Plus.
 // Notes: BW-88RC1D delegates feature access to the central service.
+// Notes: BW-88RC1E uses honest pre-billing preview language.
 // ------------------------------------------------------------
 
 import 'package:flutter/material.dart';
@@ -138,21 +139,21 @@ class _FaithDepthPackScreenState extends State<FaithDepthPackScreen> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: <Widget>[
                           Text(
-                            'Locked in BreakWave Plus',
+                            'Planned for BreakWave Plus',
                             style: theme.textTheme.titleMedium?.copyWith(
                               fontWeight: FontWeight.w700,
                             ),
                           ),
                           const SizedBox(height: 10),
                           const Text(
-                            'Core rescue stays free. This pack belongs to the deeper transformation layer inside BreakWave Plus.',
+                            'Core Rescue and basic Christian support stay free. This extended depth pack is planned for BreakWave Plus. Purchasing is not available yet.',
                           ),
                           const SizedBox(height: 16),
                           FilledButton(
                             onPressed: _openPlus,
                             child: const Padding(
                               padding: EdgeInsets.symmetric(vertical: 14),
-                              child: Text('Open BreakWave Plus'),
+                              child: Text('Review BreakWave Plus'),
                             ),
                           ),
                         ],

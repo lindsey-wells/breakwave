@@ -12,6 +12,7 @@
 // Notes: BW-87B5B2 launches the Christian journey library from Plus.
 // Notes: BW-87B5C connects Christian journey actions to Rescue and the personal plan.
 // Notes: BW-87B6B1 launches the privacy-first recovery report builder.
+// Notes: BW-88RC1E removes stale pricing structure and hardens pre-billing language.
 // ------------------------------------------------------------
 
 import 'package:flutter/material.dart';
@@ -317,7 +318,7 @@ class BreakWavePlusScreen extends StatelessWidget {
                   ),
                   SizedBox(height: 10),
                   Text(
-                    'Monthly and annual plans will include the same core recovery features. Annual pricing will be a commitment discount, not a requirement for better recovery tools.',
+                    'Plan structure and pricing will be finalized only after billing architecture, store configuration, and testing are complete. If monthly and annual plans are both offered, they should include the same core recovery features.',
                   ),
                 ],
               ),
@@ -428,44 +429,6 @@ class _FeaturePillar extends StatelessWidget {
           Text(body),
         ],
       ),
-    );
-  }
-}
-
-class _PlanRow extends StatelessWidget {
-  const _PlanRow({
-    required this.title,
-    required this.price,
-    required this.note,
-  });
-
-  final String title;
-  final String price;
-  final String note;
-
-  @override
-  Widget build(BuildContext context) {
-    final ThemeData theme = Theme.of(context);
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: <Widget>[
-        Text(
-          title,
-          style: theme.textTheme.titleMedium?.copyWith(
-            fontWeight: FontWeight.w800,
-          ),
-        ),
-        const SizedBox(height: 4),
-        Text(
-          price,
-          style: theme.textTheme.titleLarge?.copyWith(
-            fontWeight: FontWeight.w800,
-          ),
-        ),
-        const SizedBox(height: 4),
-        Text(note),
-      ],
     );
   }
 }

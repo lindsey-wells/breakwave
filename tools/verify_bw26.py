@@ -19,7 +19,9 @@ checks = [
     ("lib/features/faith/presentation/faith_depth_pack_screen.dart", [
         "class FaithDepthPackScreen",
         "BreakWave Plus Christian depth",
-        "Locked in BreakWave Plus",
+        "Planned for BreakWave Plus",
+        "Purchasing is not available yet.",
+        "Review BreakWave Plus",
         "Christian mode required",
         "BreakWavePlusScreen",
         "RecoveryMode.christian",
