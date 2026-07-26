@@ -596,3 +596,23 @@ relevant work package:
 - https://developer.android.com/google/play/billing/test
 - https://developers.google.com/android-publisher/api-ref/rest/v3/purchases.subscriptionsv2
 - https://developers.google.com/android-publisher/api-ref/rest/v3/purchases.subscriptionsv2/get
+
+## BW-88RC1J environment readiness decision
+
+BW-88RC1J selects Google Cloud with separate staging and production
+projects, Cloud Run, regional Firestore in us-east1, Pub/Sub, Secret
+Manager, Cloud KMS asymmetric signing, and GitHub Actions Workload
+Identity Federation.
+
+The confirmed Android package name is com.cube23.breakwave.
+
+Environment architecture is ready for synthetic contract and
+threat-model design.
+
+Cloud provisioning, product decisions, license-tester configuration,
+retention approval, and production permissions remain pending.
+
+The next milestone is BW-88RC1K Billing Contracts and Threat Model.
+
+BW-88RC1K adds no billing dependency, product, price, credential,
+backend deployment, purchase entry, or entitlement change.

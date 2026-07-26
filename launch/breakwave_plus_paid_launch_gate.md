@@ -180,3 +180,31 @@ Before paid launch:
 
 The approved sequencing plan is documented in
 docs/BW_88RC1I_BILLING_IMPLEMENTATION_ENTRY_PLAN.md.
+
+### 12. Billing environment readiness
+
+Before paid launch:
+
+- 24/3CJ LLC must control the Google Cloud and Cloud Billing resources
+- Staging and production must use separate projects and identities
+- Cloud Run and Firestore regions must be confirmed before creation
+- Production RTDN ingress must be owned through the production project
+- Test and production purchase events must remain isolated
+- GitHub deployment must use Workload Identity Federation rather than a
+  stored service-account key
+- Secret Manager and KMS permissions must use least privilege
+- Runtime identities must not use broad Owner or Editor roles
+- The app must receive public verification material only
+- Billing records must exclude all recovery data
+- Raw purchase tokens and credentials must be absent from logs
+- Staging and production budgets and alerts must exist
+- Billing-record retention must be approved
+- Product, base-plan, offer, tester, and pricing decisions must be
+  approved in Google Play Console
+- Pending environment actions must be closed before their dependent work
+  package
+- Environment failure must preserve Free BreakWave and Rescue
+- 24/3CJ LLC must approve production provisioning and paid rollout
+
+The approved readiness register is documented in
+docs/BW_88RC1J_BILLING_ENVIRONMENT_READINESS.md.
