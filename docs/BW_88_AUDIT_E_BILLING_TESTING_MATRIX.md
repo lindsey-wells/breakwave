@@ -410,3 +410,19 @@ Google documentation again when billing code is introduced:
 - https://developer.android.com/google/play/billing/lifecycle/subscriptions
 - https://developer.android.com/google/play/billing/rtdn-reference
 - https://developers.google.com/android-publisher/api-ref/rest/v3/purchases.subscriptionsv2
+
+## Billing implementation entry decision
+
+BW-88RC1I defines the ordered billing implementation entry plan in
+BW_88RC1I_BILLING_IMPLEMENTATION_ENTRY_PLAN.md.
+
+Implementation is divided into ten work packages from planning through
+controlled rollout.
+
+Backend verification, signed entitlement snapshots, Play Billing client
+integration, tester-only transactions, RTDN, Audit E execution, and paid
+launch must remain separable and reversible.
+
+The next milestone is BW-88RC1J Billing Environment Readiness. It adds
+no billing dependency, production billing code, product, price,
+credential, backend deployment, or entitlement change.

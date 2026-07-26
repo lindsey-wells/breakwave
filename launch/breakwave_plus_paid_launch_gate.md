@@ -158,3 +158,25 @@ Before paid launch:
 
 The approved testing contract is documented in
 docs/BW_88_AUDIT_E_BILLING_TESTING_MATRIX.md.
+
+### 11. Billing implementation sequencing
+
+Before paid launch:
+
+- All ten BW-88RC1I implementation-entry gates must be reviewed
+- Work packages WP-00 through WP-09 must remain ordered and evidenced
+- Backend, client adapter, transactions, RTDN, testing, and rollout must
+  remain separable
+- Product and commercial decisions must be approved before identifiers
+  or claims enter production code
+- Staging and production environments must remain separate
+- Purchase entry and entitlement enforcement must be independently
+  controllable
+- Rollback must preserve Free BreakWave, Rescue, and recovery data
+- No credential may enter the application repository
+- No recovery data may enter billing infrastructure
+- Every implementation patch must preserve Audits A through E
+- 24/3CJ LLC must approve paid-release evidence
+
+The approved sequencing plan is documented in
+docs/BW_88RC1I_BILLING_IMPLEMENTATION_ENTRY_PLAN.md.
