@@ -1,0 +1,48 @@
+name: Auto-Agent Shadow CI
+
+on:
+  push:
+    branches:
+      - 'validation/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  PYTHONDONTWRITEBYTECODE: '1'
+
+jobs:
+  shadow-matrix:
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+    steps:
+      - name: Checkout full history
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+      - name: Run derived shadow matrix
+        id: shadow
+        continue-on-error: true
+        run: python3 .auto-agent/runtime/shadow_matrix.py
+      - name: Upload green or red evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: BREAKWAVE_AUTO_AGENT_SHADOW_EVIDENCE
+          path: ${{ runner.temp }}/auto-agent-shadow-results
+          if-no-files-found: error
+          retention-days: 30
+      - name: Enforce final result
+        if: always()
+        run: test -f "$RUNNER_TEMP/auto-agent-shadow-results/PASS"

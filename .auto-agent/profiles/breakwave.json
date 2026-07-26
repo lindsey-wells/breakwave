@@ -1,0 +1,52 @@
+{
+  "android_package": "com.cube23.breakwave",
+  "automatic_tagging": false,
+  "branch": "main",
+  "ci_only_builds": true,
+  "description": "BreakWave Flutter Android, phone-only Termux control, GitHub Actions builds",
+  "forbidden_paths": [
+    ".auto-agent/secrets",
+    ".auto-agent/credentials"
+  ],
+  "forbidden_suffixes": [
+    ".pem",
+    ".key",
+    ".jks",
+    ".p12",
+    ".keystore"
+  ],
+  "local_path": "~/projects/breakwave",
+  "production_workflow": "CI",
+  "profile_id": "breakwave_flutter_android_termux",
+  "repository": "lindsey-wells/breakwave",
+  "required_github_account": "lindsey-wells",
+  "schema_version": 2,
+  "setup_commands": [
+    [
+      "flutter",
+      "pub",
+      "get"
+    ]
+  ],
+  "shadow_workflow": "Auto-Agent Shadow CI",
+  "validation_commands": [
+    [
+      "python3",
+      "tools/verify_bw_auto_agent_v2_install.py"
+    ],
+    [
+      "python3",
+      ".auto-agent/runtime/run_historical_verifiers.py"
+    ],
+    [
+      "flutter",
+      "analyze",
+      "--no-fatal-infos"
+    ],
+    [
+      "flutter",
+      "test"
+    ]
+  ],
+  "visible_command_max_lines": 40
+}

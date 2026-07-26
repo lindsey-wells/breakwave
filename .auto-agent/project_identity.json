@@ -1,0 +1,16 @@
+{
+  "android_package": "com.cube23.breakwave",
+  "branch": "main",
+  "development_partner": "Cube23 LLC",
+  "expected_install_baseline": "0e150544060b9936035c7ff976f08fc62d04d728",
+  "github_account": "lindsey-wells",
+  "local_path": "~/projects/breakwave",
+  "origin_url": "https://github.com/lindsey-wells/breakwave.git",
+  "owner": "24/3CJ LLC",
+  "product_operator": "Don/Sparkles",
+  "project_id": "breakwave",
+  "project_name": "BreakWave",
+  "qa_operator": "SlimNation",
+  "repository": "lindsey-wells/breakwave",
+  "schema_version": 2
+}

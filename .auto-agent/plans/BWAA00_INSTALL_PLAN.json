@@ -1,0 +1,31 @@
+{
+  "approval_policy_file": "APPROVAL_POLICY.json",
+  "authoritative": true,
+  "baseline_commit": "0e150544060b9936035c7ff976f08fc62d04d728",
+  "branch": "main",
+  "identity_file": "PROJECT_IDENTITY.json",
+  "next_plan": "BW-88RC1K Billing Contracts and Threat Model",
+  "no_force_push": true,
+  "no_tag": true,
+  "plan_id": "BREAKWAVE-BWAA00-INSTALL-V2",
+  "project_id": "breakwave",
+  "repository": "lindsey-wells/breakwave",
+  "safety_branch": "safety/before-bwaa00-auto-agent-v2-install",
+  "schema_version": 2,
+  "stage_order": [
+    "BWAA-00"
+  ],
+  "stages": [
+    {
+      "commit_message": "BWAA-00 install Auto-Agent and Shadow CI V2",
+      "number": 0,
+      "purpose": "Install framework only; no BreakWave feature or product change.",
+      "stage_id": "BWAA-00",
+      "title": "Install Auto-Agent and Shadow CI V2"
+    }
+  ],
+  "title": "Install BreakWave Auto-Agent and Shadow CI V2",
+  "validation_branch": "validation/bwaa00-auto-agent-v2-install-v1",
+  "visible_command_max_lines": 40,
+  "workflow_name": "Auto-Agent Shadow CI"
+}

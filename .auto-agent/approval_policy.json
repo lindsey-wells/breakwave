@@ -1,0 +1,13 @@
+{
+  "authorized_approvers": [
+    "Don/Sparkles",
+    "SlimNation",
+    "24/3CJ LLC authorized operator"
+  ],
+  "dual_approval_required": false,
+  "mode": "any_one_authorized_operator",
+  "note": "One authorized BreakWave operator may approve promotion.",
+  "required_approvals": 1,
+  "schema_version": 2,
+  "unauthenticated_third_party_approval_allowed": false
+}
