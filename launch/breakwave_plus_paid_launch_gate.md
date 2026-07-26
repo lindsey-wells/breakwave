@@ -134,3 +134,27 @@ Before paid launch:
 
 The approved lifecycle matrix is documented in
 docs/BW_88_AUDIT_D_SUBSCRIPTION_LIFECYCLE_MATRIX.md.
+
+### 10. Billing test evidence
+
+Before paid launch:
+
+- Every Audit E P0 and P1 test must pass
+- Automated state, precedence, snapshot, privacy, and access tests must
+  run in CI
+- License-tester purchase, Pending, renewal, Grace, Hold, cancellation,
+  pause, expiration, and restore evidence must be complete
+- RTDN delivery, deduplication, ordering, and authoritative refresh must
+  be proven
+- Initial-purchase acknowledgement and retry must be proven
+- Restore Purchases must be verified on the original and another device
+- Active and Grace offline boundaries must be proven
+- Clock rollback must not extend Plus
+- Raw credentials and purchase tokens must be absent from logs
+- Recovery data must be absent from billing payloads and evidence
+- Rescue and protected-Free access must pass in every billing state
+- No P0 or P1 defect may remain open
+- 24/3CJ LLC must approve the release evidence
+
+The approved testing contract is documented in
+docs/BW_88_AUDIT_E_BILLING_TESTING_MATRIX.md.

@@ -381,3 +381,20 @@ documentation again when billing code is introduced:
 - https://developer.android.com/google/play/billing/security
 - https://developer.android.com/google/play/billing/subscriptions
 - https://developers.google.com/android-publisher/api-ref/rest/v3/purchases.subscriptionsv2
+
+## Audit E testing decision
+
+BW-88RC1H defines the mandatory billing acceptance-test contract in
+BW_88_AUDIT_E_BILLING_TESTING_MATRIX.md.
+
+The matrix covers static contracts, deterministic unit tests,
+integration tests with controlled fakes, Google Play license-tester
+testing, Play Billing Lab state transitions, and production-readiness
+rehearsal.
+
+Every P0 and P1 test must pass before paid release. Rescue availability,
+entitlement correctness, acknowledgement, restoration, privacy, and
+recovery-data isolation cannot be waived.
+
+Audit E remains a pre-implementation contract and introduces no billing
+dependency or production billing code.
