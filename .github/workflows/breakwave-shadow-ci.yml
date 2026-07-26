@@ -1,0 +1,91 @@
+name: BreakWave Shadow CI
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
+on:
+  push:
+    branches:
+      - 'validation/bw-mod-*'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: breakwave-shadow-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  shadow-verify:
+    name: Shadow Verify, Analyze, Test, Build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout exact validation commit
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Java
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - name: Prepare Android release signing
+        env:
+          ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+        run: |
+          set -e
+          if [ -z "$ANDROID_KEYSTORE_BASE64" ]; then
+            echo "No signing secrets found; repository fallback remains active."
+            exit 0
+          fi
+          test -n "$ANDROID_KEYSTORE_PASSWORD"
+          test -n "$ANDROID_KEY_ALIAS"
+          test -n "$ANDROID_KEY_PASSWORD"
+          echo "$ANDROID_KEYSTORE_BASE64" |
+            base64 --decode > android/app/upload-keystore.jks
+          cat > android/key.properties <<EOF
+          storePassword=$ANDROID_KEYSTORE_PASSWORD
+          keyPassword=$ANDROID_KEY_PASSWORD
+          keyAlias=$ANDROID_KEY_ALIAS
+          storeFile=upload-keystore.jks
+          EOF
+
+      - name: Run complete Shadow verification
+        run: python3 .github/scripts/run_breakwave_shadow_ci.py
+
+      - name: Upload Shadow evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: bw-mod-01a-shadow-evidence
+          path: shadow_evidence/**
+          if-no-files-found: error
+
+      - name: Upload Shadow APK
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: bw-mod-01a-shadow-apk
+          path: build/app/outputs/flutter-apk/app-release.apk
+          if-no-files-found: ignore
+
+      - name: Upload Shadow AAB
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: bw-mod-01a-shadow-aab
+          path: build/app/outputs/bundle/release/app-release.aab
+          if-no-files-found: ignore
