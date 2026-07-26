@@ -1,0 +1,43 @@
+{
+  "base_commit": "0e150544060b9936035c7ff976f08fc62d04d728",
+  "command_timeout_seconds": 1800,
+  "derived_from_plan": "BWAA00_INSTALL_PLAN.json",
+  "plan_sha256": "cdd28cd87785d504847fd336735282fdc6939410df02b3120fcfc1dcee9dac00",
+  "platform_simulation_commands": [],
+  "project_name": "BreakWave",
+  "schema_version": 2,
+  "setup_commands": [
+    [
+      "flutter",
+      "pub",
+      "get"
+    ]
+  ],
+  "trees": [
+    {
+      "commit": "1077ef366d302e87812a52b4bceee58e35308b62",
+      "final": true,
+      "stage_id": "BWAA-00"
+    }
+  ],
+  "validation_commands": [
+    [
+      "python3",
+      "tools/verify_bw_auto_agent_v2_install.py"
+    ],
+    [
+      "python3",
+      ".auto-agent/runtime/run_historical_verifiers.py"
+    ],
+    [
+      "flutter",
+      "analyze",
+      "--no-fatal-infos"
+    ],
+    [
+      "flutter",
+      "test"
+    ]
+  ],
+  "verifier_commands": []
+}
