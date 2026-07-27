@@ -10,8 +10,6 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 LOCKED = {
-    "lib/features/personal_plan/presentation/personal_recovery_plan_screen.dart":
-        "2331d3e35a4fb19fba135b72b7a9a32a21584dd0b978e04899f4af3e9cd2f330",
     "lib/features/personal_plan/data/personal_recovery_plan_store.dart":
         "ad7bc81f6fbfa7bad62ad331f1f9f5bfba56c59668da088140fb56490958bcd5",
     "lib/features/personal_plan/domain/personal_recovery_plan.dart":

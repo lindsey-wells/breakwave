@@ -20,6 +20,7 @@ import '../../log/data/log_repository.dart';
 import '../data/personal_recovery_plan_store.dart';
 import '../domain/personal_recovery_plan.dart';
 import '../domain/personal_recovery_plan_prefill.dart';
+import 'widgets/personal_recovery_plan_widgets.dart';
 
 class PersonalRecoveryPlanScreen extends StatefulWidget {
   const PersonalRecoveryPlanScreen({super.key});
@@ -570,11 +571,11 @@ class _PersonalRecoveryPlanScreenState
       return ListView(
         padding: const EdgeInsets.all(20),
         children: <Widget>[
-          _PlanCard(
+          PersonalPlanCard(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
-                const _SectionTitle('Plan unavailable'),
+                const PersonalPlanSectionTitle('Plan unavailable'),
                 const SizedBox(height: 10),
                 Text(_loadError!),
                 const SizedBox(height: 16),
@@ -598,11 +599,11 @@ class _PersonalRecoveryPlanScreenState
     return ListView(
       padding: const EdgeInsets.fromLTRB(20, 20, 20, 120),
       children: <Widget>[
-        _PlanCard(
+        PersonalPlanCard(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
-              const _SectionTitle(
+              const PersonalPlanSectionTitle(
                 'Build a plan you can actually use',
               ),
               const SizedBox(height: 10),
@@ -629,11 +630,11 @@ class _PersonalRecoveryPlanScreenState
           ),
         ),
         const SizedBox(height: 16),
-        _PlanCard(
+        PersonalPlanCard(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
-              const _SectionTitle(
+              const PersonalPlanSectionTitle(
                 'Use my current BreakWave choices',
               ),
               const SizedBox(height: 8),
@@ -666,11 +667,11 @@ class _PersonalRecoveryPlanScreenState
           ),
         ),
         const SizedBox(height: 16),
-        _PlanCard(
+        PersonalPlanCard(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
-              const _SectionTitle('Why I am changing'),
+              const PersonalPlanSectionTitle('Why I am changing'),
               const SizedBox(height: 10),
               TextField(
                 controller: _primaryReasonController,
@@ -683,7 +684,7 @@ class _PersonalRecoveryPlanScreenState
                     TextCapitalization.sentences,
               ),
               const SizedBox(height: 14),
-              _ListPlanField(
+              PersonalPlanListField(
                 title: 'Reasons that matter',
                 helper:
                     'Choose suggestions or enter one reason per line.',
@@ -699,13 +700,13 @@ class _PersonalRecoveryPlanScreenState
           ),
         ),
         const SizedBox(height: 16),
-        _PlanCard(
+        PersonalPlanCard(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
-              const _SectionTitle('What I need to watch'),
+              const PersonalPlanSectionTitle('What I need to watch'),
               const SizedBox(height: 12),
-              _ListPlanField(
+              PersonalPlanListField(
                 title: 'Known triggers',
                 helper:
                     'Choose suggestions or enter one trigger per line.',
@@ -718,7 +719,7 @@ class _PersonalRecoveryPlanScreenState
                 ),
               ),
               const SizedBox(height: 18),
-              _ListPlanField(
+              PersonalPlanListField(
                 title: 'Danger windows',
                 helper:
                     'Times or situations when extra protection helps.',
@@ -734,13 +735,13 @@ class _PersonalRecoveryPlanScreenState
           ),
         ),
         const SizedBox(height: 16),
-        _PlanCard(
+        PersonalPlanCard(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
-              const _SectionTitle('My first moves'),
+              const PersonalPlanSectionTitle('My first moves'),
               const SizedBox(height: 10),
-              _ListPlanField(
+              PersonalPlanListField(
                 title: 'Redirect actions',
                 helper:
                     'Choose actions you can take before momentum builds.',
@@ -756,11 +757,11 @@ class _PersonalRecoveryPlanScreenState
           ),
         ),
         const SizedBox(height: 16),
-        _PlanCard(
+        PersonalPlanCard(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
-              const _SectionTitle(
+              const PersonalPlanSectionTitle(
                 'Support and boundaries',
               ),
               const SizedBox(height: 10),
@@ -805,11 +806,11 @@ class _PersonalRecoveryPlanScreenState
           ),
         ),
         const SizedBox(height: 16),
-        _PlanCard(
+        PersonalPlanCard(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
-              const _SectionTitle('After a slip'),
+              const PersonalPlanSectionTitle('After a slip'),
               const SizedBox(height: 10),
               const Text(
                 'Write the next honest steps—not a punishment.',
@@ -832,12 +833,12 @@ class _PersonalRecoveryPlanScreenState
         ),
         if (_mode == RecoveryMode.christian) ...<Widget>[
           const SizedBox(height: 16),
-          _PlanCard(
+          PersonalPlanCard(
             child: Column(
               crossAxisAlignment:
                   CrossAxisAlignment.start,
               children: <Widget>[
-                const _SectionTitle('Faith support'),
+                const PersonalPlanSectionTitle('Faith support'),
                 const SizedBox(height: 10),
                 const Text(
                   'Add prayer, Scripture, or a faithful next '
@@ -862,7 +863,7 @@ class _PersonalRecoveryPlanScreenState
         ],
         if (_statusMessage != null) ...<Widget>[
           const SizedBox(height: 16),
-          _PlanCard(
+          PersonalPlanCard(
             child: Text(
               _statusMessage!,
               style: Theme.of(context)
@@ -897,139 +898,6 @@ class _PersonalRecoveryPlanScreenState
           ),
         ),
       ],
-    );
-  }
-}
-
-class _ListPlanField extends StatelessWidget {
-  const _ListPlanField({
-    required this.title,
-    required this.helper,
-    required this.controller,
-    required this.suggestions,
-    required this.onToggleSuggestion,
-  });
-
-  final String title;
-  final String helper;
-  final TextEditingController controller;
-  final List<String> suggestions;
-  final ValueChanged<String> onToggleSuggestion;
-
-  List<String> get _selected {
-    return controller.text
-        .split(RegExp(r'[\n,]'))
-        .map((String value) => value.trim())
-        .where((String value) => value.isNotEmpty)
-        .toList();
-  }
-
-  bool _contains(String suggestion) {
-    return _selected.any(
-      (String value) =>
-          value.toLowerCase() ==
-          suggestion.toLowerCase(),
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return AnimatedBuilder(
-      animation: controller,
-      builder: (
-        BuildContext context,
-        Widget? child,
-      ) {
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            Text(
-              title,
-              style: Theme.of(context)
-                  .textTheme
-                  .titleMedium
-                  ?.copyWith(
-                    fontWeight: FontWeight.w800,
-                  ),
-            ),
-            const SizedBox(height: 6),
-            Text(helper),
-            const SizedBox(height: 10),
-            Wrap(
-              spacing: 8,
-              runSpacing: 8,
-              children: suggestions.map(
-                (String suggestion) {
-                  return FilterChip(
-                    label: Text(suggestion),
-                    selected: _contains(suggestion),
-                    onSelected: (_) =>
-                        onToggleSuggestion(suggestion),
-                  );
-                },
-              ).toList(),
-            ),
-            const SizedBox(height: 12),
-            TextField(
-              controller: controller,
-              decoration: const InputDecoration(
-                labelText: 'Your list',
-                hintText: 'One item per line',
-              ),
-              minLines: 2,
-              maxLines: 6,
-              textCapitalization:
-                  TextCapitalization.sentences,
-            ),
-          ],
-        );
-      },
-    );
-  }
-}
-
-class _SectionTitle extends StatelessWidget {
-  const _SectionTitle(this.text);
-
-  final String text;
-
-  @override
-  Widget build(BuildContext context) {
-    return Text(
-      text,
-      style: Theme.of(context)
-          .textTheme
-          .titleLarge
-          ?.copyWith(
-            fontWeight: FontWeight.w800,
-          ),
-    );
-  }
-}
-
-class _PlanCard extends StatelessWidget {
-  const _PlanCard({
-    required this.child,
-  });
-
-  final Widget child;
-
-  @override
-  Widget build(BuildContext context) {
-    final ColorScheme colorScheme =
-        Theme.of(context).colorScheme;
-
-    return Container(
-      padding: const EdgeInsets.all(18),
-      decoration: BoxDecoration(
-        color: colorScheme.surfaceContainerHighest
-            .withOpacity(0.45),
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(
-          color: colorScheme.outlineVariant,
-        ),
-      ),
-      child: child,
     );
   }
 }
