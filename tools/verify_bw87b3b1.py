@@ -21,6 +21,10 @@ workflow_path = Path(
     "lib/features/personal_plan/application/"
     "personal_recovery_plan_workflow.dart"
 )
+session_path = Path(
+    "lib/features/personal_plan/application/"
+    "personal_recovery_plan_session.dart"
+)
 test_path = Path(
     "test/personal_recovery_plan_refresh_test.dart"
 )
@@ -31,6 +35,7 @@ for path in [
     screen_path,
     body_path,
     workflow_path,
+    session_path,
     test_path,
 ]:
     if not path.exists():
@@ -43,6 +48,7 @@ screen = screen_path.read_text(encoding="utf-8")
 body = body_path.read_text(encoding="utf-8")
 ui = screen + "\n" + body
 workflow = workflow_path.read_text(encoding="utf-8")
+session = session_path.read_text(encoding="utf-8")
 tests = test_path.read_text(encoding="utf-8")
 
 for needle in [
@@ -72,10 +78,10 @@ for needle in [
         sys.exit(1)
 
 for needle in [
-    "_refreshFromBreakWave",
+    "importCurrentChoices",
     "Custom plan work was preserved",
 ]:
-    if needle not in screen:
+    if needle not in session:
         print(
             f"FAIL BW-87B3B1 screen sync missing: {needle}"
         )

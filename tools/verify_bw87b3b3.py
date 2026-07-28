@@ -13,6 +13,14 @@ screen_path = Path(
     "lib/features/personal_plan/presentation/"
     "personal_recovery_plan_screen.dart"
 )
+workflow_path = Path(
+    "lib/features/personal_plan/application/"
+    "personal_recovery_plan_workflow.dart"
+)
+session_path = Path(
+    "lib/features/personal_plan/application/"
+    "personal_recovery_plan_session.dart"
+)
 test_path = Path(
     "test/personal_recovery_plan_refresh_test.dart"
 )
@@ -21,6 +29,8 @@ for path in [
     model_path,
     prefill_path,
     screen_path,
+    workflow_path,
+    session_path,
     test_path,
 ]:
     if not path.exists():
@@ -30,6 +40,8 @@ for path in [
 model = model_path.read_text(encoding="utf-8")
 prefill = prefill_path.read_text(encoding="utf-8")
 screen = screen_path.read_text(encoding="utf-8")
+workflow = workflow_path.read_text(encoding="utf-8")
+session = session_path.read_text(encoding="utf-8")
 tests = test_path.read_text(encoding="utf-8")
 
 for needle in [
@@ -38,9 +50,7 @@ for needle in [
     "this.importSchemaVersion = 0",
 ]:
     if needle not in model:
-        print(
-            f"FAIL BW-87B3B3 schema model missing: {needle}"
-        )
+        print(f"FAIL BW-87B3B3 schema model missing: {needle}")
         sys.exit(1)
 
 for needle in [
@@ -51,22 +61,24 @@ for needle in [
     "importSchemaVersion:",
 ]:
     if needle not in prefill:
-        print(
-            f"FAIL BW-87B3B3 migration missing: {needle}"
-        )
+        print(f"FAIL BW-87B3B3 migration missing: {needle}")
         sys.exit(1)
 
 for needle in [
-    "_importSourceSignature",
-    "_importSourceSignature(refreshed)",
-    "_importSourceSignature(basePlan)",
-    "_importSourceSignature(imported)",
-    "_importSourceSignature(current)",
+    "importSourceSignature",
+    "hasChanges",
 ]:
-    if needle not in screen:
-        print(
-            f"FAIL BW-87B3B3 source detection missing: {needle}"
-        )
+    if needle not in workflow:
+        print(f"FAIL BW-87B3B3 source detection missing: {needle}")
+        sys.exit(1)
+
+for needle in [
+    "sourceUpdateAvailable",
+    "_session.load()",
+    "_session.importCurrentChoices",
+]:
+    if needle not in screen + session:
+        print(f"FAIL BW-87B3B3 session detection missing: {needle}")
         sys.exit(1)
 
 for needle in [
@@ -77,9 +89,7 @@ for needle in [
     "currentImportSchemaVersion",
 ]:
     if needle not in tests:
-        print(
-            f"FAIL BW-87B3B3 regression test missing: {needle}"
-        )
+        print(f"FAIL BW-87B3B3 regression test missing: {needle}")
         sys.exit(1)
 
 print(

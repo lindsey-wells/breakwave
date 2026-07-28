@@ -3,8 +3,7 @@
 // Project: BreakWave
 // File: personal_recovery_plan_screen.dart
 // Purpose: Editable, locally saved personal recovery plan.
-// Notes: BW-87B3B connects existing BreakWave choices into one plan.
-// Notes: BW-87B3B3 detects source changes through imported metadata.
+// Notes: BW-MOD-01F delegates load/import/save orchestration.
 // ------------------------------------------------------------
 
 import 'package:flutter/material.dart';
@@ -13,6 +12,7 @@ import '../../../core/recovery/recovery_mode.dart';
 import '../../../core/recovery/recovery_mode_store.dart';
 import '../../insights/domain/recovery_insights_calculator.dart';
 import '../../log/data/log_repository.dart';
+import '../application/personal_recovery_plan_session.dart';
 import '../application/personal_recovery_plan_workflow.dart';
 import '../data/personal_recovery_plan_store.dart';
 import '../domain/personal_recovery_plan.dart';
@@ -30,15 +30,7 @@ class PersonalRecoveryPlanScreen extends StatefulWidget {
 
 class _PersonalRecoveryPlanScreenState
     extends State<PersonalRecoveryPlanScreen> {
-  final PersonalRecoveryPlanPrefill _prefill =
-      const PersonalRecoveryPlanPrefill();
-  final LogRepository _logRepository =
-      const LogRepository();
-  final RecoveryInsightsCalculator _insightsCalculator =
-      const RecoveryInsightsCalculator();
-
-  late final PersonalRecoveryPlanWorkflow _workflow;
-
+  late final PersonalRecoveryPlanSession _session;
   late final PersonalRecoveryPlanDraftControllers
       _draftControllers;
 
@@ -105,10 +97,20 @@ class _PersonalRecoveryPlanScreenState
   void initState() {
     super.initState();
 
-    _workflow = PersonalRecoveryPlanWorkflow(
-      prefill: _prefill,
-      logRepository: _logRepository,
-      insightsCalculator: _insightsCalculator,
+    final PersonalRecoveryPlanWorkflow workflow =
+        PersonalRecoveryPlanWorkflow(
+      prefill: const PersonalRecoveryPlanPrefill(),
+      logRepository: const LogRepository(),
+      insightsCalculator:
+          const RecoveryInsightsCalculator(),
+    );
+
+    _session = PersonalRecoveryPlanSession(
+      workflow: workflow,
+      loadPlan: PersonalRecoveryPlanStore.load,
+      loadMode: RecoveryModeStore.loadMode,
+      savePlan: PersonalRecoveryPlanStore.save,
+      now: DateTime.now,
     );
 
     _draftControllers =
@@ -135,44 +137,27 @@ class _PersonalRecoveryPlanScreenState
   }
 
   Future<void> _loadPlan() async {
-    try {
-      final PersonalRecoveryPlan? plan =
-          await PersonalRecoveryPlanStore.load();
+    final PersonalRecoveryPlanLoadResult result =
+        await _session.load();
+    if (!mounted) return;
 
-      final RecoveryMode mode =
-          await RecoveryModeStore.loadMode() ??
-              RecoveryMode.secular;
-
-      final PersonalRecoveryPlan basePlan =
-          plan ?? PersonalRecoveryPlan.empty;
-
-      final PersonalRecoveryPlan refreshed =
-          await _refreshFromBreakWave(basePlan);
-
-      if (!mounted) return;
-
-      _mode = mode;
-      _savedPlan = plan;
-      _applyPlan(basePlan, dirty: false);
-
-      setState(() {
-        _sourceUpdateAvailable =
-            _editableSignature(refreshed) !=
-                    _editableSignature(basePlan) ||
-                _importSourceSignature(refreshed) !=
-                    _importSourceSignature(basePlan);
-        _loading = false;
-      });
-    } catch (_) {
-      if (!mounted) return;
-
+    if (!result.succeeded) {
       setState(() {
         _loading = false;
-        _loadError =
-            'BreakWave could not load your saved plan. '
-            'Your other recovery data was not changed.';
+        _loadError = result.errorMessage;
       });
+      return;
     }
+
+    _mode = result.mode;
+    _savedPlan = result.savedPlan;
+    _applyPlan(result.basePlan, dirty: false);
+
+    setState(() {
+      _sourceUpdateAvailable =
+          result.sourceUpdateAvailable;
+      _loading = false;
+    });
   }
 
   void _applyPlan(
@@ -194,23 +179,6 @@ class _PersonalRecoveryPlanScreenState
     return _draftControllers.currentDraft();
   }
 
-  String _editableSignature(PersonalRecoveryPlan plan) {
-    return _workflow.editableSignature(plan);
-  }
-
-  String _importSourceSignature(
-    PersonalRecoveryPlan plan,
-  ) {
-    return _workflow.importSourceSignature(plan);
-  }
-
-  Future<PersonalRecoveryPlan>
-      _refreshFromBreakWave(
-    PersonalRecoveryPlan current,
-  ) {
-    return _workflow.refreshFromBreakWave(current);
-  }
-
   Future<void> _importCurrentChoices() async {
     if (_importing) return;
 
@@ -219,44 +187,23 @@ class _PersonalRecoveryPlanScreenState
       _statusMessage = null;
     });
 
-    try {
-      final PersonalRecoveryPlan current =
-          _currentDraft();
+    final PersonalRecoveryPlanImportResult result =
+        await _session.importCurrentChoices(
+      _currentDraft(),
+    );
+    if (!mounted) return;
 
-      final PersonalRecoveryPlan imported =
-          await _refreshFromBreakWave(current);
-
-      if (!mounted) return;
-
-      final bool changed =
-          _editableSignature(imported) !=
-                  _editableSignature(current) ||
-              _importSourceSignature(imported) !=
-                  _importSourceSignature(current);
-
-      if (changed) {
-        _applyPlan(imported, dirty: true);
-      }
-
-      setState(() {
-        _importing = false;
-        _sourceUpdateAvailable = false;
-        _statusMessage = changed
-            ? 'Current BreakWave choices and recent log patterns were added or refreshed. Custom plan work was preserved. Review the plan, then save.'
-            : 'Your plan already matches the latest saved choices '
-                'and recent log patterns. Custom plan work was '
-                'not replaced.';
-      });
-    } catch (_) {
-      if (!mounted) return;
-
-      setState(() {
-        _importing = false;
-        _statusMessage =
-            'BreakWave could not import your saved choices '
-            'right now. Your plan was not changed.';
-      });
+    if (result.succeeded && result.changed) {
+      _applyPlan(result.plan, dirty: true);
     }
+
+    setState(() {
+      _importing = false;
+      if (result.succeeded) {
+        _sourceUpdateAvailable = false;
+      }
+      _statusMessage = result.statusMessage;
+    });
   }
 
   Future<void> _savePlan() async {
@@ -264,11 +211,10 @@ class _PersonalRecoveryPlanScreenState
 
     final PersonalRecoveryPlan draft = _currentDraft();
 
-    if (!draft.hasAnyContent) {
+    if (!_session.canSave(draft)) {
       setState(() {
         _statusMessage =
-            'Add at least one useful part of your plan '
-            'before saving.';
+            PersonalRecoveryPlanSession.emptyDraftMessage;
       });
       return;
     }
@@ -278,13 +224,13 @@ class _PersonalRecoveryPlanScreenState
       _statusMessage = null;
     });
 
-    try {
+    final PersonalRecoveryPlanSaveResult result =
+        await _session.save(draft);
+    if (!mounted) return;
+
+    if (result.succeeded && result.savedPlan != null) {
       final PersonalRecoveryPlan saved =
-          draft.preparedForSave(DateTime.now());
-
-      await PersonalRecoveryPlanStore.save(saved);
-
-      if (!mounted) return;
+          result.savedPlan!;
 
       setState(() {
         _savedPlan = saved;
@@ -292,19 +238,15 @@ class _PersonalRecoveryPlanScreenState
         _saving = false;
         _dirty = false;
         _sourceUpdateAvailable = false;
-        _statusMessage =
-            'Personal recovery plan saved on this device.';
+        _statusMessage = result.statusMessage;
       });
-    } catch (_) {
-      if (!mounted) return;
-
-      setState(() {
-        _saving = false;
-        _statusMessage =
-            'BreakWave could not save your plan right now. '
-            'Your draft is still on this screen.';
-      });
+      return;
     }
+
+    setState(() {
+      _saving = false;
+      _statusMessage = result.statusMessage;
+    });
   }
 
   Future<bool> _confirmLeave() async {
@@ -381,7 +323,8 @@ class _PersonalRecoveryPlanScreenState
             loading: _loading,
             loadError: _loadError,
             dirty: _dirty,
-            sourceUpdateAvailable: _sourceUpdateAvailable,
+            sourceUpdateAvailable:
+                _sourceUpdateAvailable,
             updatedLabel: _updatedLabel(),
             importing: _importing,
             saving: _saving,
@@ -390,7 +333,8 @@ class _PersonalRecoveryPlanScreenState
             draftControllers: _draftControllers,
             reasonSuggestions: _reasonSuggestions,
             triggerSuggestions: _triggerSuggestions,
-            dangerWindowSuggestions: _dangerWindowSuggestions,
+            dangerWindowSuggestions:
+                _dangerWindowSuggestions,
             redirectSuggestions: _redirectSuggestions,
             statusMessage: _statusMessage,
             onRetry: _retryLoadPlan,
