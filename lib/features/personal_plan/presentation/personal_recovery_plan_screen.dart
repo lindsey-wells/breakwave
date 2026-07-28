@@ -20,6 +20,7 @@ import '../../log/data/log_repository.dart';
 import '../data/personal_recovery_plan_store.dart';
 import '../domain/personal_recovery_plan.dart';
 import '../domain/personal_recovery_plan_prefill.dart';
+import 'personal_recovery_plan_draft_controllers.dart';
 import 'widgets/personal_recovery_plan_widgets.dart';
 
 class PersonalRecoveryPlanScreen extends StatefulWidget {
@@ -39,27 +40,16 @@ class _PersonalRecoveryPlanScreenState
   final RecoveryInsightsCalculator _insightsCalculator =
       const RecoveryInsightsCalculator();
 
-  late final TextEditingController _reasonsController;
-  late final TextEditingController _primaryReasonController;
-  late final TextEditingController _triggersController;
-  late final TextEditingController _dangerWindowsController;
-  late final TextEditingController _redirectActionsController;
-  late final TextEditingController _trustedSupportController;
-  late final TextEditingController _phoneBoundaryController;
-  late final TextEditingController _bedtimeStrategyController;
-  late final TextEditingController _afterSlipResetController;
-  late final TextEditingController _faithSupportController;
+  late final PersonalRecoveryPlanDraftControllers
+      _draftControllers;
 
   PersonalRecoveryPlan? _savedPlan;
-  PersonalRecoveryPlan _draftPlan =
-      PersonalRecoveryPlan.empty;
   RecoveryMode _mode = RecoveryMode.secular;
 
   bool _loading = true;
   bool _saving = false;
   bool _importing = false;
   bool _dirty = false;
-  bool _suppressDirty = false;
   bool _sourceUpdateAvailable = false;
 
   String? _statusMessage;
@@ -112,55 +102,26 @@ class _PersonalRecoveryPlanScreenState
     return suggestions;
   }
 
-  List<TextEditingController> get _controllers =>
-      <TextEditingController>[
-        _reasonsController,
-        _primaryReasonController,
-        _triggersController,
-        _dangerWindowsController,
-        _redirectActionsController,
-        _trustedSupportController,
-        _phoneBoundaryController,
-        _bedtimeStrategyController,
-        _afterSlipResetController,
-        _faithSupportController,
-      ];
-
   @override
   void initState() {
     super.initState();
 
-    _reasonsController = TextEditingController();
-    _primaryReasonController = TextEditingController();
-    _triggersController = TextEditingController();
-    _dangerWindowsController = TextEditingController();
-    _redirectActionsController = TextEditingController();
-    _trustedSupportController = TextEditingController();
-    _phoneBoundaryController = TextEditingController();
-    _bedtimeStrategyController = TextEditingController();
-    _afterSlipResetController = TextEditingController();
-    _faithSupportController = TextEditingController();
-
-    for (final TextEditingController controller in _controllers) {
-      controller.addListener(_handleDraftChanged);
-    }
+    _draftControllers =
+        PersonalRecoveryPlanDraftControllers(
+      onChanged: _handleDraftChanged,
+    );
 
     _loadPlan();
   }
 
   @override
   void dispose() {
-    for (final TextEditingController controller in _controllers) {
-      controller
-        ..removeListener(_handleDraftChanged)
-        ..dispose();
-    }
-
+    _draftControllers.dispose();
     super.dispose();
   }
 
   void _handleDraftChanged() {
-    if (_suppressDirty || !mounted) return;
+    if (!mounted) return;
 
     setState(() {
       _dirty = true;
@@ -213,30 +174,7 @@ class _PersonalRecoveryPlanScreenState
     PersonalRecoveryPlan plan, {
     required bool dirty,
   }) {
-    _suppressDirty = true;
-    _draftPlan = plan;
-
-    _writeLines(_reasonsController, plan.reasons);
-    _primaryReasonController.text = plan.primaryReason;
-    _writeLines(_triggersController, plan.triggers);
-    _writeLines(
-      _dangerWindowsController,
-      plan.dangerWindows,
-    );
-    _writeLines(
-      _redirectActionsController,
-      plan.redirectActions,
-    );
-    _trustedSupportController.text =
-        plan.trustedSupportName;
-    _phoneBoundaryController.text = plan.phoneBoundary;
-    _bedtimeStrategyController.text =
-        plan.bedtimeStrategy;
-    _afterSlipResetController.text =
-        plan.afterSlipReset;
-    _faithSupportController.text = plan.faithSupport;
-
-    _suppressDirty = false;
+    _draftControllers.applyPlan(plan);
 
     if (mounted) {
       setState(() {
@@ -247,52 +185,8 @@ class _PersonalRecoveryPlanScreenState
     }
   }
 
-  List<String> _parseLines(String raw) {
-    final List<String> result = <String>[];
-    final Set<String> seen = <String>{};
-
-    for (final String part in raw.split(RegExp(r'[\n,]'))) {
-      final String display = part.trim();
-      final String key = display.toLowerCase();
-
-      if (display.isEmpty || !seen.add(key)) {
-        continue;
-      }
-
-      result.add(display);
-    }
-
-    return result;
-  }
-
-  void _writeLines(
-    TextEditingController controller,
-    List<String> values,
-  ) {
-    controller.text = values.join('\n');
-  }
-
   PersonalRecoveryPlan _currentDraft() {
-    return _draftPlan.copyWith(
-      reasons: _parseLines(_reasonsController.text),
-      primaryReason:
-          _primaryReasonController.text.trim(),
-      triggers: _parseLines(_triggersController.text),
-      dangerWindows:
-          _parseLines(_dangerWindowsController.text),
-      redirectActions:
-          _parseLines(_redirectActionsController.text),
-      trustedSupportName:
-          _trustedSupportController.text.trim(),
-      phoneBoundary:
-          _phoneBoundaryController.text.trim(),
-      bedtimeStrategy:
-          _bedtimeStrategyController.text.trim(),
-      afterSlipReset:
-          _afterSlipResetController.text.trim(),
-      faithSupport:
-          _faithSupportController.text.trim(),
-    );
+    return _draftControllers.currentDraft();
   }
 
   String _editableSignature(PersonalRecoveryPlan plan) {
@@ -452,7 +346,7 @@ class _PersonalRecoveryPlanScreenState
 
       setState(() {
         _savedPlan = saved;
-        _draftPlan = saved;
+        _draftControllers.updateBasePlan(saved);
         _saving = false;
         _dirty = false;
         _sourceUpdateAvailable = false;
@@ -469,27 +363,6 @@ class _PersonalRecoveryPlanScreenState
             'Your draft is still on this screen.';
       });
     }
-  }
-
-  void _toggleSuggestion(
-    TextEditingController controller,
-    String value,
-  ) {
-    final List<String> items =
-        _parseLines(controller.text);
-
-    final int existingIndex = items.indexWhere(
-      (String item) =>
-          item.toLowerCase() == value.toLowerCase(),
-    );
-
-    if (existingIndex >= 0) {
-      items.removeAt(existingIndex);
-    } else {
-      items.add(value);
-    }
-
-    _writeLines(controller, items);
   }
 
   Future<bool> _confirmLeave() async {
@@ -674,7 +547,7 @@ class _PersonalRecoveryPlanScreenState
               const PersonalPlanSectionTitle('Why I am changing'),
               const SizedBox(height: 10),
               TextField(
-                controller: _primaryReasonController,
+                controller: _draftControllers.primaryReason,
                 decoration: const InputDecoration(
                   labelText: 'My main reason',
                   hintText:
@@ -688,11 +561,11 @@ class _PersonalRecoveryPlanScreenState
                 title: 'Reasons that matter',
                 helper:
                     'Choose suggestions or enter one reason per line.',
-                controller: _reasonsController,
+                controller: _draftControllers.reasons,
                 suggestions: _reasonSuggestions,
                 onToggleSuggestion: (String value) =>
-                    _toggleSuggestion(
-                  _reasonsController,
+                    _draftControllers.toggleSuggestion(
+                  _draftControllers.reasons,
                   value,
                 ),
               ),
@@ -710,11 +583,11 @@ class _PersonalRecoveryPlanScreenState
                 title: 'Known triggers',
                 helper:
                     'Choose suggestions or enter one trigger per line.',
-                controller: _triggersController,
+                controller: _draftControllers.triggers,
                 suggestions: _triggerSuggestions,
                 onToggleSuggestion: (String value) =>
-                    _toggleSuggestion(
-                  _triggersController,
+                    _draftControllers.toggleSuggestion(
+                  _draftControllers.triggers,
                   value,
                 ),
               ),
@@ -723,11 +596,11 @@ class _PersonalRecoveryPlanScreenState
                 title: 'Danger windows',
                 helper:
                     'Times or situations when extra protection helps.',
-                controller: _dangerWindowsController,
+                controller: _draftControllers.dangerWindows,
                 suggestions: _dangerWindowSuggestions,
                 onToggleSuggestion: (String value) =>
-                    _toggleSuggestion(
-                  _dangerWindowsController,
+                    _draftControllers.toggleSuggestion(
+                  _draftControllers.dangerWindows,
                   value,
                 ),
               ),
@@ -745,11 +618,11 @@ class _PersonalRecoveryPlanScreenState
                 title: 'Redirect actions',
                 helper:
                     'Choose actions you can take before momentum builds.',
-                controller: _redirectActionsController,
+                controller: _draftControllers.redirectActions,
                 suggestions: _redirectSuggestions,
                 onToggleSuggestion: (String value) =>
-                    _toggleSuggestion(
-                  _redirectActionsController,
+                    _draftControllers.toggleSuggestion(
+                  _draftControllers.redirectActions,
                   value,
                 ),
               ),
@@ -766,7 +639,7 @@ class _PersonalRecoveryPlanScreenState
               ),
               const SizedBox(height: 10),
               TextField(
-                controller: _trustedSupportController,
+                controller: _draftControllers.trustedSupport,
                 decoration: const InputDecoration(
                   labelText: 'Trusted support person',
                   hintText: 'Name only',
@@ -778,7 +651,7 @@ class _PersonalRecoveryPlanScreenState
               ),
               const SizedBox(height: 14),
               TextField(
-                controller: _phoneBoundaryController,
+                controller: _draftControllers.phoneBoundary,
                 decoration: const InputDecoration(
                   labelText: 'Phone or environment boundary',
                   hintText:
@@ -791,7 +664,7 @@ class _PersonalRecoveryPlanScreenState
               ),
               const SizedBox(height: 14),
               TextField(
-                controller: _bedtimeStrategyController,
+                controller: _draftControllers.bedtimeStrategy,
                 decoration: const InputDecoration(
                   labelText: 'Bedtime strategy',
                   hintText:
@@ -817,7 +690,7 @@ class _PersonalRecoveryPlanScreenState
               ),
               const SizedBox(height: 12),
               TextField(
-                controller: _afterSlipResetController,
+                controller: _draftControllers.afterSlipReset,
                 decoration: const InputDecoration(
                   labelText: 'My reset plan',
                   hintText:
@@ -846,7 +719,7 @@ class _PersonalRecoveryPlanScreenState
                 ),
                 const SizedBox(height: 12),
                 TextField(
-                  controller: _faithSupportController,
+                  controller: _draftControllers.faithSupport,
                   decoration: const InputDecoration(
                     labelText: 'My faith-based support plan',
                     hintText:

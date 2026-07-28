@@ -68,13 +68,23 @@ for needle in [
     "New BreakWave choices are available",
     "Refresh from current BreakWave choices",
     "Custom plan work was preserved",
-    "_draftPlan = saved",
 ]:
     if needle not in screen:
         print(
             f"FAIL BW-87B3B1 screen sync missing: {needle}"
         )
         sys.exit(1)
+
+saved_sync_markers = [
+    "_draftPlan = saved",
+    "_draftControllers.updateBasePlan(saved)",
+]
+if not any(marker in screen for marker in saved_sync_markers):
+    print(
+        "FAIL BW-87B3B1 saved draft sync is missing from "
+        "both supported architectures"
+    )
+    sys.exit(1)
 
 for needle in [
     "key != 'rescue completion'",
