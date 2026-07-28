@@ -18,7 +18,7 @@ import '../data/personal_recovery_plan_store.dart';
 import '../domain/personal_recovery_plan.dart';
 import '../domain/personal_recovery_plan_prefill.dart';
 import 'personal_recovery_plan_draft_controllers.dart';
-import 'widgets/personal_recovery_plan_widgets.dart';
+import 'widgets/personal_recovery_plan_body.dart';
 
 class PersonalRecoveryPlanScreen extends StatefulWidget {
   const PersonalRecoveryPlanScreen({super.key});
@@ -338,6 +338,14 @@ class _PersonalRecoveryPlanScreenState
     return discard == true;
   }
 
+  void _retryLoadPlan() {
+    setState(() {
+      _loading = true;
+      _loadError = null;
+    });
+    _loadPlan();
+  }
+
   String _updatedLabel() {
     final String raw = _savedPlan?.updatedAtIso ?? '';
     final DateTime? parsed = DateTime.tryParse(raw);
@@ -369,350 +377,28 @@ class _PersonalRecoveryPlanScreenState
           title: const Text('My recovery plan'),
         ),
         body: SafeArea(
-          child: _buildBody(context),
+          child: PersonalRecoveryPlanBody(
+            loading: _loading,
+            loadError: _loadError,
+            dirty: _dirty,
+            sourceUpdateAvailable: _sourceUpdateAvailable,
+            updatedLabel: _updatedLabel(),
+            importing: _importing,
+            saving: _saving,
+            hasSavedPlan: _savedPlan != null,
+            mode: _mode,
+            draftControllers: _draftControllers,
+            reasonSuggestions: _reasonSuggestions,
+            triggerSuggestions: _triggerSuggestions,
+            dangerWindowSuggestions: _dangerWindowSuggestions,
+            redirectSuggestions: _redirectSuggestions,
+            statusMessage: _statusMessage,
+            onRetry: _retryLoadPlan,
+            onRefresh: _importCurrentChoices,
+            onSave: _savePlan,
+          ),
         ),
       ),
-    );
-  }
-
-  Widget _buildBody(BuildContext context) {
-    if (_loading) {
-      return const Center(
-        child: CircularProgressIndicator(),
-      );
-    }
-
-    if (_loadError != null) {
-      return ListView(
-        padding: const EdgeInsets.all(20),
-        children: <Widget>[
-          PersonalPlanCard(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                const PersonalPlanSectionTitle('Plan unavailable'),
-                const SizedBox(height: 10),
-                Text(_loadError!),
-                const SizedBox(height: 16),
-                FilledButton(
-                  onPressed: () {
-                    setState(() {
-                      _loading = true;
-                      _loadError = null;
-                    });
-                    _loadPlan();
-                  },
-                  child: const Text('Try again'),
-                ),
-              ],
-            ),
-          ),
-        ],
-      );
-    }
-
-    return ListView(
-      padding: const EdgeInsets.fromLTRB(20, 20, 20, 120),
-      children: <Widget>[
-        PersonalPlanCard(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
-              const PersonalPlanSectionTitle(
-                'Build a plan you can actually use',
-              ),
-              const SizedBox(height: 10),
-              const Text(
-                'Connect what matters, what starts the wave, '
-                'and what you will do next. Your plan stays '
-                'on this device.',
-              ),
-              const SizedBox(height: 12),
-              Text(
-                _dirty
-                    ? 'Unsaved changes'
-                    : _sourceUpdateAvailable
-                        ? 'New BreakWave choices are available'
-                        : _updatedLabel(),
-                style: Theme.of(context)
-                    .textTheme
-                    .bodyMedium
-                    ?.copyWith(
-                      fontWeight: FontWeight.w800,
-                    ),
-              ),
-            ],
-          ),
-        ),
-        const SizedBox(height: 16),
-        PersonalPlanCard(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
-              const PersonalPlanSectionTitle(
-                'Use my current BreakWave choices',
-              ),
-              const SizedBox(height: 8),
-              const Text(
-                'Refresh imported parts using your saved reasons, '
-                'triggers, risky times, trusted support name, saved Why, '
-                'and recent log patterns. Existing plan work will not be replaced.',
-              ),
-              const SizedBox(height: 14),
-              SizedBox(
-                width: double.infinity,
-                child: FilledButton.tonalIcon(
-                  onPressed: _importing
-                      ? null
-                      : _importCurrentChoices,
-                  icon: const Icon(Icons.auto_fix_high),
-                  label: Padding(
-                    padding: const EdgeInsets.symmetric(
-                      vertical: 12,
-                    ),
-                    child: Text(
-                      _importing
-                          ? 'Refreshing plan...'
-                          : 'Refresh from current BreakWave choices',
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-        const SizedBox(height: 16),
-        PersonalPlanCard(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
-              const PersonalPlanSectionTitle('Why I am changing'),
-              const SizedBox(height: 10),
-              TextField(
-                controller: _draftControllers.primaryReason,
-                decoration: const InputDecoration(
-                  labelText: 'My main reason',
-                  hintText:
-                      'The reason I want in front of me first',
-                ),
-                textCapitalization:
-                    TextCapitalization.sentences,
-              ),
-              const SizedBox(height: 14),
-              PersonalPlanListField(
-                title: 'Reasons that matter',
-                helper:
-                    'Choose suggestions or enter one reason per line.',
-                controller: _draftControllers.reasons,
-                suggestions: _reasonSuggestions,
-                onToggleSuggestion: (String value) =>
-                    _draftControllers.toggleSuggestion(
-                  _draftControllers.reasons,
-                  value,
-                ),
-              ),
-            ],
-          ),
-        ),
-        const SizedBox(height: 16),
-        PersonalPlanCard(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
-              const PersonalPlanSectionTitle('What I need to watch'),
-              const SizedBox(height: 12),
-              PersonalPlanListField(
-                title: 'Known triggers',
-                helper:
-                    'Choose suggestions or enter one trigger per line.',
-                controller: _draftControllers.triggers,
-                suggestions: _triggerSuggestions,
-                onToggleSuggestion: (String value) =>
-                    _draftControllers.toggleSuggestion(
-                  _draftControllers.triggers,
-                  value,
-                ),
-              ),
-              const SizedBox(height: 18),
-              PersonalPlanListField(
-                title: 'Danger windows',
-                helper:
-                    'Times or situations when extra protection helps.',
-                controller: _draftControllers.dangerWindows,
-                suggestions: _dangerWindowSuggestions,
-                onToggleSuggestion: (String value) =>
-                    _draftControllers.toggleSuggestion(
-                  _draftControllers.dangerWindows,
-                  value,
-                ),
-              ),
-            ],
-          ),
-        ),
-        const SizedBox(height: 16),
-        PersonalPlanCard(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
-              const PersonalPlanSectionTitle('My first moves'),
-              const SizedBox(height: 10),
-              PersonalPlanListField(
-                title: 'Redirect actions',
-                helper:
-                    'Choose actions you can take before momentum builds.',
-                controller: _draftControllers.redirectActions,
-                suggestions: _redirectSuggestions,
-                onToggleSuggestion: (String value) =>
-                    _draftControllers.toggleSuggestion(
-                  _draftControllers.redirectActions,
-                  value,
-                ),
-              ),
-            ],
-          ),
-        ),
-        const SizedBox(height: 16),
-        PersonalPlanCard(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
-              const PersonalPlanSectionTitle(
-                'Support and boundaries',
-              ),
-              const SizedBox(height: 10),
-              TextField(
-                controller: _draftControllers.trustedSupport,
-                decoration: const InputDecoration(
-                  labelText: 'Trusted support person',
-                  hintText: 'Name only',
-                  helperText:
-                      'Calling and messaging details remain in Support.',
-                ),
-                textCapitalization:
-                    TextCapitalization.words,
-              ),
-              const SizedBox(height: 14),
-              TextField(
-                controller: _draftControllers.phoneBoundary,
-                decoration: const InputDecoration(
-                  labelText: 'Phone or environment boundary',
-                  hintText:
-                      'Example: Charge my phone outside the bedroom.',
-                ),
-                minLines: 2,
-                maxLines: 4,
-                textCapitalization:
-                    TextCapitalization.sentences,
-              ),
-              const SizedBox(height: 14),
-              TextField(
-                controller: _draftControllers.bedtimeStrategy,
-                decoration: const InputDecoration(
-                  labelText: 'Bedtime strategy',
-                  hintText:
-                      'Example: Phone away, lights out, read for ten minutes.',
-                ),
-                minLines: 2,
-                maxLines: 4,
-                textCapitalization:
-                    TextCapitalization.sentences,
-              ),
-            ],
-          ),
-        ),
-        const SizedBox(height: 16),
-        PersonalPlanCard(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
-              const PersonalPlanSectionTitle('After a slip'),
-              const SizedBox(height: 10),
-              const Text(
-                'Write the next honest steps—not a punishment.',
-              ),
-              const SizedBox(height: 12),
-              TextField(
-                controller: _draftControllers.afterSlipReset,
-                decoration: const InputDecoration(
-                  labelText: 'My reset plan',
-                  hintText:
-                      'Example: Stop, tell the truth, log what happened, and restart.',
-                ),
-                minLines: 3,
-                maxLines: 6,
-                textCapitalization:
-                    TextCapitalization.sentences,
-              ),
-            ],
-          ),
-        ),
-        if (_mode == RecoveryMode.christian) ...<Widget>[
-          const SizedBox(height: 16),
-          PersonalPlanCard(
-            child: Column(
-              crossAxisAlignment:
-                  CrossAxisAlignment.start,
-              children: <Widget>[
-                const PersonalPlanSectionTitle('Faith support'),
-                const SizedBox(height: 10),
-                const Text(
-                  'Add prayer, Scripture, or a faithful next '
-                  'step you want available when the wave rises.',
-                ),
-                const SizedBox(height: 12),
-                TextField(
-                  controller: _draftControllers.faithSupport,
-                  decoration: const InputDecoration(
-                    labelText: 'My faith-based support plan',
-                    hintText:
-                        'Example: Pray honestly, read my saved verse, and contact support.',
-                  ),
-                  minLines: 3,
-                  maxLines: 6,
-                  textCapitalization:
-                      TextCapitalization.sentences,
-                ),
-              ],
-            ),
-          ),
-        ],
-        if (_statusMessage != null) ...<Widget>[
-          const SizedBox(height: 16),
-          PersonalPlanCard(
-            child: Text(
-              _statusMessage!,
-              style: Theme.of(context)
-                  .textTheme
-                  .bodyMedium
-                  ?.copyWith(
-                    fontWeight: FontWeight.w700,
-                  ),
-            ),
-          ),
-        ],
-        const SizedBox(height: 18),
-        SizedBox(
-          width: double.infinity,
-          child: FilledButton(
-            onPressed:
-                _saving || (!_dirty && _savedPlan != null)
-                    ? null
-                    : _savePlan,
-            child: Padding(
-              padding: const EdgeInsets.symmetric(
-                vertical: 16,
-              ),
-              child: Text(
-                _saving
-                    ? 'Saving...'
-                    : (!_dirty && _savedPlan != null)
-                        ? 'Plan saved'
-                        : 'Save recovery plan',
-              ),
-            ),
-          ),
-        ),
-      ],
     );
   }
 }

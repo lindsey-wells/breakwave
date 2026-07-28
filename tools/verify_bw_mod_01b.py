@@ -11,6 +11,10 @@ SCREEN_REL = (
     "lib/features/personal_plan/presentation/"
     "personal_recovery_plan_screen.dart"
 )
+BODY_REL = (
+    "lib/features/personal_plan/presentation/widgets/"
+    "personal_recovery_plan_body.dart"
+)
 WIDGETS_REL = (
     "lib/features/personal_plan/presentation/widgets/"
     "personal_recovery_plan_widgets.dart"
@@ -50,47 +54,52 @@ for rel, expected in LOCKED.items():
         fail(f"locked file changed: {rel}")
 
 screen_path = ROOT / SCREEN_REL
+body_path = ROOT / BODY_REL
 widgets_path = ROOT / WIDGETS_REL
-for path in (screen_path, widgets_path):
+for path in (screen_path, body_path, widgets_path):
     if not path.is_file():
         fail(f"missing stage file: {path.relative_to(ROOT)}")
 
 screen = screen_path.read_text(encoding="utf-8")
+body = body_path.read_text(encoding="utf-8")
+ui = screen + "\n" + body
 widgets = widgets_path.read_text(encoding="utf-8")
 screen_lines = len(screen.splitlines())
 widget_lines = len(widgets.splitlines())
 
-if screen_lines > 920:
+if screen_lines > 480:
     fail(
-        "screen did not shrink enough for presentation extraction: "
+        "screen exceeded later-stage presentation boundary: "
         f"{screen_lines} lines"
     )
-if screen_lines <= 400:
-    fail("screen unexpectedly crossed a later-stage boundary")
+if screen_lines <= 240:
+    fail("screen unexpectedly crossed its state-owner boundary")
 if widget_lines > 180:
     fail(f"widget module exceeds review ceiling: {widget_lines} lines")
 
 if (
-    "import 'widgets/personal_recovery_plan_widgets.dart';"
+    "import 'widgets/personal_recovery_plan_body.dart';"
     not in screen
 ):
-    fail("screen is missing the extracted widget import")
+    fail("screen is missing the extracted body import")
+if "import 'personal_recovery_plan_widgets.dart';" not in body:
+    fail("body is missing the extracted widget import")
 
 for old_name in ("_ListPlanField", "_SectionTitle", "_PlanCard"):
-    if old_name in screen:
-        fail(f"private widget remains in screen: {old_name}")
+    if old_name in ui:
+        fail(f"private widget remains in plan UI: {old_name}")
 
 for name in (
     "PersonalPlanListField",
     "PersonalPlanSectionTitle",
     "PersonalPlanCard",
 ):
-    if f"class {name}" in screen:
-        fail(f"widget class was not extracted: {name}")
+    if f"class {name}" in screen or f"class {name}" in body:
+        fail(f"widget class was not kept in widget module: {name}")
     if f"class {name}" not in widgets:
         fail(f"extracted widget class missing: {name}")
-    if name not in screen:
-        fail(f"screen does not use extracted widget: {name}")
+    if name not in body:
+        fail(f"form body does not use extracted widget: {name}")
 
 for forbidden in (
     "PersonalRecoveryPlanStore",
@@ -131,8 +140,8 @@ for token in (
     "Refresh from current BreakWave choices",
     "Discard unsaved changes?",
 ):
-    if token not in screen:
-        fail(f"screen behavior marker changed or moved: {token}")
+    if token not in ui:
+        fail(f"plan behavior marker changed or moved incorrectly: {token}")
 
 print(
     "PASS: BW-MOD-01B extracted presentation-only widgets while "

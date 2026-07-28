@@ -5,7 +5,6 @@ from __future__ import annotations
 
 import ast
 import hashlib
-import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -54,10 +53,21 @@ for rel in [*STAGE_FILE_HASHES, "tools/verify_bw_mod_01a.py"]:
     if lines > 400:
         fail(f"stage file exceeds 400 lines: {rel} ({lines})")
 
-screen = (
+screen_path = (
     ROOT / "lib/features/personal_plan/presentation/"
     "personal_recovery_plan_screen.dart"
-).read_text(encoding="utf-8")
+)
+body_path = (
+    ROOT / "lib/features/personal_plan/presentation/widgets/"
+    "personal_recovery_plan_body.dart"
+)
+for path in (screen_path, body_path):
+    if not path.is_file():
+        fail(f"missing plan presentation file: {path.relative_to(ROOT)}")
+
+screen = screen_path.read_text(encoding="utf-8")
+body = body_path.read_text(encoding="utf-8")
+ui = screen + "\n" + body
 for token in (
     "CircularProgressIndicator",
     "Plan unavailable",
@@ -68,7 +78,7 @@ for token in (
     "Personal recovery plan saved on this device.",
     "RecoveryMode.christian",
 ):
-    if token not in screen:
+    if token not in ui:
         fail(f"screen characterization token missing: {token}")
 
 test_paths = [

@@ -11,6 +11,10 @@ SCREEN_REL = (
     "lib/features/personal_plan/presentation/"
     "personal_recovery_plan_screen.dart"
 )
+BODY_REL = (
+    "lib/features/personal_plan/presentation/widgets/"
+    "personal_recovery_plan_body.dart"
+)
 WORKFLOW_REL = (
     "lib/features/personal_plan/application/"
     "personal_recovery_plan_workflow.dart"
@@ -48,6 +52,7 @@ for rel, expected in LOCKED.items():
 
 paths = {
     "screen": ROOT / SCREEN_REL,
+    "body": ROOT / BODY_REL,
     "workflow": ROOT / WORKFLOW_REL,
     "test": ROOT / TEST_REL,
 }
@@ -56,15 +61,17 @@ for label, path in paths.items():
         fail(f"missing {label} file: {path.relative_to(ROOT)}")
 
 screen = paths["screen"].read_text(encoding="utf-8")
+body = paths["body"].read_text(encoding="utf-8")
+ui = screen + "\n" + body
 workflow = paths["workflow"].read_text(encoding="utf-8")
 tests = paths["test"].read_text(encoding="utf-8")
 verifier = Path(__file__).read_text(encoding="utf-8")
 
 limits = {
-    "screen": (500, 740, screen),
+    "screen": (241, 480, screen),
     "workflow": (80, 180, workflow),
     "test": (60, 180, tests),
-    "verifier": (1, 320, verifier),
+    "verifier": (1, 360, verifier),
 }
 for label, (minimum, maximum, source) in limits.items():
     count = len(source.splitlines())
@@ -150,8 +157,8 @@ for token in (
     "Refresh from current BreakWave choices",
     "Discard unsaved changes?",
 ):
-    if token not in screen:
-        fail(f"screen behavior marker changed or moved: {token}")
+    if token not in ui:
+        fail(f"plan behavior marker changed or moved: {token}")
 
 print(
     "PASS: BW-MOD-01D extracted Personal Recovery Plan refresh "

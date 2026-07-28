@@ -11,6 +11,10 @@ SCREEN_REL = (
     "lib/features/personal_plan/presentation/"
     "personal_recovery_plan_screen.dart"
 )
+BODY_REL = (
+    "lib/features/personal_plan/presentation/widgets/"
+    "personal_recovery_plan_body.dart"
+)
 CONTROLLERS_REL = (
     "lib/features/personal_plan/presentation/"
     "personal_recovery_plan_draft_controllers.dart"
@@ -48,6 +52,7 @@ for rel, expected in LOCKED.items():
 
 paths = {
     "screen": ROOT / SCREEN_REL,
+    "body": ROOT / BODY_REL,
     "controllers": ROOT / CONTROLLERS_REL,
     "test": ROOT / TEST_REL,
 }
@@ -56,14 +61,16 @@ for label, path in paths.items():
         fail(f"missing {label} file: {path.relative_to(ROOT)}")
 
 screen = paths["screen"].read_text(encoding="utf-8")
+body = paths["body"].read_text(encoding="utf-8")
+ui = screen + "\n" + body
 controllers = paths["controllers"].read_text(encoding="utf-8")
 tests = paths["test"].read_text(encoding="utf-8")
 
 line_limits = {
-    "screen": (401, 820),
+    "screen": (241, 480),
     "controllers": (1, 220),
     "test": (1, 220),
-    "verifier": (1, 400),
+    "verifier": (1, 420),
 }
 sources = {
     "screen": screen,
@@ -86,10 +93,10 @@ for token in (
     "_draftControllers.applyPlan(plan)",
     "_draftControllers.currentDraft()",
     "_draftControllers.updateBasePlan(saved)",
-    "_draftControllers.toggleSuggestion(",
+    "draftControllers.toggleSuggestion(",
 ):
-    if token not in screen:
-        fail(f"screen controller integration missing: {token}")
+    if token not in ui:
+        fail(f"plan controller integration missing: {token}")
 
 for forbidden in (
     "late final TextEditingController",
@@ -109,8 +116,8 @@ for forbidden in (
     "List<String> _parseLines",
     "void _writeLines",
 ):
-    if forbidden in screen:
-        fail(f"screen still owns extracted responsibility: {forbidden}")
+    if forbidden in ui:
+        fail(f"plan UI still owns extracted responsibility: {forbidden}")
 
 for name in (
     "reasons",
@@ -183,8 +190,8 @@ for token in (
     "Refresh from current BreakWave choices",
     "Discard unsaved changes?",
 ):
-    if token not in screen:
-        fail(f"screen behavior marker changed or moved: {token}")
+    if token not in ui:
+        fail(f"plan behavior marker changed or moved: {token}")
 
 print(
     "PASS: BW-MOD-01C extracted Personal Recovery Plan controller "

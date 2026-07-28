@@ -13,6 +13,10 @@ screen_path = Path(
     "lib/features/personal_plan/presentation/"
     "personal_recovery_plan_screen.dart"
 )
+body_path = Path(
+    "lib/features/personal_plan/presentation/widgets/"
+    "personal_recovery_plan_body.dart"
+)
 workflow_path = Path(
     "lib/features/personal_plan/application/"
     "personal_recovery_plan_workflow.dart"
@@ -25,6 +29,7 @@ for path in [
     model_path,
     prefill_path,
     screen_path,
+    body_path,
     workflow_path,
     test_path,
 ]:
@@ -35,6 +40,8 @@ for path in [
 model = model_path.read_text(encoding="utf-8")
 prefill = prefill_path.read_text(encoding="utf-8")
 screen = screen_path.read_text(encoding="utf-8")
+body = body_path.read_text(encoding="utf-8")
+ui = screen + "\n" + body
 workflow = workflow_path.read_text(encoding="utf-8")
 tests = test_path.read_text(encoding="utf-8")
 
@@ -66,13 +73,21 @@ for needle in [
 
 for needle in [
     "_refreshFromBreakWave",
-    "New BreakWave choices are available",
-    "Refresh from current BreakWave choices",
     "Custom plan work was preserved",
 ]:
     if needle not in screen:
         print(
             f"FAIL BW-87B3B1 screen sync missing: {needle}"
+        )
+        sys.exit(1)
+
+for needle in [
+    "New BreakWave choices are available",
+    "Refresh from current BreakWave choices",
+]:
+    if needle not in ui:
+        print(
+            f"FAIL BW-87B3B1 plan UI sync missing: {needle}"
         )
         sys.exit(1)
 
