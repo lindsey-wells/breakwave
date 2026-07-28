@@ -13,6 +13,10 @@ screen_path = Path(
     "lib/features/personal_plan/presentation/"
     "personal_recovery_plan_screen.dart"
 )
+workflow_path = Path(
+    "lib/features/personal_plan/application/"
+    "personal_recovery_plan_workflow.dart"
+)
 test_path = Path(
     "test/personal_recovery_plan_refresh_test.dart"
 )
@@ -21,6 +25,7 @@ for path in [
     model_path,
     prefill_path,
     screen_path,
+    workflow_path,
     test_path,
 ]:
     if not path.exists():
@@ -30,6 +35,7 @@ for path in [
 model = model_path.read_text(encoding="utf-8")
 prefill = prefill_path.read_text(encoding="utf-8")
 screen = screen_path.read_text(encoding="utf-8")
+workflow = workflow_path.read_text(encoding="utf-8")
 tests = test_path.read_text(encoding="utf-8")
 
 for needle in [
@@ -59,12 +65,7 @@ for needle in [
         sys.exit(1)
 
 for needle in [
-    "RecoveryInsightsCalculator",
-    "LogRepository",
     "_refreshFromBreakWave",
-    "snapshot.topTriggers30Days",
-    "busiestWeekday30Days",
-    "busiestTimeWindow30Days",
     "New BreakWave choices are available",
     "Refresh from current BreakWave choices",
     "Custom plan work was preserved",
@@ -72,6 +73,22 @@ for needle in [
     if needle not in screen:
         print(
             f"FAIL BW-87B3B1 screen sync missing: {needle}"
+        )
+        sys.exit(1)
+
+for needle in [
+    "RecoveryInsightsCalculator",
+    "LogRepository",
+    "refreshFromBreakWave",
+    "snapshot.topTriggers30Days",
+    "busiestWeekday30Days",
+    "busiestTimeWindow30Days",
+    "key != 'rescue completion'",
+    "key != 'wave timer'",
+]:
+    if needle not in workflow:
+        print(
+            f"FAIL BW-87B3B1 workflow sync missing: {needle}"
         )
         sys.exit(1)
 
@@ -85,17 +102,6 @@ if not any(marker in screen for marker in saved_sync_markers):
         "both supported architectures"
     )
     sys.exit(1)
-
-for needle in [
-    "key != 'rescue completion'",
-    "key != 'wave timer'",
-]:
-    if needle not in screen:
-        print(
-            f"FAIL BW-87B3B1 system-trigger filter missing: "
-            f"{needle}"
-        )
-        sys.exit(1)
 
 for needle in [
     "refreshes imported sections and preserves manual additions",

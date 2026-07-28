@@ -17,6 +17,7 @@ import '../../../core/triggers/triggers_store.dart';
 import '../../../core/why/custom_why_store.dart';
 import '../../insights/domain/recovery_insights_calculator.dart';
 import '../../log/data/log_repository.dart';
+import '../application/personal_recovery_plan_workflow.dart';
 import '../data/personal_recovery_plan_store.dart';
 import '../domain/personal_recovery_plan.dart';
 import '../domain/personal_recovery_plan_prefill.dart';
@@ -39,6 +40,8 @@ class _PersonalRecoveryPlanScreenState
       const LogRepository();
   final RecoveryInsightsCalculator _insightsCalculator =
       const RecoveryInsightsCalculator();
+
+  late final PersonalRecoveryPlanWorkflow _workflow;
 
   late final PersonalRecoveryPlanDraftControllers
       _draftControllers;
@@ -105,6 +108,12 @@ class _PersonalRecoveryPlanScreenState
   @override
   void initState() {
     super.initState();
+
+    _workflow = PersonalRecoveryPlanWorkflow(
+      prefill: _prefill,
+      logRepository: _logRepository,
+      insightsCalculator: _insightsCalculator,
+    );
 
     _draftControllers =
         PersonalRecoveryPlanDraftControllers(
@@ -190,83 +199,20 @@ class _PersonalRecoveryPlanScreenState
   }
 
   String _editableSignature(PersonalRecoveryPlan plan) {
-    return <String>[
-      plan.reasons.join('|').toLowerCase(),
-      plan.primaryReason.trim().toLowerCase(),
-      plan.triggers.join('|').toLowerCase(),
-      plan.dangerWindows.join('|').toLowerCase(),
-      plan.redirectActions.join('|').toLowerCase(),
-      plan.trustedSupportName.trim().toLowerCase(),
-      plan.phoneBoundary.trim(),
-      plan.bedtimeStrategy.trim(),
-      plan.afterSlipReset.trim(),
-      plan.faithSupport.trim(),
-    ].join('§');
+    return _workflow.editableSignature(plan);
   }
 
   String _importSourceSignature(
     PersonalRecoveryPlan plan,
   ) {
-    return <String>[
-      plan.importSchemaVersion.toString(),
-      plan.importedReasons.join('|').toLowerCase(),
-      plan.importedPrimaryReason.trim().toLowerCase(),
-      plan.importedTriggers.join('|').toLowerCase(),
-      plan.importedDangerWindows.join('|').toLowerCase(),
-      plan.importedTrustedSupportName.trim().toLowerCase(),
-    ].join('§');
+    return _workflow.importSourceSignature(plan);
   }
 
   Future<PersonalRecoveryPlan>
       _refreshFromBreakWave(
     PersonalRecoveryPlan current,
-  ) async {
-    final reasons =
-        await ReasonsStore.loadSelection();
-    final triggers =
-        await TriggersStore.loadSelection();
-    final contact =
-        await SupportContactStore.loadContact();
-    final customWhy =
-        await CustomWhyStore.load();
-    final entries =
-        await _logRepository.loadEntries();
-
-    final snapshot =
-        _insightsCalculator.calculate(
-      entries: entries,
-      now: DateTime.now(),
-    );
-
-    final List<String> observedTriggers =
-        snapshot.topTriggers30Days
-            .map((item) => item.trigger)
-            .where((String value) {
-      final String key =
-          value.trim().toLowerCase();
-
-      return key != 'rescue completion' &&
-          key != 'wave timer';
-    }).toList();
-
-    final List<String> observedDangerWindows =
-        <String>[
-      if (snapshot.busiestWeekday30Days != null)
-        snapshot.busiestWeekday30Days!,
-      if (snapshot.busiestTimeWindow30Days != null)
-        snapshot.busiestTimeWindow30Days!,
-    ];
-
-    return _prefill.refreshFromCurrentChoices(
-      current: current,
-      reasonsSelection: reasons,
-      triggersSelection: triggers,
-      supportContact: contact,
-      customWhy: customWhy,
-      observedTriggers: observedTriggers,
-      observedDangerWindows:
-          observedDangerWindows,
-    );
+  ) {
+    return _workflow.refreshFromBreakWave(current);
   }
 
   Future<void> _importCurrentChoices() async {
