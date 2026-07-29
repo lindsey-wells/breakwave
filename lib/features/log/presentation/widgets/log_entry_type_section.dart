@@ -4,11 +4,13 @@
 // File: log_entry_type_section.dart
 // Purpose: Entry type selector for the BW-04 log flow.
 // Notes: BW-72B shortens Log copy for faster capture.
+// Notes: BW-LOG-01A adds distinct icon and color identity.
 // ------------------------------------------------------------
 
 import 'package:flutter/material.dart';
 
 import '../../../../core/theme/breakwave_colors.dart';
+import 'log_entry_visuals.dart';
 
 class LogEntryTypeSection extends StatelessWidget {
   final String selectedType;
@@ -49,26 +51,42 @@ class LogEntryTypeSection extends StatelessWidget {
               runSpacing: 8,
               children: entryTypes.map((String type) {
                 final bool isSelected = selectedType == type;
-                return ChoiceChip(
-                  label: Text(type),
+                final LogEntryVisualStyle visual =
+                    LogEntryVisuals.forType(type);
+
+                return Semantics(
                   selected: isSelected,
-                  showCheckmark: true,
-                  checkmarkColor: Colors.white,
-                  backgroundColor: BreakWaveColors.chipIdle,
-                  selectedColor: BreakWaveColors.chipSelected,
-                  side: BorderSide(
-                    color: isSelected
-                        ? BreakWaveColors.chipSelectedBorder
-                        : const Color(0x33FFFFFF),
-                    width: isSelected ? 1.6 : 1.0,
+                  label: '$type log entry type',
+                  child: ChoiceChip(
+                    key: ValueKey<String>(
+                      'log-entry-type-$type',
+                    ),
+                    avatar: Icon(
+                      visual.icon,
+                      size: 19,
+                      color: visual.color,
+                    ),
+                    label: Text(type),
+                    selected: isSelected,
+                    showCheckmark: false,
+                    backgroundColor: BreakWaveColors.chipIdle,
+                    selectedColor: visual.backgroundColor,
+                    side: BorderSide(
+                      color: isSelected
+                          ? visual.color
+                          : const Color(0x33FFFFFF),
+                      width: isSelected ? 1.8 : 1.0,
+                    ),
+                    elevation: isSelected ? 3 : 0,
+                    shadowColor: visual.color.withOpacity(0.30),
+                    labelStyle: TextStyle(
+                      color: Colors.white,
+                      fontWeight: isSelected
+                          ? FontWeight.w800
+                          : FontWeight.w500,
+                    ),
+                    onSelected: (_) => onSelected(type),
                   ),
-                  elevation: isSelected ? 3 : 0,
-                  shadowColor: BreakWaveColors.chipSelectedGlow,
-                  labelStyle: TextStyle(
-                    color: Colors.white,
-                    fontWeight: isSelected ? FontWeight.w800 : FontWeight.w500,
-                  ),
-                  onSelected: (_) => onSelected(type),
                 );
               }).toList(),
             ),

@@ -6,11 +6,13 @@
 // Notes: BW-72B makes recent entries compact with expandable details.
 // Notes: BW-84A adds Show all / Show latest review controls.
 // Notes: BW-84D highlights the most recently updated entry.
+// Notes: BW-LOG-01A adds type badges and intensity dots.
 // ------------------------------------------------------------
 
 import 'package:flutter/material.dart';
 
 import '../../domain/log_entry.dart';
+import 'log_entry_visuals.dart';
 
 class RecentLogEntriesCard extends StatelessWidget {
   final List<LogEntry> entries;
@@ -41,7 +43,8 @@ class RecentLogEntriesCard extends StatelessWidget {
         ? 'No saved entries yet.'
         : showAllEntries
             ? 'Showing all $totalEntryCount saved entries.'
-            : 'Showing latest $visibleCount of $totalEntryCount saved entries.';
+            : 'Showing latest $visibleCount of '
+                '$totalEntryCount saved entries.';
 
     return Card(
       child: Padding(
@@ -55,23 +58,28 @@ class RecentLogEntriesCard extends StatelessWidget {
             ),
             const SizedBox(height: 8),
             Text(
-              'Newest saved moments. Open details only when you need them.',
+              'Newest saved moments. Open details only '
+              'when you need them.',
               style: Theme.of(context).textTheme.bodyMedium,
             ),
             const SizedBox(height: 8),
             Text(
               reviewScopeText,
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+              style: Theme.of(context)
+                  .textTheme
+                  .bodyMedium
+                  ?.copyWith(
                     fontWeight: FontWeight.w700,
                   ),
             ),
-            if (showAllEntries && totalEntryCount > 5) ...<Widget>[
-              const SizedBox(height: 6),
-              Text(
-                'Keep scrolling to review older saved entries.',
-                style: Theme.of(context).textTheme.bodySmall,
-              ),
-            ],
+            if (showAllEntries && totalEntryCount > 5)
+              ...<Widget>[
+                const SizedBox(height: 6),
+                Text(
+                  'Keep scrolling to review older saved entries.',
+                  style: Theme.of(context).textTheme.bodySmall,
+                ),
+              ],
             if (canToggleScope) ...<Widget>[
               const SizedBox(height: 12),
               OutlinedButton.icon(
@@ -82,7 +90,9 @@ class RecentLogEntriesCard extends StatelessWidget {
                       : Icons.article_outlined,
                 ),
                 label: Text(
-                  showAllEntries ? 'Show latest 5' : 'Show all entries',
+                  showAllEntries
+                      ? 'Show latest 5'
+                      : 'Show all entries',
                 ),
               ),
             ],
@@ -96,7 +106,8 @@ class RecentLogEntriesCard extends StatelessWidget {
                     padding: const EdgeInsets.only(bottom: 12),
                     child: _RecentEntryRow(
                       entry: entry,
-                      isHighlighted: entry.id == highlightedEntryId,
+                      isHighlighted:
+                          entry.id == highlightedEntryId,
                       onEdit: () => onEdit(entry),
                       onDelete: () => onDelete(entry),
                     ),
@@ -120,10 +131,13 @@ class _EmptyHistoryState extends StatelessWidget {
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: const Color(0x22FFFFFF)),
+        border: Border.all(
+          color: const Color(0x22FFFFFF),
+        ),
       ),
       child: const Text(
-        'No saved entries yet. Your recent log history will appear here after you save an entry.',
+        'No saved entries yet. Your recent log history '
+        'will appear here after you save an entry.',
       ),
     );
   }
@@ -144,17 +158,23 @@ class _RecentEntryRow extends StatelessWidget {
 
   String _formatTimestamp(String iso) {
     try {
-      final DateTime time = DateTime.parse(iso).toLocal();
-      final String month = time.month.toString().padLeft(2, '0');
-      final String day = time.day.toString().padLeft(2, '0');
+      final DateTime time =
+          DateTime.parse(iso).toLocal();
+      final String month =
+          time.month.toString().padLeft(2, '0');
+      final String day =
+          time.day.toString().padLeft(2, '0');
       final int hour24 = time.hour;
       final int minute = time.minute;
       final int hour12 = hour24 == 0
           ? 12
           : (hour24 > 12 ? hour24 - 12 : hour24);
-      final String minuteText = minute.toString().padLeft(2, '0');
-      final String meridiem = hour24 >= 12 ? 'PM' : 'AM';
-      return '$month/$day • $hour12:$minuteText $meridiem';
+      final String minuteText =
+          minute.toString().padLeft(2, '0');
+      final String meridiem =
+          hour24 >= 12 ? 'PM' : 'AM';
+      return '$month/$day • '
+          '$hour12:$minuteText $meridiem';
     } catch (_) {
       return 'Saved recently';
     }
@@ -171,10 +191,12 @@ class _RecentEntryRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final ThemeData theme = Theme.of(context);
-    final Color borderColor =
-        isHighlighted ? theme.colorScheme.primary : const Color(0x22FFFFFF);
+    final Color borderColor = isHighlighted
+        ? theme.colorScheme.primary
+        : const Color(0x22FFFFFF);
     final Color backgroundColor = isHighlighted
-        ? theme.colorScheme.primaryContainer.withOpacity(0.25)
+        ? theme.colorScheme.primaryContainer
+            .withOpacity(0.25)
         : Colors.transparent;
 
     final String triggerText = entry.triggers.isEmpty
@@ -189,27 +211,30 @@ class _RecentEntryRow extends StatelessWidget {
           style: theme.textTheme.bodyMedium,
         ),
       ],
-      if (entry.actionTaken.trim().isNotEmpty) ...<Widget>[
-        const SizedBox(height: 8),
-        Text(
-          'Action: ${entry.actionTaken.trim()}',
-          style: theme.textTheme.bodyMedium,
-        ),
-      ],
-      if (entry.consequence.trim().isNotEmpty) ...<Widget>[
-        const SizedBox(height: 8),
-        Text(
-          'Consequence: ${entry.consequence.trim()}',
-          style: theme.textTheme.bodyMedium,
-        ),
-      ],
-      if (entry.betterPlan.trim().isNotEmpty) ...<Widget>[
-        const SizedBox(height: 8),
-        Text(
-          'Better plan: ${entry.betterPlan.trim()}',
-          style: theme.textTheme.bodyMedium,
-        ),
-      ],
+      if (entry.actionTaken.trim().isNotEmpty)
+        ...<Widget>[
+          const SizedBox(height: 8),
+          Text(
+            'Action: ${entry.actionTaken.trim()}',
+            style: theme.textTheme.bodyMedium,
+          ),
+        ],
+      if (entry.consequence.trim().isNotEmpty)
+        ...<Widget>[
+          const SizedBox(height: 8),
+          Text(
+            'Consequence: ${entry.consequence.trim()}',
+            style: theme.textTheme.bodyMedium,
+          ),
+        ],
+      if (entry.betterPlan.trim().isNotEmpty)
+        ...<Widget>[
+          const SizedBox(height: 8),
+          Text(
+            'Better plan: ${entry.betterPlan.trim()}',
+            style: theme.textTheme.bodyMedium,
+          ),
+        ],
       if (entry.notes.trim().isNotEmpty) ...<Widget>[
         const SizedBox(height: 8),
         Text(
@@ -234,25 +259,18 @@ class _RecentEntryRow extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
           Wrap(
-            spacing: 8,
-            runSpacing: 8,
-            crossAxisAlignment: WrapCrossAlignment.center,
+            spacing: 12,
+            runSpacing: 10,
+            crossAxisAlignment:
+                WrapCrossAlignment.center,
             children: <Widget>[
-              Text(
-                entry.entryType,
-                style: theme.textTheme.titleMedium,
+              _EntryTypeBadge(
+                entryType: entry.entryType,
               ),
-              Text(
-                '•',
-                style: theme.textTheme.titleMedium,
-              ),
-              Text(
-                'Intensity ${entry.intensity}',
-                style: theme.textTheme.bodyMedium,
-              ),
-              Text(
-                '•',
-                style: theme.textTheme.titleMedium,
+              _IntensityDots(
+                entryId: entry.id,
+                intensity: entry.intensity,
+                entryType: entry.entryType,
               ),
               Text(
                 _formatTimestamp(entry.createdAtIso),
@@ -263,11 +281,17 @@ class _RecentEntryRow extends StatelessWidget {
           if (isHighlighted) ...<Widget>[
             const SizedBox(height: 10),
             Container(
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
+              padding: const EdgeInsets.symmetric(
+                horizontal: 10,
+                vertical: 7,
+              ),
               decoration: BoxDecoration(
-                color: theme.colorScheme.primary.withOpacity(0.16),
+                color: theme.colorScheme.primary
+                    .withOpacity(0.16),
                 borderRadius: BorderRadius.circular(999),
-                border: Border.all(color: theme.colorScheme.primary),
+                border: Border.all(
+                  color: theme.colorScheme.primary,
+                ),
               ),
               child: Row(
                 mainAxisSize: MainAxisSize.min,
@@ -280,7 +304,8 @@ class _RecentEntryRow extends StatelessWidget {
                   const SizedBox(width: 6),
                   Text(
                     'Updated just now',
-                    style: theme.textTheme.bodySmall?.copyWith(
+                    style:
+                        theme.textTheme.bodySmall?.copyWith(
                       color: theme.colorScheme.primary,
                       fontWeight: FontWeight.w800,
                     ),
@@ -294,13 +319,15 @@ class _RecentEntryRow extends StatelessWidget {
             'Triggers: $triggerText',
             style: theme.textTheme.bodyMedium,
           ),
-          if (entry.replacementAction.trim().isNotEmpty) ...<Widget>[
-            const SizedBox(height: 8),
-            Text(
-              'Replacement action: ${entry.replacementAction.trim()}',
-              style: theme.textTheme.bodyMedium,
-            ),
-          ],
+          if (entry.replacementAction.trim().isNotEmpty)
+            ...<Widget>[
+              const SizedBox(height: 8),
+              Text(
+                'Replacement action: '
+                '${entry.replacementAction.trim()}',
+                style: theme.textTheme.bodyMedium,
+              ),
+            ],
           if (_hasDetails) ...<Widget>[
             const SizedBox(height: 8),
             ExpansionTile(
@@ -308,7 +335,8 @@ class _RecentEntryRow extends StatelessWidget {
               childrenPadding: EdgeInsets.zero,
               title: Text(
                 'Show details',
-                style: theme.textTheme.bodyMedium?.copyWith(
+                style:
+                    theme.textTheme.bodyMedium?.copyWith(
                   fontWeight: FontWeight.w700,
                 ),
               ),
@@ -316,7 +344,8 @@ class _RecentEntryRow extends StatelessWidget {
                 Align(
                   alignment: Alignment.centerLeft,
                   child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                    crossAxisAlignment:
+                        CrossAxisAlignment.start,
                     children: detailChildren,
                   ),
                 ),
@@ -340,6 +369,124 @@ class _RecentEntryRow extends StatelessWidget {
               ),
             ],
           ),
+        ],
+      ),
+    );
+  }
+}
+
+class _EntryTypeBadge extends StatelessWidget {
+  const _EntryTypeBadge({
+    required this.entryType,
+  });
+
+  final String entryType;
+
+  @override
+  Widget build(BuildContext context) {
+    final LogEntryVisualStyle visual =
+        LogEntryVisuals.forType(entryType);
+
+    return Semantics(
+      label: '$entryType log entry',
+      child: Container(
+        key: ValueKey<String>(
+          'log-entry-badge-${entryType.toLowerCase()}',
+        ),
+        padding: const EdgeInsets.symmetric(
+          horizontal: 10,
+          vertical: 7,
+        ),
+        decoration: BoxDecoration(
+          color: visual.backgroundColor,
+          borderRadius: BorderRadius.circular(999),
+          border: Border.all(
+            color: visual.color,
+          ),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: <Widget>[
+            Icon(
+              visual.icon,
+              size: 18,
+              color: visual.color,
+            ),
+            const SizedBox(width: 6),
+            Text(
+              entryType,
+              style: Theme.of(context)
+                  .textTheme
+                  .bodyMedium
+                  ?.copyWith(
+                    color: Colors.white,
+                    fontWeight: FontWeight.w800,
+                  ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _IntensityDots extends StatelessWidget {
+  const _IntensityDots({
+    required this.entryId,
+    required this.intensity,
+    required this.entryType,
+  });
+
+  final String entryId;
+  final int intensity;
+  final String entryType;
+
+  @override
+  Widget build(BuildContext context) {
+    final LogEntryVisualStyle visual =
+        LogEntryVisuals.forType(entryType);
+    final int safeIntensity = intensity.clamp(1, 5).toInt();
+
+    return Semantics(
+      label: 'Intensity $safeIntensity out of 5',
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: <Widget>[
+          Text(
+            'Intensity $safeIntensity',
+            style: Theme.of(context).textTheme.bodyMedium,
+          ),
+          const SizedBox(width: 7),
+          ...List<Widget>.generate(5, (int index) {
+            final int value = index + 1;
+            final bool isFilled = value <= safeIntensity;
+
+            return Padding(
+              padding: EdgeInsets.only(
+                right: value == 5 ? 0 : 4,
+              ),
+              child: Container(
+                key: ValueKey<String>(
+                  'log-intensity-dot-$entryId-$value-'
+                  '${isFilled ? 'filled' : 'empty'}',
+                ),
+                width: 8,
+                height: 8,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: isFilled
+                      ? visual.color
+                      : Colors.transparent,
+                  border: Border.all(
+                    color: isFilled
+                        ? visual.color
+                        : const Color(0x66FFFFFF),
+                    width: 1,
+                  ),
+                ),
+              ),
+            );
+          }),
         ],
       ),
     );
