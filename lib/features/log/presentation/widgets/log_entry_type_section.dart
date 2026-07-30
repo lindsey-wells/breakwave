@@ -5,6 +5,7 @@
 // Purpose: Entry type selector for the BW-04 log flow.
 // Notes: BW-72B shortens Log copy for faster capture.
 // Notes: BW-LOG-01A adds distinct icon and color identity.
+// Notes: BW-LOG-01B2 exposes Reflection as an intensity-free entry type.
 // ------------------------------------------------------------
 
 import 'package:flutter/material.dart';
@@ -28,6 +29,7 @@ class LogEntryTypeSection extends StatelessWidget {
       'Urge',
       'Slip',
       'Victory',
+      'Reflection',
     ];
 
     return Card(

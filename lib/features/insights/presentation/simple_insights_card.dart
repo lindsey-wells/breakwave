@@ -53,6 +53,7 @@ class _SimpleInsightsCardState extends State<SimpleInsightsCard> {
     int urgeCount = 0;
     int victoryCount = 0;
     int slipCount = 0;
+    int reflectionCount = 0;
     int rescueFollowThrough = 0;
     int totalIntensity = 0;
     int intensityEntryCount = 0;
@@ -73,6 +74,9 @@ class _SimpleInsightsCardState extends State<SimpleInsightsCard> {
           break;
         case 'Slip':
           slipCount += 1;
+          break;
+        case 'Reflection':
+          reflectionCount += 1;
           break;
       }
 
@@ -118,7 +122,7 @@ class _SimpleInsightsCardState extends State<SimpleInsightsCard> {
       _snapshot = _InsightsSnapshot(
         recentEntriesText: recentEntries.isEmpty
             ? 'Recent entries: none yet.'
-            : 'Recent entries: $urgeCount urge • $victoryCount victory • $slipCount slip',
+            : 'Recent entries: $urgeCount urge • $victoryCount victory • $slipCount slip • $reflectionCount reflection',
         intensityText: intensityText,
         rescueText: rescueFollowThrough == 0
             ? 'Rescue follow-through: none logged yet.'

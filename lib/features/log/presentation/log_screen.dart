@@ -73,6 +73,10 @@ class _LogScreenState extends State<LogScreen> {
 
   static const String _otherLabel = 'Other';
 
+  bool get _isReflectionDraft =>
+      _entryType.trim().toLowerCase() ==
+      LogEntry.reflectionEntryType.toLowerCase();
+
   static const List<String> _availableTriggers = <String>[
     'Stress',
     'Boredom',
@@ -399,6 +403,9 @@ class _LogScreenState extends State<LogScreen> {
 
     try {
       final String savedType = _entryType;
+      final bool isReflectionEntry =
+          savedType.trim().toLowerCase() ==
+          LogEntry.reflectionEntryType.toLowerCase();
       final String? editingId = _editingEntryId;
       final List<String> resolvedTriggers = _resolvedTriggers();
       final String replacementActionForSave = _resolvedReplacementAction();
@@ -406,7 +413,7 @@ class _LogScreenState extends State<LogScreen> {
       final LogEntry entry = LogEntry(
         id: editingId ?? DateTime.now().microsecondsSinceEpoch.toString(),
         entryType: savedType,
-        intensity: _intensity,
+        intensity: isReflectionEntry ? null : _intensity,
         triggers: resolvedTriggers,
         thought: _thoughtController.text.trim(),
         actionTaken: _actionTakenController.text.trim(),
@@ -519,11 +526,13 @@ class _LogScreenState extends State<LogScreen> {
                     onSelected: _setEntryType,
                   ),
                   const SizedBox(height: 16),
-                  LogIntensitySection(
-                    selectedIntensity: _intensity,
-                    onSelected: _setIntensity,
-                  ),
-                  const SizedBox(height: 16),
+                  if (!_isReflectionDraft) ...<Widget>[
+                    LogIntensitySection(
+                      selectedIntensity: _intensity,
+                      onSelected: _setIntensity,
+                    ),
+                    const SizedBox(height: 16),
+                  ],
                   LogTriggerChipsSection(
                     availableTriggers: _availableTriggers,
                     selectedTriggers: _selectedTriggers,
@@ -534,6 +543,7 @@ class _LogScreenState extends State<LogScreen> {
                   ),
                   const SizedBox(height: 16),
                   LogCbtReflectionCard(
+                    isReflectionEntry: _isReflectionDraft,
                     thoughtController: _thoughtController,
                     actionTakenController: _actionTakenController,
                     consequenceController: _consequenceController,
@@ -555,7 +565,7 @@ class _LogScreenState extends State<LogScreen> {
                   const SizedBox(height: 16),
                     LogSaveCard(
                       entryType: _entryType,
-                      intensity: _intensity,
+                      intensity: _isReflectionDraft ? null : _intensity,
                       triggerCount: _resolvedTriggers().length,
                       savedEntryCount: _savedEntryCount,
                       isSaving: _isSaving,

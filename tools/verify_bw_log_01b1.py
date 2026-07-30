@@ -19,7 +19,6 @@ checks = {
     ],
     "lib/features/log/presentation/log_screen.dart": [
         "_intensity = entry.intensity ?? 3;",
-        "intensity: _intensity,",
     ],
     "lib/features/log/presentation/widgets/recent_log_entries_card.dart": [
         "if (entry.intensity != null)",
@@ -65,19 +64,7 @@ for rel_path, needles in checks.items():
             )
             sys.exit(1)
 
-selector = (
-    ROOT
-    / "lib/features/log/presentation/widgets/"
-    "log_entry_type_section.dart"
-).read_text(encoding="utf-8")
-
-if "'Reflection'," in selector:
-    print(
-        "FAIL BW-LOG-01B1 selector changed before BW-LOG-01B2"
-    )
-    sys.exit(1)
-
 print(
     "PASS: BW-LOG-01B1 Reflection data foundation "
-    "is nullable, backward-compatible, and UI-gated."
+    "remains nullable and backward-compatible."
 )

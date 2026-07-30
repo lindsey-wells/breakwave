@@ -5,13 +5,14 @@
 // Purpose: Save confirmation card for the BW-04 log flow.
 // Notes: BW-76B adds clearer save/update feedback without leaving Log.
 // Notes: BW-84B makes editing mode visible near the save/update action.
+// Notes: BW-LOG-01B2 omits fake intensity from Reflection drafts.
 // ------------------------------------------------------------
 
 import 'package:flutter/material.dart';
 
 class LogSaveCard extends StatelessWidget {
   final String entryType;
-  final int intensity;
+  final int? intensity;
   final int triggerCount;
   final int savedEntryCount;
   final bool isSaving;
@@ -36,7 +37,11 @@ class LogSaveCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final ThemeData theme = Theme.of(context);
-    final String triggerLabel = triggerCount == 1 ? 'trigger' : 'triggers';
+    final String triggerLabel =
+        triggerCount == 1 ? 'trigger' : 'triggers';
+    final String draftSummary = intensity == null
+        ? 'Current draft: $entryType • $triggerCount $triggerLabel selected'
+        : 'Current draft: $entryType • intensity $intensity • $triggerCount $triggerLabel selected';
 
     return Card(
       child: Padding(
@@ -50,7 +55,7 @@ class LogSaveCard extends StatelessWidget {
             ),
             const SizedBox(height: 8),
             Text(
-              'Current draft: $entryType • intensity $intensity • $triggerCount $triggerLabel selected',
+              draftSummary,
               style: theme.textTheme.bodyMedium,
             ),
             const SizedBox(height: 8),
