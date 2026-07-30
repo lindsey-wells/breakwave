@@ -219,7 +219,7 @@ class _LogScreenState extends State<LogScreen> {
       _editingEntryId = entry.id;
       _editingCreatedAtIso = entry.createdAtIso;
       _entryType = entry.entryType;
-      _intensity = entry.intensity;
+      _intensity = entry.intensity ?? 3;
 
       _selectedTriggers.clear();
       _otherTriggerController.clear();

@@ -55,9 +55,14 @@ class _SimpleInsightsCardState extends State<SimpleInsightsCard> {
     int slipCount = 0;
     int rescueFollowThrough = 0;
     int totalIntensity = 0;
+    int intensityEntryCount = 0;
 
     for (final LogEntry entry in recentEntries) {
-      totalIntensity += entry.intensity;
+      final int? intensity = entry.intensity;
+      if (intensity != null) {
+        totalIntensity += intensity;
+        intensityEntryCount += 1;
+      }
 
       switch (entry.entryType) {
         case 'Urge':
@@ -77,11 +82,12 @@ class _SimpleInsightsCardState extends State<SimpleInsightsCard> {
       }
     }
 
-    final double averageIntensity =
-        recentEntries.isEmpty ? 0 : totalIntensity / recentEntries.length;
+    final double averageIntensity = intensityEntryCount == 0
+        ? 0
+        : totalIntensity / intensityEntryCount;
 
     final String intensityText;
-    if (recentEntries.isEmpty) {
+    if (intensityEntryCount == 0) {
       intensityText = 'Intensity trend: no recent entries yet.';
     } else if (averageIntensity <= 2.2) {
       intensityText = 'Intensity trend: recent waves are leaning lighter.';

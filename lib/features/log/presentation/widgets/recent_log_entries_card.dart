@@ -264,11 +264,12 @@ class _RecentEntryRow extends StatelessWidget {
               _EntryTypeBadge(
                 entryType: entry.entryType,
               ),
-              _IntensityDots(
-                entryId: entry.id,
-                intensity: entry.intensity,
-                entryType: entry.entryType,
-              ),
+              if (entry.intensity != null)
+                _IntensityDots(
+                  entryId: entry.id,
+                  intensity: entry.intensity!,
+                  entryType: entry.entryType,
+                ),
               Text(
                 _formatTimestamp(entry.createdAtIso),
                 style: theme.textTheme.bodySmall,

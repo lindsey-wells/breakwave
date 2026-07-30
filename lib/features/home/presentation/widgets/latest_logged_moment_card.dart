@@ -73,14 +73,16 @@ class LatestLoggedMomentCard extends StatelessWidget {
                         latest.entryType,
                         style: Theme.of(context).textTheme.titleMedium,
                       ),
-                      Text(
-                        '•',
-                        style: Theme.of(context).textTheme.titleMedium,
-                      ),
-                      Text(
-                        'Intensity ${latest.intensity}',
-                        style: Theme.of(context).textTheme.bodyMedium,
-                      ),
+                      if (latest.intensity != null) ...<Widget>[
+                        Text(
+                          '•',
+                          style: Theme.of(context).textTheme.titleMedium,
+                        ),
+                        Text(
+                          'Intensity ${latest.intensity}',
+                          style: Theme.of(context).textTheme.bodyMedium,
+                        ),
+                      ],
                       Text(
                         '•',
                         style: Theme.of(context).textTheme.titleMedium,

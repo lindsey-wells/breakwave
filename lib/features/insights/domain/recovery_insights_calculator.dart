@@ -120,9 +120,14 @@ class RecoveryInsightsCalculator {
     int slips = 0;
     int victories = 0;
     int totalIntensity = 0;
+    int intensityEntryCount = 0;
 
     for (final _DatedLogEntry item in periodEntries) {
-      totalIntensity += item.entry.intensity;
+      final int? intensity = item.entry.intensity;
+      if (intensity != null) {
+        totalIntensity += intensity;
+        intensityEntryCount += 1;
+      }
 
       switch (item.normalizedType) {
         case 'urge':
@@ -145,7 +150,9 @@ class RecoveryInsightsCalculator {
       urges: urges,
       slips: slips,
       victories: victories,
-      averageIntensity: total == 0 ? 0 : totalIntensity / total,
+      averageIntensity: intensityEntryCount == 0
+          ? 0
+          : totalIntensity / intensityEntryCount,
     );
   }
 
