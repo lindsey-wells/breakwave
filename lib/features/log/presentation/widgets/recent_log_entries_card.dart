@@ -43,8 +43,7 @@ class RecentLogEntriesCard extends StatelessWidget {
         ? 'No saved entries yet.'
         : showAllEntries
             ? 'Showing all $totalEntryCount saved entries.'
-            : 'Showing latest $visibleCount of '
-                '$totalEntryCount saved entries.';
+            : 'Showing latest $visibleCount of $totalEntryCount saved entries.';
 
     return Card(
       child: Padding(
@@ -58,8 +57,7 @@ class RecentLogEntriesCard extends StatelessWidget {
             ),
             const SizedBox(height: 8),
             Text(
-              'Newest saved moments. Open details only '
-              'when you need them.',
+              'Newest saved moments. Open details only when you need them.',
               style: Theme.of(context).textTheme.bodyMedium,
             ),
             const SizedBox(height: 8),
@@ -106,8 +104,7 @@ class RecentLogEntriesCard extends StatelessWidget {
                     padding: const EdgeInsets.only(bottom: 12),
                     child: _RecentEntryRow(
                       entry: entry,
-                      isHighlighted:
-                          entry.id == highlightedEntryId,
+                      isHighlighted: entry.id == highlightedEntryId,
                       onEdit: () => onEdit(entry),
                       onDelete: () => onDelete(entry),
                     ),
@@ -323,8 +320,7 @@ class _RecentEntryRow extends StatelessWidget {
             ...<Widget>[
               const SizedBox(height: 8),
               Text(
-                'Replacement action: '
-                '${entry.replacementAction.trim()}',
+                'Replacement action: ${entry.replacementAction.trim()}',
                 style: theme.textTheme.bodyMedium,
               ),
             ],

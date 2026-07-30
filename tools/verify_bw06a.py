@@ -34,9 +34,11 @@ EXPECTED_PATTERNS = {
         "elevation: isSelected ? 3 : 0",
     ],
     "lib/features/log/presentation/widgets/log_entry_type_section.dart": [
-        "BreakWaveColors.chipSelected",
-        "BreakWaveColors.chipSelectedBorder",
-        "showCheckmark: true",
+        "log_entry_visuals.dart",
+        "LogEntryVisuals.forType(type)",
+        "selectedColor: visual.backgroundColor",
+        "? visual.color",
+        "showCheckmark: false",
         "FontWeight.w800",
     ],
     "lib/features/log/presentation/widgets/log_intensity_section.dart": [
@@ -74,9 +76,14 @@ def main() -> None:
 
         for pattern in EXPECTED_PATTERNS.get(rel_path, []):
             if pattern not in content:
-                fail(f"missing pattern in {rel_path}: {pattern}")
+                fail(
+                    f"missing pattern in {rel_path}: {pattern}"
+                )
 
-    print("PASS: BW-06A selected-state contrast polish verified.")
+    print(
+        "PASS: BW-06A selected-state contrast polish "
+        "verified with BW-LOG-01A visual identity."
+    )
 
 
 if __name__ == "__main__":
