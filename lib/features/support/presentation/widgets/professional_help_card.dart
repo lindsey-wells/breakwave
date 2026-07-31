@@ -19,12 +19,13 @@ class ProfessionalHelpCard extends StatelessWidget {
     final ThemeData theme = Theme.of(context);
     final ColorScheme colorScheme = theme.colorScheme;
 
-    return Container(
-      decoration: BoxDecoration(
-        color: colorScheme.surfaceContainerHighest.withOpacity(0.45),
+    return Material(
+      color: colorScheme.surfaceContainerHighest.withOpacity(0.45),
+      shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: colorScheme.outlineVariant),
+        side: BorderSide(color: colorScheme.outlineVariant),
       ),
+      clipBehavior: Clip.antiAlias,
       child: ExpansionTile(
         tilePadding: const EdgeInsets.fromLTRB(18, 12, 18, 12),
         childrenPadding: const EdgeInsets.fromLTRB(18, 0, 18, 18),

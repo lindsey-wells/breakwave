@@ -30,11 +30,13 @@ required = {
         "wave starts getting stronger",
     ],
     "lib/features/support/presentation/widgets/professional_help_card.dart": [
+        "Material(",
         "ExpansionTile(",
         "When to seek professional help",
         "seek emergency help immediately",
     ],
     "lib/features/support/presentation/widgets/cbt_informed_support_card.dart": [
+        "Material(",
         "ExpansionTile(",
         "CBT means cognitive behavioral tools.",
         "Important safety note",
