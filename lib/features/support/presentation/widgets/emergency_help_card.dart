@@ -2,57 +2,17 @@
 // Cube23 Collaboration Header
 // Project: BreakWave
 // File: emergency_help_card.dart
-// Purpose: Immediate support card for BreakWave.
-// Notes: BW-37 replaces unfinished CTA with real trusted-contact actions.
+// Purpose: Immediate emergency guidance for BreakWave.
+// Notes: BW-SUPPORT-01B separates immediate danger from ordinary urge support.
 // ------------------------------------------------------------
 
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-import '../../../../core/support/support_contact.dart';
-import '../../../../core/support/support_contact_actions.dart';
-import '../../../../core/support/support_contact_store.dart';
-
-class EmergencyHelpCard extends StatefulWidget {
+class EmergencyHelpCard extends StatelessWidget {
   const EmergencyHelpCard({super.key});
 
-  @override
-  State<EmergencyHelpCard> createState() => _EmergencyHelpCardState();
-}
-
-class _EmergencyHelpCardState extends State<EmergencyHelpCard> {
-  SupportContact? _contact;
-
-  @override
-  void initState() {
-    super.initState();
-    SupportContactStore.changes.addListener(_load);
-    _load();
-  }
-
-  @override
-  void dispose() {
-    SupportContactStore.changes.removeListener(_load);
-    super.dispose();
-  }
-
-  Future<void> _load() async {
-    final SupportContact? contact = await SupportContactStore.loadContact();
-    if (!mounted) return;
-    setState(() {
-      _contact = contact;
-    });
-  }
-
-  Future<void> _run(Future<bool> Function() action, String failureText) async {
-    final bool ok = await action();
-    if (!mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(ok ? 'Opening your contact app.' : failureText)),
-    );
-  }
-
-  Future<void> _callEmergencyServices() async {
+  Future<void> _callEmergencyServices(BuildContext context) async {
     final Uri uri = Uri(
       scheme: 'tel',
       path: '911',
@@ -63,11 +23,13 @@ class _EmergencyHelpCardState extends State<EmergencyHelpCard> {
       mode: LaunchMode.externalApplication,
     );
 
-    if (!mounted) return;
+    if (!context.mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(
-          ok ? 'Opening your phone app.' : 'Unable to open the phone app right now.',
+          ok
+              ? 'Opening your phone app.'
+              : 'Unable to open the phone app right now.',
         ),
       ),
     );
@@ -77,69 +39,59 @@ class _EmergencyHelpCardState extends State<EmergencyHelpCard> {
   Widget build(BuildContext context) {
     final ThemeData theme = Theme.of(context);
     final ColorScheme colorScheme = theme.colorScheme;
-    final bool hasPhone = _contact?.hasPhone ?? false;
-    final bool hasEmail = _contact?.hasEmail ?? false;
 
     return Container(
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
-        color: colorScheme.surfaceContainerHighest.withOpacity(0.45),
+        color: colorScheme.errorContainer.withOpacity(0.20),
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: colorScheme.outlineVariant),
+        border: Border.all(
+          color: colorScheme.error.withOpacity(0.65),
+        ),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
-          Text(
-            'Emergency Help',
-            style: theme.textTheme.titleMedium?.copyWith(
-              fontWeight: FontWeight.w700,
-            ),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              Icon(
+                Icons.emergency_outlined,
+                color: colorScheme.error,
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Text(
+                  'Immediate danger',
+                  style: theme.textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+              ),
+            ],
           ),
           const SizedBox(height: 10),
-          Text(
-            'When the pressure spikes, reduce isolation fast. Use your trusted contact tools right away instead of waiting for the wave to negotiate with you.',
-            style: theme.textTheme.bodyMedium,
+          const Text(
+            'Use this only when you or someone else may be in immediate danger or needs urgent police, fire, or medical help.',
+          ),
+          const SizedBox(height: 10),
+          const Text(
+            'In the United States, this button calls 911. Outside the United States, use your local emergency number.',
           ),
           const SizedBox(height: 16),
-          FilledButton(
-            onPressed: _callEmergencyServices,
-            child: const Padding(
+          FilledButton.icon(
+            onPressed: () => _callEmergencyServices(context),
+            icon: const Icon(Icons.phone_in_talk_outlined),
+            label: const Padding(
               padding: EdgeInsets.symmetric(vertical: 14),
-              child: Text('Call emergency services'),
+              child: Text('Call 911 (U.S.)'),
             ),
           ),
-          if (hasPhone) const SizedBox(height: 10),
-          if (hasPhone)
-            FilledButton.tonal(
-              onPressed: () => _run(
-                () => SupportContactActions.sendStrugglingText(_contact!),
-                'Unable to open text message right now.',
-              ),
-              child: const Padding(
-                padding: EdgeInsets.symmetric(vertical: 14),
-                child: Text('Text trusted contact now'),
-              ),
-            ),
-          if (hasEmail) const SizedBox(height: 10),
-          if (hasEmail)
-            OutlinedButton(
-              onPressed: () => _run(
-                () => SupportContactActions.sendSupportEmail(_contact!),
-                'Unable to open email right now.',
-              ),
-              child: const Padding(
-                padding: EdgeInsets.symmetric(vertical: 14),
-                child: Text('Email trusted contact now'),
-              ),
-            ),
-          if (!hasPhone && !hasEmail) ...<Widget>[
-            const SizedBox(height: 10),
-            Text(
-              'Save a trusted contact below to unlock direct emergency contact actions.',
-              style: theme.textTheme.bodyMedium,
-            ),
-          ],
+          const SizedBox(height: 12),
+          Text(
+            'For urge support that is not an immediate emergency, use the trusted-contact tools below.',
+            style: theme.textTheme.bodyMedium,
+          ),
         ],
       ),
     );

@@ -12,9 +12,13 @@ checks = [
     ]),
     ("lib/features/support/presentation/widgets/emergency_help_card.dart", [
         "class EmergencyHelpCard",
-        "Emergency Help",
-        "Call emergency services",
-        "Text trusted contact now",
+        "Immediate danger",
+        "Call 911 (U.S.)",
+        "Outside the United States, use your local emergency number.",
+    ]),
+    ("lib/features/support/presentation/widgets/support_quick_actions_card.dart", [
+        "Text ${_contact!.name}: I’m struggling",
+        "Email ${_contact!.name} now",
     ]),
     ("lib/features/support/presentation/widgets/trusted_accountability_card.dart", [
         "class TrustedAccountabilityCard",

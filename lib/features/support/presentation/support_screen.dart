@@ -5,17 +5,17 @@
 // Purpose: BW-55 grouped Support tab cleanup.
 // Notes: BW-73A declutters Support with collapsible launch-ready groups.
 // Notes: BW-87B4C passes real guided-routine navigation actions into Plus.
+// Notes: BW-SUPPORT-01B puts immediate support first and expands it by default.
 // ------------------------------------------------------------
 
 import 'package:flutter/material.dart';
 
+import '../../../core/ui/breakwave_app_bar.dart';
 import '../../../core/ui/wave_surface.dart';
 import '../../guided_routines/domain/recovery_routine.dart';
-import '../../../core/ui/breakwave_app_bar.dart';
 import '../../premium/presentation/breakwave_plus_screen.dart';
 import 'widgets/breakwave_contact_links_card.dart';
 import 'widgets/cbt_informed_support_card.dart';
-import 'widgets/professional_help_card.dart';
 import 'widgets/custom_why_settings_card.dart';
 import 'widgets/educate_me_entry_card.dart';
 import 'widgets/education_resources_card.dart';
@@ -25,6 +25,7 @@ import 'widgets/email_export_card.dart';
 import 'widgets/emergency_help_card.dart';
 import 'widgets/privacy_lock_settings_card.dart';
 import 'widgets/privacy_settings_card.dart';
+import 'widgets/professional_help_card.dart';
 import 'widgets/recovery_mode_settings_card.dart';
 import 'widgets/reminder_settings_card.dart';
 import 'widgets/support_categories_card.dart';
@@ -38,8 +39,7 @@ class SupportScreen extends StatelessWidget {
     this.onRoutineActionRequested,
   });
 
-  final ValueChanged<RoutineActionTarget>?
-      onRoutineActionRequested;
+  final ValueChanged<RoutineActionTarget>? onRoutineActionRequested;
 
   @override
   Widget build(BuildContext context) {
@@ -83,6 +83,22 @@ class SupportScreen extends StatelessWidget {
                   const SizedBox(height: 20),
 
                   const _SupportGroup(
+                    eyebrow: 'Get help now',
+                    title: 'Reduce isolation fast',
+                    subtitle:
+                        'Immediate-danger guidance, trusted contact setup, and ready-to-send support messages.',
+                    icon: Icons.support_agent_outlined,
+                    initiallyExpanded: true,
+                    children: <Widget>[
+                      EmergencyHelpCard(),
+                      SupportContactCard(),
+                      SupportQuickActionsCard(),
+                      TrustedAccountabilityCard(),
+                    ],
+                  ),
+
+                  const SizedBox(height: 16),
+                  const _SupportGroup(
                     eyebrow: 'Recovery model',
                     title: 'Cognitive behavioral tools, not shame',
                     subtitle:
@@ -92,22 +108,6 @@ class SupportScreen extends StatelessWidget {
                     children: <Widget>[
                       CbtInformedSupportCard(),
                       ProfessionalHelpCard(),
-                    ],
-                  ),
-
-                  const SizedBox(height: 16),
-                  const _SupportGroup(
-                    eyebrow: 'Get help now',
-                    title: 'Reduce isolation fast',
-                    subtitle:
-                        'Reach a trusted person, open emergency options, or copy a support message.',
-                    icon: Icons.support_agent_outlined,
-                    initiallyExpanded: false,
-                    children: <Widget>[
-                      EmergencyHelpCard(),
-                      SupportContactCard(),
-                      SupportQuickActionsCard(),
-                      TrustedAccountabilityCard(),
                     ],
                   ),
 
@@ -136,8 +136,7 @@ class SupportScreen extends StatelessWidget {
                     initiallyExpanded: false,
                     children: <Widget>[
                       _BreakWavePlusPreviewCard(
-                        onRoutineActionRequested:
-                            onRoutineActionRequested,
+                        onRoutineActionRequested: onRoutineActionRequested,
                       ),
                     ],
                   ),
@@ -170,7 +169,6 @@ class SupportScreen extends StatelessWidget {
                       EducateMeEntryCard(),
                     ],
                   ),
-
 
                   const SizedBox(height: 16),
                   const _SupportGroup(
@@ -276,15 +274,13 @@ class _BreakWavePlusPreviewCard extends StatelessWidget {
     this.onRoutineActionRequested,
   });
 
-  final ValueChanged<RoutineActionTarget>?
-      onRoutineActionRequested;
+  final ValueChanged<RoutineActionTarget>? onRoutineActionRequested;
 
   void _openPlus(BuildContext context) {
     Navigator.of(context).push(
       MaterialPageRoute(
         builder: (_) => BreakWavePlusScreen(
-          onRoutineActionRequested:
-              onRoutineActionRequested,
+          onRoutineActionRequested: onRoutineActionRequested,
         ),
       ),
     );

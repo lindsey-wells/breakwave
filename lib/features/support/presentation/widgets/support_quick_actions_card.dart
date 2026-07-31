@@ -4,6 +4,7 @@
 // File: support_quick_actions_card.dart
 // Purpose: BW-21/BW-37 support quick actions card.
 // Notes: Supports direct text/email actions and keeps copy actions as fallback.
+// Notes: BW-SUPPORT-01B masks saved contact details at a glance.
 // ------------------------------------------------------------
 
 import 'package:flutter/material.dart';
@@ -17,7 +18,8 @@ class SupportQuickActionsCard extends StatefulWidget {
   const SupportQuickActionsCard({super.key});
 
   @override
-  State<SupportQuickActionsCard> createState() => _SupportQuickActionsCardState();
+  State<SupportQuickActionsCard> createState() =>
+      _SupportQuickActionsCardState();
 }
 
 class _SupportQuickActionsCardState extends State<SupportQuickActionsCard> {
@@ -66,7 +68,10 @@ class _SupportQuickActionsCardState extends State<SupportQuickActionsCard> {
     );
   }
 
-  Future<void> _runAction(Future<bool> Function() action, String failureText) async {
+  Future<void> _runAction(
+    Future<bool> Function() action,
+    String failureText,
+  ) async {
     final bool ok = await action();
     if (!mounted) return;
 
@@ -75,6 +80,23 @@ class _SupportQuickActionsCardState extends State<SupportQuickActionsCard> {
         content: Text(ok ? 'Opening your messaging app.' : failureText),
       ),
     );
+  }
+
+  String _readinessText({
+    required bool hasContact,
+    required bool hasPhone,
+    required bool hasEmail,
+  }) {
+    if (!hasContact) {
+      return 'Save a trusted contact first, then send a direct text or email.';
+    }
+
+    final List<String> channels = <String>[
+      if (hasPhone) 'phone saved',
+      if (hasEmail) 'email saved',
+    ];
+
+    return 'Ready for ${_contact!.name} • ${channels.join(' • ')}';
   }
 
   @override
@@ -105,9 +127,11 @@ class _SupportQuickActionsCardState extends State<SupportQuickActionsCard> {
                 ),
                 const SizedBox(height: 10),
                 Text(
-                  hasContact
-                      ? 'Ready for ${_contact!.name}${hasPhone ? ' • ${_contact!.phoneNumber}' : ''}${hasEmail ? '${hasPhone ? ' • ' : ' • '}${_contact!.emailAddress}' : ''}'
-                      : 'Save a trusted contact first, then send a direct text or email.',
+                  _readinessText(
+                    hasContact: hasContact,
+                    hasPhone: hasPhone,
+                    hasEmail: hasEmail,
+                  ),
                   style: theme.textTheme.bodyMedium,
                 ),
                 const SizedBox(height: 16),
@@ -131,7 +155,9 @@ class _SupportQuickActionsCardState extends State<SupportQuickActionsCard> {
                     ),
                     child: Padding(
                       padding: const EdgeInsets.symmetric(vertical: 14),
-                      child: Text('Text ${_contact!.name}: Please check on me'),
+                      child: Text(
+                        'Text ${_contact!.name}: Please check on me',
+                      ),
                     ),
                   ),
                   const SizedBox(height: 10),

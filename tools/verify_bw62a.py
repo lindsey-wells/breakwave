@@ -5,12 +5,13 @@ path = Path("lib/features/support/presentation/support_screen.dart")
 text = path.read_text(encoding="utf-8")
 
 checks = [
+    "eyebrow: 'Get help now'",
+    "SupportContactCard",
+    "SupportQuickActionsCard",
     "eyebrow: 'Recovery model'",
     "title: 'Cognitive behavioral tools, not shame'",
     "CbtInformedSupportCard",
     "ProfessionalHelpCard",
-    "eyebrow: 'Get help now'",
-    "SupportContactCard",
     "eyebrow: 'Learn and resources'",
     "SupportCategoriesCard",
     "EducationResourcesCard",
@@ -25,11 +26,12 @@ for needle in checks:
 
 order = [
     "Support Harbor",
+    "eyebrow: 'Get help now'",
+    "SupportContactCard",
+    "SupportQuickActionsCard",
     "eyebrow: 'Recovery model'",
     "CbtInformedSupportCard",
     "ProfessionalHelpCard",
-    "eyebrow: 'Get help now'",
-    "SupportContactCard",
     "eyebrow: 'Your recovery setup'",
     "eyebrow: 'BreakWave Plus'",
     "eyebrow: 'Privacy and safety'",

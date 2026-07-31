@@ -8,7 +8,7 @@ checks = [
     "BW-73A declutters Support with collapsible launch-ready groups.",
     "class _SupportGroup extends StatelessWidget",
     "ExpansionTile",
-    "initiallyExpanded: false",
+    "initiallyExpanded: true",
     "initiallyExpanded: false",
     "Recovery model",
     "Cognitive behavioral tools, not shame",
@@ -58,8 +58,8 @@ for needle in checks:
         failed = True
 
 order = [
-    ("Recovery model", text.find("Recovery model")),
     ("Get help now", text.find("Get help now")),
+    ("Recovery model", text.find("Recovery model")),
     ("Your recovery setup", text.find("Your recovery setup")),
     ("BreakWave Plus", text.find("BreakWave Plus")),
     ("Privacy and safety", text.find("Privacy and safety")),

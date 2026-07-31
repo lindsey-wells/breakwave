@@ -14,9 +14,9 @@ educate = Path(
 ).read_text(encoding="utf-8")
 
 start = support.find("eyebrow: 'Recovery model'")
-end = support.find("eyebrow: 'Get help now'")
+end = support.find("eyebrow: 'Your recovery setup'")
 
-if start == -1 or end == -1:
+if start == -1 or end == -1 or start >= end:
     print("FAIL BW-86C1 could not locate Recovery model group")
     sys.exit(1)
 
