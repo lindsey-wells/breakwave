@@ -73,59 +73,51 @@ class OnboardingIntroStepDetails
   Widget _buildWelcome(
     BuildContext context,
   ) {
-    final ThemeData theme =
-        Theme.of(context);
+    final ThemeData theme = Theme.of(context);
+    final ColorScheme colorScheme = theme.colorScheme;
 
     return Column(
       key: const Key(
         'onboarding-welcome-details',
       ),
-      crossAxisAlignment:
-          CrossAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
         Text(
-          'Why this exists',
-          style: theme.textTheme.titleMedium
-              ?.copyWith(
+          'A welcome from the people behind BreakWave',
+          style: theme.textTheme.titleMedium?.copyWith(
             fontWeight: FontWeight.w900,
           ),
         ),
         const SizedBox(height: 10),
         const Text(
-          'BreakWave began with a simple belief: '
-          'help should be within reach before a '
-          'private urge becomes a private decision.',
+          'If we could meet you in person, we would shake your hand and congratulate you for taking this first step.',
         ),
-        const SizedBox(height: 18),
-        const _InfoLine(
-          icon: Icons.waves_rounded,
-          title: 'Fast help when the wave rises',
-          body:
-              'Open Rescue immediately instead of '
-              'trying to outthink the urge alone.',
+        const SizedBox(height: 12),
+        const Text(
+          'BreakWave was created by people who understand how powerful pornography urges can feel because we have faced these struggles too.',
+        ),
+        const SizedBox(height: 16),
+        Container(
+          width: double.infinity,
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: colorScheme.primary.withOpacity(0.14),
+            borderRadius: BorderRadius.circular(18),
+            border: Border.all(
+              color: colorScheme.primary.withOpacity(0.45),
+            ),
+          ),
+          child: const Text(
+            'When the wave rises, BreakWave helps you pause, regain control, and choose what comes next.',
+          ),
         ),
         const SizedBox(height: 14),
-        const _InfoLine(
-          icon: Icons.schedule_rounded,
-          title: 'Preparation before pressure',
-          body:
-              'Identify risky windows and choose '
-              'your next move ahead of time.',
+        const Text(
+          'You are not weak because you need support. You are here now, and that matters.',
         ),
-        const SizedBox(height: 14),
-        const _InfoLine(
-          icon: Icons.favorite_outline,
-          title: 'Honesty without shame',
-          body:
-              'Notice patterns, learn from them, '
-              'and keep moving forward.',
-        ),
-        const SizedBox(height: 18),
+        const SizedBox(height: 16),
         Text(
-          'BreakWave is not therapy, medical '
-          'treatment, or a cure. It is a private '
-          'recovery support tool for practical '
-          'next steps.',
+          'BreakWave is not therapy, medical treatment, a diagnosis, a cure, or an emergency service.',
           style: theme.textTheme.bodySmall,
         ),
       ],

@@ -50,20 +50,20 @@ void main() {
       );
 
       expect(
-        find.text('Why this exists'),
+        find.text('A welcome from the people behind BreakWave'),
         findsOneWidget,
       );
 
       expect(
         find.textContaining(
-          'help should be within reach',
+          'shake your hand and congratulate you',
         ),
         findsOneWidget,
       );
 
       expect(
         find.textContaining(
-          'not therapy, medical treatment, or a cure',
+          'not therapy, medical treatment, a diagnosis, a cure',
         ),
         findsOneWidget,
       );

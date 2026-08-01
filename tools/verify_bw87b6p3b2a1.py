@@ -86,9 +86,9 @@ for needle in [
 for needle in [
     "class OnboardingIntroStepDetails",
     "onboarding-welcome-details",
-    "Why this exists",
-    "help should be within reach",
-    "not therapy, medical treatment, or a cure",
+    "A welcome from the people behind BreakWave",
+    "shake your hand and congratulate you",
+    "not therapy, medical treatment, a diagnosis, a cure",
     "onboarding-privacy-details",
     "What stays private",
     "Local by default",

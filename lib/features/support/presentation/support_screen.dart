@@ -32,6 +32,7 @@ import 'widgets/support_categories_card.dart';
 import 'widgets/support_contact_card.dart';
 import 'widgets/support_quick_actions_card.dart';
 import 'widgets/trusted_accountability_card.dart';
+import 'widgets/who_we_are_card.dart';
 
 class SupportScreen extends StatelessWidget {
   const SupportScreen({
@@ -167,6 +168,19 @@ class SupportScreen extends StatelessWidget {
                       SupportCategoriesCard(),
                       EducationResourcesCard(),
                       EducateMeEntryCard(),
+                    ],
+                  ),
+
+                  const SizedBox(height: 16),
+                  const _SupportGroup(
+                    eyebrow: 'About BreakWave',
+                    title: 'Who we are and why we built this',
+                    subtitle:
+                        'A welcome from the people behind BreakWave.',
+                    icon: Icons.people_outline,
+                    initiallyExpanded: false,
+                    children: <Widget>[
+                      WhoWeAreCard(),
                     ],
                   ),
 

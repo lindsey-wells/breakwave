@@ -57,9 +57,8 @@ class _OnboardingFlowScreenState
       icon: Icons.waving_hand_outlined,
       title: 'Welcome to BreakWave',
       body:
-          'BreakWave is built for the moment an urge '
-          'starts rising—not after it has already '
-          'taken over.',
+          'Taking the first step toward changing a private '
+          'struggle takes courage. We are glad you are here.',
     ),
     _OnboardingShellStep(
       icon: Icons.shield_outlined,
