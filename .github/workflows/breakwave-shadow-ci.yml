@@ -1,13 +1,20 @@
 name: BreakWave Shadow CI
 
+run-name: ${{ github.event_name == 'push' && github.event.head_commit.message || inputs.run_label || format('BreakWave Shadow CI — {0}', github.ref_name) }}
+
 env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
 on:
   push:
     branches:
-      - 'validation/bw-mod-*'
+      - 'validation/bw-*'
   workflow_dispatch:
+    inputs:
+      run_label:
+        description: 'Optional BW mission label shown in Actions'
+        required: false
+        type: string
 
 permissions:
   contents: read
@@ -26,6 +33,23 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
+
+      - name: Derive Shadow metadata
+        id: shadow_metadata
+        shell: bash
+        run: |
+          set -euo pipefail
+          subject="$(git log -1 --pretty=%s)"
+          stage_id="$(printf '%s\n' "$subject" | grep -oE 'BW-[A-Z0-9]+(-[A-Z0-9]+)+' | head -n 1 || true)"
+          if [ -z "$stage_id" ]; then
+            stage_id="BW-SHADOW"
+          fi
+          artifact_prefix="$(printf '%s' "$stage_id" | tr '[:upper:]' '[:lower:]')"
+          echo "stage_id=$stage_id" >> "$GITHUB_OUTPUT"
+          echo "artifact_prefix=$artifact_prefix" >> "$GITHUB_OUTPUT"
+          echo "BW_SHADOW_STAGE_ID=$stage_id" >> "$GITHUB_ENV"
+          echo "Shadow stage: $stage_id"
+          echo "Artifact prefix: $artifact_prefix"
 
       - name: Set up Java
         uses: actions/setup-java@v5
@@ -70,7 +94,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: bw-mod-01a-shadow-evidence
+          name: ${{ steps.shadow_metadata.outputs.artifact_prefix }}-shadow-evidence
           path: shadow_evidence/**
           if-no-files-found: error
 
@@ -78,7 +102,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: bw-mod-01a-shadow-apk
+          name: ${{ steps.shadow_metadata.outputs.artifact_prefix }}-shadow-apk
           path: build/app/outputs/flutter-apk/app-release.apk
           if-no-files-found: ignore
 
@@ -86,6 +110,6 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: bw-mod-01a-shadow-aab
+          name: ${{ steps.shadow_metadata.outputs.artifact_prefix }}-shadow-aab
           path: build/app/outputs/bundle/release/app-release.aab
           if-no-files-found: ignore

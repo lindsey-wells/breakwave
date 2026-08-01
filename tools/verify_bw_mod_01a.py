@@ -22,7 +22,6 @@ session = session_path.read_text(encoding="utf-8")
 ui = screen + "\n" + body
 behavior = screen + "\n" + workflow + "\n" + session
 
-
 for token in [
     "CircularProgressIndicator",
     "Plan unavailable",
@@ -39,7 +38,7 @@ for token in [
 
 workflow_ci = (ROOT / ".github/workflows/breakwave-shadow-ci.yml").read_text(encoding="utf-8")
 runner = (ROOT / ".github/scripts/run_breakwave_shadow_ci.py").read_text(encoding="utf-8")
-for token in ["name: BreakWave Shadow CI", "validation/bw-mod-*", "run_breakwave_shadow_ci.py"]:
+for token in ["name: BreakWave Shadow CI", "validation/bw-*", "run_breakwave_shadow_ci.py"]:
     if token not in workflow_ci:
         print(f"FAIL BW-MOD-01A: Shadow marker missing: {token}")
         sys.exit(1)
@@ -48,5 +47,4 @@ for token in ["flutter", "build", "appbundle", "verify_bw88rc1a.py", "verify_bw8
         print(f"FAIL BW-MOD-01A: runner marker missing: {token}")
         sys.exit(1)
 
-
-print("PASS: BW-MOD-01A characterization and Shadow CI contract remain intact.")
+print("PASS: BW-MOD-01A characterization and generalized Shadow CI contract remain intact.")
