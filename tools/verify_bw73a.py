@@ -1,4 +1,5 @@
 from pathlib import Path
+import re
 import sys
 
 path = Path("lib/features/support/presentation/support_screen.dart")
@@ -6,28 +7,21 @@ text = path.read_text(encoding="utf-8")
 
 checks = [
     "BW-73A declutters Support with collapsible launch-ready groups.",
+    "BW-SUPPORT-01C creates a compact task-based Support structure.",
     "class _SupportGroup extends StatelessWidget",
     "ExpansionTile",
     "initiallyExpanded: true",
     "initiallyExpanded: false",
-    "Recovery model",
-    "Cognitive behavioral tools, not shame",
-    "Understand the recovery approach behind BreakWave before the support tools.",
-    "Icons.psychology_alt_outlined",
+    "maintainState: true",
+    "dense: true",
+    "visualDensity: VisualDensity.compact",
     "Get help now",
-    "Reduce isolation fast",
-    "Your recovery setup",
-    "Personalize how BreakWave supports you",
+    "Set up your recovery",
+    "Learn how BreakWave helps",
     "Privacy and safety",
-    "Protect sensitive recovery details",
-    "Learn and resources",
-    "Understand the pattern and choose next steps",
-    "BreakWave Plus",
-    "Go deeper than emergency interruption",
-    "Contact BreakWave",
-    "Send feedback or stay connected",
-    "Advanced",
-    "Data export tools",
+    "Explore BreakWave Plus",
+    "About and contact",
+    "More tools",
     "EmergencyHelpCard",
     "SupportContactCard",
     "SupportQuickActionsCard",
@@ -43,41 +37,52 @@ checks = [
     "EducationResourcesCard",
     "EducateMeEntryCard",
     "_BreakWavePlusPreviewCard",
+    "WhoWeAreCard",
     "EmailCaptureSettingsCard",
     "EmailAppHandoffCard",
     "BreakWaveContactLinksCard",
     "EmailExportCard",
-    "EdgeInsets.fromLTRB(20, 20, 20, 150)",
+    "EdgeInsets.fromLTRB(16, 16, 16, 150)",
 ]
 
 failed = False
-
 for needle in checks:
     if needle not in text:
         print(f"FAIL {path} missing: {needle}")
         failed = True
 
 order = [
-    ("Get help now", text.find("Get help now")),
-    ("Recovery model", text.find("Recovery model")),
-    ("Your recovery setup", text.find("Your recovery setup")),
-    ("BreakWave Plus", text.find("BreakWave Plus")),
-    ("Privacy and safety", text.find("Privacy and safety")),
-    ("Learn and resources", text.find("Learn and resources")),
-    ("Contact BreakWave", text.find("Contact BreakWave")),
-    ("Advanced", text.find("Advanced")),
+    "support-help-now-group",
+    "support-recovery-setup-group",
+    "support-learn-breakwave-group",
+    "support-privacy-safety-group",
+    "support-plus-group",
+    "support-about-contact-group",
+    "support-more-tools-group",
 ]
-
-for label, index in order:
+positions = []
+for marker in order:
+    index = text.find(marker)
     if index == -1:
-        print(f"FAIL order anchor missing: {label}")
+        print(f"FAIL order anchor missing: {marker}")
         failed = True
+    positions.append(index)
 
-if not failed:
-    for (left_label, left_index), (right_label, right_index) in zip(order, order[1:]):
-        if left_index > right_index:
-            print(f"FAIL order issue: {left_label} should appear before {right_label}")
-            failed = True
+if not failed and positions != sorted(positions):
+    print("FAIL BW-73A compact Support groups are out of order")
+    failed = True
+
+group_invocations = re.findall(
+    r"(?:const\s+)?_SupportGroup\(\s*"
+    r"key:\s*(?:const\s+)?Key\('support-[^']+-group'\)",
+    text,
+)
+if len(group_invocations) != 7:
+    print(
+        "FAIL BW-SUPPORT-01C expected exactly seven "
+        f"task-based group invocations, found {len(group_invocations)}"
+    )
+    failed = True
 
 launch = Path("launch/support_declutter_groups.md")
 if not launch.exists():
@@ -98,4 +103,4 @@ else:
 if failed:
     sys.exit(1)
 
-print("PASS: BW-73A Support declutter groups verified.")
+print("PASS: BW-73A Support declutter contract preserved in BW-SUPPORT-01C.")

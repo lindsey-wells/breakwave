@@ -17,9 +17,12 @@ required = {
         'not therapy, medical treatment, a diagnosis, a cure, or an emergency service',
     ],
     'lib/features/support/presentation/support_screen.dart': [
-        "eyebrow: 'About BreakWave'",
-        "title: 'Who we are and why we built this'",
+        "key: Key('support-about-contact-group')",
+        "title: 'About and contact'",
         'WhoWeAreCard()',
+        'EmailCaptureSettingsCard()',
+        'EmailAppHandoffCard()',
+        'BreakWaveContactLinksCard()',
     ],
     'lib/features/support/presentation/widgets/who_we_are_card.dart': [
         'Who We Are',
@@ -46,11 +49,22 @@ for rel, needles in required.items():
             failed = True
 
 support = (ROOT / 'lib/features/support/presentation/support_screen.dart').read_text(encoding='utf-8')
-about = support.find("eyebrow: 'About BreakWave'")
-learn = support.find("eyebrow: 'Learn and resources'")
-contact = support.find("eyebrow: 'Contact BreakWave'")
-if not (learn != -1 and about != -1 and contact != -1 and learn < about < contact):
-    print('FAIL BW-ONBOARD-01A About BreakWave placement is not between learning and contact')
+learn = support.find("support-learn-breakwave-group")
+about = support.find("support-about-contact-group")
+more = support.find("support-more-tools-group")
+if not (learn != -1 and about != -1 and more != -1 and learn < about < more):
+    print('FAIL BW-ONBOARD-01A About and contact placement is not after learning and before More tools')
+    failed = True
+
+about_end = support.find("support-more-tools-group")
+about_group = support[about:about_end]
+if not (
+    about_group.find('WhoWeAreCard()')
+    < about_group.find('EmailCaptureSettingsCard()')
+    < about_group.find('EmailAppHandoffCard()')
+    < about_group.find('BreakWaveContactLinksCard()')
+):
+    print('FAIL BW-ONBOARD-01A Who We Are should lead About and contact')
     failed = True
 
 if failed:

@@ -5,13 +5,12 @@ checks = [
     ("lib/features/support/presentation/support_screen.dart", [
         "Purpose: BW-55 grouped Support tab cleanup.",
         "Get help now",
-        "Your recovery setup",
-        "BreakWave Plus",
+        "Set up your recovery",
+        "Learn how BreakWave helps",
         "Privacy and safety",
-        "Learn and resources",
-        "Contact BreakWave",
-        "Advanced",
-        "Data export tools",
+        "Explore BreakWave Plus",
+        "About and contact",
+        "More tools",
         "BreakWavePlusScreen",
         "_BreakWavePlusPreviewCard",
         "Preview Plus roadmap",
@@ -53,6 +52,7 @@ for rel_path, needles in checks:
 blocked = [
     ("lib/features/rescue/presentation/widgets/support_escalation_card.dart", "Support tools expanding soon"),
     ("lib/features/support/presentation/widgets/email_app_handoff_card.dart", "BreakWave team email override"),
+    ("lib/features/support/presentation/support_screen.dart", "Go deeper than emergency interruption"),
 ]
 
 for rel_path, needle in blocked:

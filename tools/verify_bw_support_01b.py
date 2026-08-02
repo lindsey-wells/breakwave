@@ -7,12 +7,14 @@ ROOT = Path(__file__).resolve().parent.parent
 required = {
     "lib/features/support/presentation/support_screen.dart": [
         "BW-SUPPORT-01B puts immediate support first",
-        "eyebrow: 'Get help now'",
+        "key: Key('support-help-now-group')",
+        "title: 'Get help now'",
         "initiallyExpanded: true",
-        "Immediate-danger guidance",
+        "Emergency guidance",
         "EmergencyHelpCard()",
         "SupportContactCard()",
         "SupportQuickActionsCard()",
+        "TrustedAccountabilityCard()",
     ],
     "lib/features/support/presentation/widgets/emergency_help_card.dart": [
         "Immediate danger",
@@ -62,7 +64,9 @@ for rel, needles in required.items():
             failed = True
 
 support = (ROOT / "lib/features/support/presentation/support_screen.dart").read_text(encoding="utf-8")
-if support.find("eyebrow: 'Get help now'") > support.find("eyebrow: 'Recovery model'"):
+help_index = support.find("key: Key('support-help-now-group')")
+recovery_index = support.find("key: Key('support-recovery-setup-group')")
+if not (help_index != -1 and recovery_index != -1 and help_index < recovery_index):
     print("FAIL BW-SUPPORT-01B immediate support is not first")
     failed = True
 

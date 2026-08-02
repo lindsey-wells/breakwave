@@ -6,6 +6,7 @@
 // Notes: BW-73A declutters Support with collapsible launch-ready groups.
 // Notes: BW-87B4C passes real guided-routine navigation actions into Plus.
 // Notes: BW-SUPPORT-01B puts immediate support first and expands it by default.
+// Notes: BW-SUPPORT-01C creates a compact task-based Support structure.
 // ------------------------------------------------------------
 
 import 'package:flutter/material.dart';
@@ -48,7 +49,7 @@ class SupportScreen extends StatelessWidget {
       appBar: const BreakWaveAppBar(sectionTitle: 'Support'),
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.fromLTRB(20, 20, 20, 150),
+          padding: const EdgeInsets.fromLTRB(16, 16, 16, 150),
           child: Center(
             child: ConstrainedBox(
               constraints: const BoxConstraints(maxWidth: 720),
@@ -68,7 +69,7 @@ class SupportScreen extends StatelessWidget {
                         ),
                         SizedBox(height: 8),
                         Text(
-                          'Get support before the wave gets stronger.',
+                          'Find the right support for this moment.',
                           style: TextStyle(
                             fontSize: 24,
                             fontWeight: FontWeight.w700,
@@ -76,18 +77,18 @@ class SupportScreen extends StatelessWidget {
                         ),
                         SizedBox(height: 8),
                         Text(
-                          'Set up trusted help, privacy, recovery mode, and deeper tools from one organized place.',
+                          'Immediate help stays first. Everything else is grouped by what you want to do next.',
                         ),
                       ],
                     ),
                   ),
-                  const SizedBox(height: 20),
+                  const SizedBox(height: 16),
 
                   const _SupportGroup(
-                    eyebrow: 'Get help now',
-                    title: 'Reduce isolation fast',
+                    key: Key('support-help-now-group'),
+                    title: 'Get help now',
                     subtitle:
-                        'Immediate-danger guidance, trusted contact setup, and ready-to-send support messages.',
+                        'Emergency guidance, trusted contact setup, and ready-to-send support messages.',
                     icon: Icons.support_agent_outlined,
                     initiallyExpanded: true,
                     children: <Widget>[
@@ -98,26 +99,12 @@ class SupportScreen extends StatelessWidget {
                     ],
                   ),
 
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 12),
                   const _SupportGroup(
-                    eyebrow: 'Recovery model',
-                    title: 'Cognitive behavioral tools, not shame',
+                    key: Key('support-recovery-setup-group'),
+                    title: 'Set up your recovery',
                     subtitle:
-                        'Understand the recovery approach behind BreakWave before the support tools.',
-                    icon: Icons.psychology_alt_outlined,
-                    initiallyExpanded: false,
-                    children: <Widget>[
-                      CbtInformedSupportCard(),
-                      ProfessionalHelpCard(),
-                    ],
-                  ),
-
-                  const SizedBox(height: 16),
-                  const _SupportGroup(
-                    eyebrow: 'Your recovery setup',
-                    title: 'Personalize how BreakWave supports you',
-                    subtitle:
-                        'Choose your recovery mode, save your why, and set reminders.',
+                        'Choose your recovery voice, keep your reasons close, and plan reminders.',
                     icon: Icons.tune_outlined,
                     initiallyExpanded: false,
                     children: <Widget>[
@@ -127,12 +114,44 @@ class SupportScreen extends StatelessWidget {
                     ],
                   ),
 
-                  const SizedBox(height: 16),
-                  _SupportGroup(
-                    eyebrow: 'BreakWave Plus',
-                    title: 'Go deeper than emergency interruption',
+                  const SizedBox(height: 12),
+                  const _SupportGroup(
+                    key: Key('support-learn-breakwave-group'),
+                    title: 'Learn how BreakWave helps',
                     subtitle:
-                        'Preview the longer-term recovery tools being built for a future paid release.',
+                        'Understand urges, recovery patterns, and when professional support may help.',
+                    icon: Icons.school_outlined,
+                    initiallyExpanded: false,
+                    children: <Widget>[
+                      // BW-ONBOARD-01B inserts the replayable tutorial first here.
+                      CbtInformedSupportCard(),
+                      ProfessionalHelpCard(),
+                      SupportCategoriesCard(),
+                      EducationResourcesCard(),
+                      EducateMeEntryCard(),
+                    ],
+                  ),
+
+                  const SizedBox(height: 12),
+                  const _SupportGroup(
+                    key: Key('support-privacy-safety-group'),
+                    title: 'Privacy and safety',
+                    subtitle:
+                        'Control app lock, notification privacy, Home visibility, and screen protection.',
+                    icon: Icons.lock_outline,
+                    initiallyExpanded: false,
+                    children: <Widget>[
+                      PrivacyLockSettingsCard(),
+                      PrivacySettingsCard(),
+                    ],
+                  ),
+
+                  const SizedBox(height: 12),
+                  _SupportGroup(
+                    key: const Key('support-plus-group'),
+                    title: 'Explore BreakWave Plus',
+                    subtitle:
+                        'Preview longer-term planning, insight, and guided recovery tools.',
                     icon: Icons.workspace_premium_outlined,
                     initiallyExpanded: false,
                     children: <Widget>[
@@ -142,70 +161,29 @@ class SupportScreen extends StatelessWidget {
                     ],
                   ),
 
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 12),
                   const _SupportGroup(
-                    eyebrow: 'Privacy and safety',
-                    title: 'Protect sensitive recovery details',
+                    key: Key('support-about-contact-group'),
+                    title: 'About and contact',
                     subtitle:
-                        'Control app lock, notification privacy, Home visibility, and screen privacy.',
-                    icon: Icons.lock_outline,
-                    initiallyExpanded: false,
-                    children: <Widget>[
-                      PrivacyLockSettingsCard(),
-                      PrivacySettingsCard(),
-                    ],
-                  ),
-
-                  const SizedBox(height: 16),
-                  const _SupportGroup(
-                    eyebrow: 'Learn and resources',
-                    title: 'Understand the pattern and choose next steps',
-                    subtitle:
-                        'Education resources and next-step learning surfaces.',
-                    icon: Icons.menu_book_outlined,
-                    initiallyExpanded: false,
-                    children: <Widget>[
-                      SupportCategoriesCard(),
-                      EducationResourcesCard(),
-                      EducateMeEntryCard(),
-                    ],
-                  ),
-
-                  const SizedBox(height: 16),
-                  const _SupportGroup(
-                    eyebrow: 'About BreakWave',
-                    title: 'Who we are and why we built this',
-                    subtitle:
-                        'A welcome from the people behind BreakWave.',
+                        'Meet the people behind BreakWave, send feedback, or stay connected.',
                     icon: Icons.people_outline,
                     initiallyExpanded: false,
                     children: <Widget>[
                       WhoWeAreCard(),
-                    ],
-                  ),
-
-                  const SizedBox(height: 16),
-                  const _SupportGroup(
-                    eyebrow: 'Contact BreakWave',
-                    title: 'Send feedback or stay connected',
-                    subtitle:
-                        'Email preferences, manual feedback handoff, and public links.',
-                    icon: Icons.email_outlined,
-                    initiallyExpanded: false,
-                    children: <Widget>[
                       EmailCaptureSettingsCard(),
                       EmailAppHandoffCard(),
                       BreakWaveContactLinksCard(),
                     ],
                   ),
 
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 12),
                   const _SupportGroup(
-                    eyebrow: 'Advanced',
-                    title: 'Data export tools',
+                    key: Key('support-more-tools-group'),
+                    title: 'More tools',
                     subtitle:
-                        'Manual export tools for saved email-consent data.',
-                    icon: Icons.ios_share_outlined,
+                        'Manage data export and other less-frequent support settings.',
+                    icon: Icons.more_horiz_rounded,
                     initiallyExpanded: false,
                     children: <Widget>[
                       EmailExportCard(),
@@ -222,15 +200,8 @@ class SupportScreen extends StatelessWidget {
 }
 
 class _SupportGroup extends StatelessWidget {
-  final String eyebrow;
-  final String title;
-  final String subtitle;
-  final IconData icon;
-  final bool initiallyExpanded;
-  final List<Widget> children;
-
   const _SupportGroup({
-    required this.eyebrow,
+    super.key,
     required this.title,
     required this.subtitle,
     required this.icon,
@@ -238,39 +209,63 @@ class _SupportGroup extends StatelessWidget {
     required this.children,
   });
 
+  final String title;
+  final String subtitle;
+  final IconData icon;
+  final bool initiallyExpanded;
+  final List<Widget> children;
+
   @override
   Widget build(BuildContext context) {
     final ThemeData theme = Theme.of(context);
     final ColorScheme colorScheme = theme.colorScheme;
+    final BorderRadius borderRadius = BorderRadius.circular(22);
 
     return Card(
+      margin: EdgeInsets.zero,
+      clipBehavior: Clip.antiAlias,
+      shape: RoundedRectangleBorder(
+        borderRadius: borderRadius,
+      ),
       child: ExpansionTile(
         initiallyExpanded: initiallyExpanded,
-        tilePadding: const EdgeInsets.fromLTRB(18, 12, 18, 12),
-        childrenPadding: const EdgeInsets.fromLTRB(18, 0, 18, 18),
-        leading: Icon(icon),
-        title: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            Text(
-              eyebrow,
-              style: theme.textTheme.labelLarge?.copyWith(
-                color: colorScheme.primary,
-                fontWeight: FontWeight.w800,
-              ),
-            ),
-            const SizedBox(height: 4),
-            Text(
-              title,
-              style: theme.textTheme.titleMedium?.copyWith(
-                fontWeight: FontWeight.w800,
-              ),
-            ),
-          ],
+        maintainState: true,
+        dense: true,
+        visualDensity: VisualDensity.compact,
+        tilePadding: const EdgeInsets.fromLTRB(16, 10, 12, 10),
+        childrenPadding: const EdgeInsets.fromLTRB(14, 0, 14, 14),
+        leading: Container(
+          width: 40,
+          height: 40,
+          alignment: Alignment.center,
+          decoration: BoxDecoration(
+            color: colorScheme.primary.withOpacity(0.12),
+            borderRadius: BorderRadius.circular(14),
+          ),
+          child: Icon(
+            icon,
+            size: 22,
+            color: colorScheme.primary,
+          ),
+        ),
+        title: Text(
+          title,
+          style: theme.textTheme.titleMedium?.copyWith(
+            fontWeight: FontWeight.w800,
+          ),
         ),
         subtitle: Padding(
-          padding: const EdgeInsets.only(top: 8),
-          child: Text(subtitle),
+          padding: const EdgeInsets.only(top: 4),
+          child: Text(
+            subtitle,
+            style: theme.textTheme.bodyMedium,
+          ),
+        ),
+        shape: RoundedRectangleBorder(
+          borderRadius: borderRadius,
+        ),
+        collapsedShape: RoundedRectangleBorder(
+          borderRadius: borderRadius,
         ),
         children: <Widget>[
           for (int index = 0; index < children.length; index++) ...<Widget>[
@@ -323,7 +318,7 @@ class _BreakWavePlusPreviewCard extends StatelessWidget {
           ),
           const SizedBox(height: 8),
           const Text(
-            'BreakWave Plus is being built as a substantial longer-term recovery system. Subscriptions will remain unavailable until those tools are ready and tested.',
+            'BreakWave Plus is being built for deeper planning, insights, and guided routines. Subscriptions remain unavailable until those tools are ready and tested.',
           ),
           const SizedBox(height: 14),
           FilledButton(

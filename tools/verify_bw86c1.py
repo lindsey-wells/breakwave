@@ -13,18 +13,25 @@ educate = Path(
     "lib/features/support/presentation/widgets/educate_me_entry_card.dart"
 ).read_text(encoding="utf-8")
 
-start = support.find("eyebrow: 'Recovery model'")
-end = support.find("eyebrow: 'Your recovery setup'")
+start = support.find("key: Key('support-learn-breakwave-group')")
+end = support.find("key: Key('support-privacy-safety-group')")
 
 if start == -1 or end == -1 or start >= end:
-    print("FAIL BW-86C1 could not locate Recovery model group")
+    print("FAIL BW-86C1 could not locate Learn how BreakWave helps group")
     sys.exit(1)
 
 group = support[start:end]
-
-if "initiallyExpanded: false" not in group:
-    print("FAIL BW-86C1 Recovery model is not collapsed by default")
-    sys.exit(1)
+for needle in [
+    "initiallyExpanded: false",
+    "CbtInformedSupportCard()",
+    "ProfessionalHelpCard()",
+    "SupportCategoriesCard()",
+    "EducationResourcesCard()",
+    "EducateMeEntryCard()",
+]:
+    if needle not in group:
+        print(f"FAIL BW-86C1 learning group missing: {needle}")
+        sys.exit(1)
 
 for name, text, label, destination in [
     (
