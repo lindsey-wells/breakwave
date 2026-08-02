@@ -24,12 +24,32 @@ required = {
         "SupportContactActions.sendCheckOnMeText(contact)",
         "SupportContactActions.sendSupportEmail(contact)",
     ],
+    "lib/features/support/presentation/widgets/support_contact_card.dart": [
+        "BW-PRIVACY-01A keeps saved contact details masked until editing",
+        "SupportContactMasking.phone",
+        "SupportContactMasking.email",
+        "trusted-contact-masked-summary",
+        "trusted-contact-edit-details",
+        "Edit contact details",
+        "Cancel editing and mask details",
+        "_savedContact != null && !_editing",
+        "visible while you edit them",
+        "TextField(",
+        "Save trusted contact",
+        "Clear trusted contact",
+    ],
     "test/trusted_contact_masking_test.dart": [
         "phone masking preserves formatting",
         "email masking hides the local part",
         "trusted contact details are masked until deliberately revealed",
+        "saved contact editor stays masked until edit is deliberately opened",
         "Phone: (•••) •••-1212",
         "Email: a•••@example.com",
+        "Phone: ••••••1212",
+        "Email: a•••@email.me",
+        "find.byType(TextField), findsNothing",
+        "trusted-contact-edit-details",
+        "trusted-contact-cancel-editing",
         "Text trusted contact",
         "Email trusted contact",
     ],
@@ -51,7 +71,7 @@ for relative_path, needles in required.items():
             )
             failed = True
 
-card = (
+accountability_card = (
     ROOT
     / "lib/features/support/presentation/widgets/trusted_accountability_card.dart"
 ).read_text(encoding="utf-8")
@@ -60,10 +80,40 @@ for exposed in [
     "'Phone: ${contact.phoneNumber}'",
     "'Email: ${contact.emailAddress}'",
 ]:
-    if exposed in card:
+    if exposed in accountability_card:
         print(
             "FAIL BW-PRIVACY-01A unconditionally exposed detail remains: "
             f"{exposed}"
+        )
+        failed = True
+
+edit_card = (
+    ROOT
+    / "lib/features/support/presentation/widgets/support_contact_card.dart"
+).read_text(encoding="utf-8")
+
+for editing_contract in [
+    "_phoneController.text = contact?.phoneNumber ?? ''",
+    "_emailController.text = contact?.emailAddress ?? ''",
+    "Save trusted contact",
+    "Clear trusted contact",
+]:
+    if editing_contract not in edit_card:
+        print(
+            "FAIL BW-PRIVACY-01A editing contract changed unexpectedly: "
+            f"{editing_contract}"
+        )
+        failed = True
+
+for privacy_contract in [
+    "if (_savedContact != null && !_editing)",
+    "_buildMaskedSummary(",
+    "_buildEditor(",
+]:
+    if privacy_contract not in edit_card:
+        print(
+            "FAIL BW-PRIVACY-01A editor privacy contract missing: "
+            f"{privacy_contract}"
         )
         failed = True
 
@@ -78,23 +128,6 @@ for required_action_value in [
         print(
             "FAIL BW-PRIVACY-01A direct contact action lost saved detail: "
             f"{required_action_value}"
-        )
-        failed = True
-
-edit_card = (
-    ROOT
-    / "lib/features/support/presentation/widgets/support_contact_card.dart"
-).read_text(encoding="utf-8")
-for editing_contract in [
-    "_phoneController.text = contact?.phoneNumber ?? ''",
-    "_emailController.text = contact?.emailAddress ?? ''",
-    "Save trusted contact",
-    "Clear trusted contact",
-]:
-    if editing_contract not in edit_card:
-        print(
-            "FAIL BW-PRIVACY-01A editing contract changed unexpectedly: "
-            f"{editing_contract}"
         )
         failed = True
 
@@ -114,5 +147,5 @@ if failed:
     sys.exit(1)
 
 print(
-    "PASS: BW-PRIVACY-01A trusted-contact masking and action preservation verified."
+    "PASS: BW-PRIVACY-01A masks read-only and saved-editor contact details while preserving deliberate editing and support actions."
 )
