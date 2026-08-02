@@ -30,7 +30,7 @@ checks = [
     ("lib/features/support/presentation/support_screen.dart", [
         "CbtInformedSupportCard",
         "ProfessionalHelpCard",
-        "Learn and resources",
+        "Learn how BreakWave helps",
     ]),
     ("launch/cbt_informed_recovery_foundation.md", [
         "CBT-Informed Recovery Foundation v1",

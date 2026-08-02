@@ -3,7 +3,7 @@ import sys
 
 checks = [
     ("lib/features/support/presentation/support_screen.dart", [
-        "Get support before the wave gets stronger.",
+        "Find the right support for this moment.",
     ]),
     ("lib/core/clinical/cbt_recovery_foundation.dart", [
         "change unhelpful thoughts",
@@ -37,10 +37,10 @@ checks = [
         "Share export bundle",
     ]),
     ("tools/verify_bw05.py", [
-        "Get support before the wave gets stronger.",
+        "Find the right support for this moment.",
     ]),
     ("tools/verify_bw06.py", [
-        "Get support before the wave gets stronger.",
+        "Find the right support for this moment.",
     ]),
     ("tools/verify_bw42.py", [
         "BreakWave works without email.",

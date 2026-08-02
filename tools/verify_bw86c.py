@@ -7,7 +7,7 @@ edu = Path("lib/features/support/presentation/widgets/education_resources_card.d
 entry = Path("lib/features/support/presentation/widgets/educate_me_entry_card.dart").read_text(encoding="utf-8")
 
 required_support = [
-    "Cognitive behavioral tools, not shame",
+    "Learn how BreakWave helps",
 ]
 
 required_cbt = [
