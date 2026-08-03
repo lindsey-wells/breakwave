@@ -30,6 +30,8 @@ catalog = (ROOT / required[2]).read_text()
 screen = (ROOT / required[3]).read_text()
 entry = (ROOT / required[4]).read_text()
 contract = (ROOT / required[8]).read_text()
+state_test = (ROOT / required[5]).read_text()
+screen_test = (ROOT / required[7]).read_text()
 
 for needle in [
     "import 'widgets/teach_me_breakwave_entry_card.dart';",
@@ -52,6 +54,9 @@ for needle in [
     'SharedPreferences',
     'saveProgress',
     'complete',
+    'final BreakWaveTutorialState existing = await load(now: now);',
+    'completed: existing.completed',
+    'completedAtIso: existing.completedAtIso',
 ]:
     if needle not in state_store:
         print(f'FAIL BW-ONBOARD-01B1 state store missing: {needle}')
@@ -108,11 +113,26 @@ for forbidden in [
         print(f'FAIL BW-ONBOARD-01B1 forbidden cross-scope dependency: {forbidden}')
         failed = True
 
+for needle, source in [
+    (
+        'completed replay stays completed when progress changes',
+        state_test,
+    ),
+    (
+        'replaying after completion keeps completed status',
+        screen_test,
+    ),
+]:
+    if needle not in source:
+        print(f'FAIL BW-ONBOARD-01B1 replay regression missing: {needle}')
+        failed = True
+
 for needle in [
     'No post-onboarding invitation is added in BW-ONBOARD-01B1.',
     'Practice Rescue is reserved for BW-ONBOARD-01B2.',
     'The tutorial never changes onboarding, entitlement, Log, insight, streak, or recovery data.',
     'Rescue remains available regardless of tutorial state.',
+    'A completed tutorial remains completed during partial replay.',
 ]:
     if needle not in contract:
         print(f'FAIL BW-ONBOARD-01B1 contract missing: {needle}')

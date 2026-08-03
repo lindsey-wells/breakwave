@@ -10,6 +10,7 @@ optional, replayable tutorial that is always available without Plus.
 - Six sections: purpose, Rescue, Home, Log, recovery tools, and privacy/access.
 - A permanent first entry under Support → Learn how BreakWave helps.
 - Separate local tutorial progress and completion state.
+- A completed tutorial remains completed during partial replay.
 - Secular or Christian wording based on the saved recovery mode.
 - Free-versus-Plus language derived from `BreakWaveAccessPolicy`.
 - Small-screen scrolling, Android Back behavior, exit, resume, and replay.

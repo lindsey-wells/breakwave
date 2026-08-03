@@ -78,4 +78,26 @@ void main() {
     expect(state.completed, isTrue);
     expect(find.text('Open'), findsOneWidget);
   });
+
+  testWidgets('replaying after completion keeps completed status', (
+    WidgetTester tester,
+  ) async {
+    await BreakWaveTutorialStateStore.complete(
+      now: DateTime.utc(2026, 8, 2, 5),
+    );
+
+    await tester.pumpWidget(
+      const MaterialApp(home: TeachMeBreakWaveScreen()),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('Part 1 of 6'), findsOneWidget);
+
+    await tester.tap(find.byKey(const Key('teach-me-breakwave-next')));
+    await tester.pumpAndSettle();
+
+    final state = await BreakWaveTutorialStateStore.load();
+    expect(state.currentStep, 1);
+    expect(state.completed, isTrue);
+  });
 }

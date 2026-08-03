@@ -48,4 +48,25 @@ void main() {
     expect(state.completed, isTrue);
     expect(state.completedAtIso, isNotNull);
   });
+
+  test('completed replay stays completed when progress changes', () async {
+    await BreakWaveTutorialStateStore.complete(
+      now: DateTime.utc(2026, 8, 2, 3),
+    );
+
+    final BreakWaveTutorialState before =
+        await BreakWaveTutorialStateStore.load();
+
+    await BreakWaveTutorialStateStore.saveProgress(
+      step: 1,
+      now: DateTime.utc(2026, 8, 2, 4),
+    );
+
+    final BreakWaveTutorialState after =
+        await BreakWaveTutorialStateStore.load();
+
+    expect(after.currentStep, 1);
+    expect(after.completed, isTrue);
+    expect(after.completedAtIso, before.completedAtIso);
+  });
 }

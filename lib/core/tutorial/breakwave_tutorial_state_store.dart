@@ -72,11 +72,13 @@ class BreakWaveTutorialStateStore {
         : step >= BreakWaveTutorialState.totalSteps
             ? BreakWaveTutorialState.totalSteps - 1
             : step;
+    final BreakWaveTutorialState existing = await load(now: now);
     final BreakWaveTutorialState state = BreakWaveTutorialState(
       schemaVersion: BreakWaveTutorialState.currentSchemaVersion,
       currentStep: safeStep,
-      completed: false,
+      completed: existing.completed,
       updatedAtIso: (now ?? DateTime.now()).toUtc().toIso8601String(),
+      completedAtIso: existing.completedAtIso,
     );
     await save(state);
     return state;
