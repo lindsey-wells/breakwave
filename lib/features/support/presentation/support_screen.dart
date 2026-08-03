@@ -7,6 +7,7 @@
 // Notes: BW-87B4C passes real guided-routine navigation actions into Plus.
 // Notes: BW-SUPPORT-01B puts immediate support first and expands it by default.
 // Notes: BW-SUPPORT-01C creates a compact task-based Support structure.
+// Notes: BW-ONBOARD-01B1 adds the replayable tutorial entry first.
 // ------------------------------------------------------------
 
 import 'package:flutter/material.dart';
@@ -32,6 +33,7 @@ import 'widgets/reminder_settings_card.dart';
 import 'widgets/support_categories_card.dart';
 import 'widgets/support_contact_card.dart';
 import 'widgets/support_quick_actions_card.dart';
+import 'widgets/teach_me_breakwave_entry_card.dart';
 import 'widgets/trusted_accountability_card.dart';
 import 'widgets/who_we_are_card.dart';
 
@@ -124,6 +126,7 @@ class SupportScreen extends StatelessWidget {
                     initiallyExpanded: false,
                     children: <Widget>[
                       // BW-ONBOARD-01B inserts the replayable tutorial first here.
+                      TeachMeBreakWaveEntryCard(),
                       CbtInformedSupportCard(),
                       ProfessionalHelpCard(),
                       SupportCategoriesCard(),
