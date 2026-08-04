@@ -14,6 +14,7 @@ import '../../../core/tutorial/breakwave_tutorial_state.dart';
 import '../../../core/tutorial/breakwave_tutorial_state_store.dart';
 import '../../../core/ui/wave_surface.dart';
 import '../domain/breakwave_tutorial_step.dart';
+import 'practice_rescue_screen.dart';
 
 class TeachMeBreakWaveScreen extends StatefulWidget {
   const TeachMeBreakWaveScreen({super.key});
@@ -149,6 +150,27 @@ class _TeachMeBreakWaveScreenState extends State<TeachMeBreakWaveScreen> {
     }
 
     return true;
+  }
+
+  Future<void> _openPracticeRescue() async {
+    final bool? completed = await Navigator.of(context).push<bool>(
+      MaterialPageRoute<bool>(
+        builder: (_) => const PracticeRescueScreen(),
+      ),
+    );
+
+    if (!mounted || completed != true) return;
+
+    final ScaffoldMessengerState messenger =
+        ScaffoldMessenger.of(context);
+    messenger.hideCurrentSnackBar();
+    messenger.showSnackBar(
+      const SnackBar(
+        content: Text(
+          'Practice complete. No Log entry, message, call, or recovery data was saved.',
+        ),
+      ),
+    );
   }
 
   void _showError(String message) {
@@ -317,6 +339,30 @@ class _TeachMeBreakWaveScreenState extends State<TeachMeBreakWaveScreen> {
                             ],
                           ),
                         ),
+                      if (current.topic == BreakWaveTutorialTopic.rescue) ...<Widget>[
+                        const SizedBox(height: 8),
+                        SizedBox(
+                          width: double.infinity,
+                          child: FilledButton.icon(
+                            key: const Key(
+                              'teach-me-breakwave-practice-rescue',
+                            ),
+                            onPressed: _busy ? null : _openPracticeRescue,
+                            icon: const Icon(Icons.science_outlined),
+                            label: const Padding(
+                              padding: EdgeInsets.symmetric(vertical: 14),
+                              child: Text('Practice Rescue safely'),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 10),
+                        Text(
+                          'Practice mode is clearly labeled and cannot save a Log entry or launch messages, calls, emergency actions, or Support.',
+                          style: theme.textTheme.bodySmall?.copyWith(
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                      ],
                     ],
                   ),
                 ),
