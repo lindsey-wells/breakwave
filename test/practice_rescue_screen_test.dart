@@ -65,12 +65,10 @@ void main() {
     await tester.tap(find.text('4 High Risk'));
     await tester.pump();
 
-    await tester.scrollUntilVisible(
-      find.text('Text someone safe'),
-      300,
-      scrollable: find.byKey(const Key('practice-rescue-scroll')),
-    );
-    await tester.tap(find.text('Text someone safe'));
+    final Finder textSomeoneSafe = find.text('Text someone safe');
+    await tester.ensureVisible(textSomeoneSafe);
+    await tester.pumpAndSettle();
+    await tester.tap(textSomeoneSafe);
     await tester.pump();
 
     expect(
@@ -78,12 +76,11 @@ void main() {
       findsOneWidget,
     );
 
-    await tester.scrollUntilVisible(
-      find.byKey(const Key('practice-rescue-finish')),
-      300,
-      scrollable: find.byKey(const Key('practice-rescue-scroll')),
-    );
-    await tester.tap(find.byKey(const Key('practice-rescue-finish')));
+    final Finder finishButton =
+        find.byKey(const Key('practice-rescue-finish'));
+    await tester.ensureVisible(finishButton);
+    await tester.pumpAndSettle();
+    await tester.tap(finishButton);
     await tester.pumpAndSettle();
 
     expect(find.text('Open practice'), findsOneWidget);

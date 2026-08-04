@@ -25,10 +25,14 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.text('Part 2 of 6'), findsOneWidget);
 
-    await tester.tap(
-      find.byKey(const Key('teach-me-breakwave-practice-rescue')),
+    final Finder practiceButton = find.byKey(
+      const Key('teach-me-breakwave-practice-rescue'),
     );
+    await tester.ensureVisible(practiceButton);
     await tester.pumpAndSettle();
+    await tester.tap(practiceButton);
+    await tester.pumpAndSettle();
+
     expect(find.byType(PracticeRescueScreen), findsOneWidget);
 
     await tester.tap(find.byKey(const Key('practice-rescue-exit')));
