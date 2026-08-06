@@ -6,6 +6,7 @@
 // Notes: BW-75A hardens local notification permissions, timezone handling,
 // and neutral reminder copy without making reminders exact alarms.
 // Notes: BW-86B3 strengthens check-in and danger-window nudge copy.
+// Notes: BW-NOTIFY-01A adds privacy-aware test delivery and readiness status.
 // ------------------------------------------------------------
 
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
@@ -16,6 +17,7 @@ import 'package:timezone/timezone.dart' as tz;
 import '../privacy/privacy_settings.dart';
 import '../privacy/privacy_settings_store.dart';
 import '../triggers/triggers_selection.dart';
+import 'notification_readiness.dart';
 import 'reminder_settings.dart';
 
 class BreakWaveNotifications {
@@ -24,14 +26,14 @@ class BreakWaveNotifications {
 
   static const int dailyReminderId = 2201;
   static const int riskyNudgeId = 2202;
+  static const int testNotificationId = 2203;
 
-  static const String notificationIconName =
-      'ic_stat_breakwave';
-  static const String fallbackNotificationIconName =
-      '@mipmap/ic_launcher';
+  static const String notificationIconName = 'ic_stat_breakwave';
+  static const String fallbackNotificationIconName = '@mipmap/ic_launcher';
 
   static bool _initialized = false;
   static bool _timeZoneReady = false;
+  static String? _timeZoneIdentifier;
 
   static Future<void> initialize() async {
     if (_initialized) return;
@@ -57,9 +59,12 @@ class BreakWaveNotifications {
   static Future<void> _configureLocalTimeZone() async {
     try {
       final currentTimeZone = await FlutterTimezone.getLocalTimezone();
-      tz.setLocalLocation(tz.getLocation(currentTimeZone.identifier));
+      final String identifier = currentTimeZone.identifier;
+      tz.setLocalLocation(tz.getLocation(identifier));
+      _timeZoneIdentifier = identifier;
       _timeZoneReady = true;
     } catch (_) {
+      _timeZoneIdentifier = null;
       _timeZoneReady = false;
     }
   }
@@ -92,6 +97,117 @@ class BreakWaveNotifications {
       return granted ?? true;
     } catch (_) {
       return false;
+    }
+  }
+
+  static Future<NotificationReadiness> readReadiness() async {
+    String? errorMessage;
+    final bool initialized = await safeInitialize();
+    bool? notificationsEnabled;
+
+    if (initialized) {
+      try {
+        final android = _plugin.resolvePlatformSpecificImplementation<
+            AndroidFlutterLocalNotificationsPlugin>();
+        notificationsEnabled = await android?.areNotificationsEnabled();
+      } catch (_) {
+        errorMessage = 'Unable to read Android notification permission.';
+      }
+    } else {
+      errorMessage = 'Unable to initialize the notification service.';
+    }
+
+    final NotificationPermissionStatus permissionStatus;
+    if (notificationsEnabled == true) {
+      permissionStatus = NotificationPermissionStatus.enabled;
+    } else if (notificationsEnabled == false) {
+      permissionStatus = NotificationPermissionStatus.disabled;
+    } else {
+      permissionStatus = NotificationPermissionStatus.unavailable;
+    }
+
+    return NotificationReadiness(
+      initialized: initialized,
+      timeZoneReady: _timeZoneReady,
+      timeZoneIdentifier: _timeZoneIdentifier,
+      permissionStatus: permissionStatus,
+      errorMessage: errorMessage,
+    );
+  }
+
+  static Future<TestNotificationResult> sendTestNotification() async {
+    final bool permissionGranted = await safeRequestPermissions();
+    NotificationReadiness readiness = await readReadiness();
+
+    if (!permissionGranted ||
+        readiness.permissionStatus ==
+            NotificationPermissionStatus.disabled) {
+      return TestNotificationResult(
+        outcome: TestNotificationOutcome.permissionDenied,
+        readiness: readiness,
+      );
+    }
+
+    if (!readiness.initialized) {
+      return TestNotificationResult(
+        outcome: TestNotificationOutcome.failed,
+        readiness: readiness,
+      );
+    }
+
+    if (readiness.permissionStatus ==
+        NotificationPermissionStatus.unavailable) {
+      return TestNotificationResult(
+        outcome: TestNotificationOutcome.unavailable,
+        readiness: readiness,
+      );
+    }
+
+    try {
+      final PrivacySettings privacy = await PrivacySettingsStore.load();
+      final TestNotificationCopy copy = TestNotificationCopy.forPrivacy(
+        discreetNotifications: privacy.discreetNotifications,
+      );
+
+      await _showNowWithIconFallback(
+        id: testNotificationId,
+        title: copy.title,
+        body: copy.body,
+      );
+
+      readiness = await readReadiness();
+      return TestNotificationResult(
+        outcome: TestNotificationOutcome.shown,
+        readiness: readiness,
+      );
+    } catch (_) {
+      readiness = await readReadiness();
+      return TestNotificationResult(
+        outcome: TestNotificationOutcome.failed,
+        readiness: readiness,
+      );
+    }
+  }
+
+  static Future<void> _showNowWithIconFallback({
+    required int id,
+    required String title,
+    required String body,
+  }) async {
+    try {
+      await _plugin.show(
+        id: id,
+        title: title,
+        body: body,
+        notificationDetails: _details(useCustomIcon: true),
+      );
+    } catch (_) {
+      await _plugin.show(
+        id: id,
+        title: title,
+        body: body,
+        notificationDetails: _details(useCustomIcon: false),
+      );
     }
   }
 
@@ -145,11 +261,13 @@ class BreakWaveNotifications {
     }
 
     if (settings.riskyNudgeEnabled) {
-      const String fullBody = 'Danger window. Pause now. Open BreakWave and take one steady next step.';
+      const String fullBody =
+          'Danger window. Pause now. Open BreakWave and take one steady next step.';
 
       await _scheduleWithIconFallback(
         id: riskyNudgeId,
-        title: privacy.discreetNotifications ? 'Nudge' : 'BreakWave nudge',
+        title:
+            privacy.discreetNotifications ? 'Nudge' : 'BreakWave nudge',
         body: privacy.discreetNotifications ? 'Pause now.' : fullBody,
         scheduledDate: _nextInstance(
           settings.riskyHour,
@@ -199,8 +317,7 @@ class BreakWaveNotifications {
       notificationDetails: _details(
         useCustomIcon: useCustomIcon,
       ),
-      androidScheduleMode:
-          AndroidScheduleMode.inexactAllowWhileIdle,
+      androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
       matchDateTimeComponents: DateTimeComponents.time,
     );
   }
@@ -223,8 +340,14 @@ class BreakWaveNotifications {
 
   static tz.TZDateTime _nextInstance(int hour, int minute) {
     final tz.TZDateTime now = tz.TZDateTime.now(tz.local);
-    tz.TZDateTime scheduled =
-        tz.TZDateTime(tz.local, now.year, now.month, now.day, hour, minute);
+    tz.TZDateTime scheduled = tz.TZDateTime(
+      tz.local,
+      now.year,
+      now.month,
+      now.day,
+      hour,
+      minute,
+    );
 
     if (!scheduled.isAfter(now)) {
       scheduled = scheduled.add(const Duration(days: 1));
