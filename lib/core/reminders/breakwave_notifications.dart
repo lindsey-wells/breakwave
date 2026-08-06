@@ -261,13 +261,11 @@ class BreakWaveNotifications {
     }
 
     if (settings.riskyNudgeEnabled) {
-      const String fullBody =
-          'Danger window. Pause now. Open BreakWave and take one steady next step.';
+      const String fullBody = 'Danger window. Pause now. Open BreakWave and take one steady next step.';
 
       await _scheduleWithIconFallback(
         id: riskyNudgeId,
-        title:
-            privacy.discreetNotifications ? 'Nudge' : 'BreakWave nudge',
+        title: privacy.discreetNotifications ? 'Nudge' : 'BreakWave nudge',
         body: privacy.discreetNotifications ? 'Pause now.' : fullBody,
         scheduledDate: _nextInstance(
           settings.riskyHour,

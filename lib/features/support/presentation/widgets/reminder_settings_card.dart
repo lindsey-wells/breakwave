@@ -282,8 +282,7 @@ class _ReminderSettingsCardState extends State<ReminderSettingsCard> {
           ? await BreakWaveNotifications.safeRequestPermissions()
           : true;
 
-      final bool rescheduled =
-          await BreakWaveNotifications.safeRescheduleAll(
+      final bool rescheduled = await BreakWaveNotifications.safeRescheduleAll(
         settings: _settings,
         triggersSelection: _triggers,
       );
@@ -536,24 +535,27 @@ class _ReminderSettingsCardState extends State<ReminderSettingsCard> {
                   style: theme.textTheme.bodyMedium,
                 ),
                 const SizedBox(height: 16),
-                SwitchListTile.adaptive(
-                  contentPadding: EdgeInsets.zero,
-                  title: const Text('Daily check-in reminder'),
-                  subtitle: Text(
-                    _timeText(
-                      _settings.dailyHour,
-                      _settings.dailyMinute,
+                Material(
+                  type: MaterialType.transparency,
+                  child: SwitchListTile.adaptive(
+                    contentPadding: EdgeInsets.zero,
+                    title: const Text('Daily check-in reminder'),
+                    subtitle: Text(
+                      _timeText(
+                        _settings.dailyHour,
+                        _settings.dailyMinute,
+                      ),
                     ),
+                    value: _settings.dailyReminderEnabled,
+                    onChanged: (bool value) {
+                      setState(() {
+                        _clearSavedStatus();
+                        _settings = _settings.copyWith(
+                          dailyReminderEnabled: value,
+                        );
+                      });
+                    },
                   ),
-                  value: _settings.dailyReminderEnabled,
-                  onChanged: (bool value) {
-                    setState(() {
-                      _clearSavedStatus();
-                      _settings = _settings.copyWith(
-                        dailyReminderEnabled: value,
-                      );
-                    });
-                  },
                 ),
                 Align(
                   alignment: Alignment.centerLeft,
@@ -564,24 +566,27 @@ class _ReminderSettingsCardState extends State<ReminderSettingsCard> {
                   ),
                 ),
                 const SizedBox(height: 12),
-                SwitchListTile.adaptive(
-                  contentPadding: EdgeInsets.zero,
-                  title: const Text('Watch-for nudge'),
-                  subtitle: Text(
-                    _timeText(
-                      _settings.riskyHour,
-                      _settings.riskyMinute,
+                Material(
+                  type: MaterialType.transparency,
+                  child: SwitchListTile.adaptive(
+                    contentPadding: EdgeInsets.zero,
+                    title: const Text('Watch-for nudge'),
+                    subtitle: Text(
+                      _timeText(
+                        _settings.riskyHour,
+                        _settings.riskyMinute,
+                      ),
                     ),
+                    value: _settings.riskyNudgeEnabled,
+                    onChanged: (bool value) {
+                      setState(() {
+                        _clearSavedStatus();
+                        _settings = _settings.copyWith(
+                          riskyNudgeEnabled: value,
+                        );
+                      });
+                    },
                   ),
-                  value: _settings.riskyNudgeEnabled,
-                  onChanged: (bool value) {
-                    setState(() {
-                      _clearSavedStatus();
-                      _settings = _settings.copyWith(
-                        riskyNudgeEnabled: value,
-                      );
-                    });
-                  },
                 ),
                 Align(
                   alignment: Alignment.centerLeft,
