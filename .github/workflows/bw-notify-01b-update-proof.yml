@@ -19,15 +19,15 @@ jobs:
       - name: Checkout proof commit
         uses: actions/checkout@v4
         with:
-          fetch-depth: 2
+          fetch-depth: 3
 
       - name: Verify proof-only commit
         shell: bash
         run: |
           set -euo pipefail
-          test "$(git rev-parse HEAD^)" = "ea06fd1a31ce3f9075d42915cc5920217e063227"
-          test "$(git diff --name-only HEAD^..HEAD)" = ".github/workflows/bw-notify-01b-update-proof.yml"
-          test "$(git rev-parse HEAD^{tree})" = "6f6ba67af646b3bef14904b5b380819ded6b15eb"
+          test "$(git rev-parse HEAD^^)" = "ea06fd1a31ce3f9075d42915cc5920217e063227"
+          test "$(git diff --name-only ea06fd1a31ce3f9075d42915cc5920217e063227..HEAD)" = ".github/workflows/bw-notify-01b-update-proof.yml"
+          test "$(git rev-parse 'ea06fd1a31ce3f9075d42915cc5920217e063227^{tree}')" = "6f6ba67af646b3bef14904b5b380819ded6b15eb"
 
       - name: Set up Java
         uses: actions/setup-java@v5
