@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 from pathlib import Path
+import re
 import sys
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -42,11 +43,23 @@ for token in [
     "changed_verifiers",
     "changed_tests",
     '"stage_id": stage_id',
-    '"schema_version": 2',
 ]:
     if token not in runner:
         print(f"FAIL BW-CI-01A runner missing: {token}")
         sys.exit(1)
+
+schema_versions = [
+    int(value)
+    for value in re.findall(
+        r'"schema_version":\s*(\d+)',
+        runner,
+    )
+]
+if not schema_versions or max(schema_versions) < 2:
+    print(
+        "FAIL BW-CI-01A runner schema version must be 2 or later"
+    )
+    sys.exit(1)
 
 for forbidden in ['BASELINE =', 'TARGET_TESTS =', '"stage_id": "BW-MOD-01A"']:
     if forbidden in runner:

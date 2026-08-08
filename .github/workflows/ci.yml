@@ -43,6 +43,9 @@ jobs:
       - name: Get dependencies
         run: flutter pub get
 
+      - name: BreakWaveVerify engine preflight
+        run: python3 tools/breakwave_verify.py selftest
+
       - name: Run BreakWave verification scripts
         run: |
           set -e

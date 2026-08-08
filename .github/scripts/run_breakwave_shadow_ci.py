@@ -3,7 +3,6 @@
 
 from __future__ import annotations
 
-import hashlib
 import json
 import os
 import re
@@ -14,6 +13,12 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 OUT = ROOT / "shadow_evidence"
+TOOLS = ROOT / "tools"
+
+if str(TOOLS) not in sys.path:
+    sys.path.insert(0, str(TOOLS))
+
+import breakwave_verify as bw_verify
 
 
 def run(name: str, command: list[str]) -> dict:
@@ -136,10 +141,6 @@ def resolve_stage_id() -> str:
     return "BW-SHADOW"
 
 
-def file_sha256(path: Path) -> str:
-    return hashlib.sha256(path.read_bytes()).hexdigest()
-
-
 def main() -> None:
     OUT.mkdir(parents=True, exist_ok=True)
     steps: list[dict] = []
@@ -156,10 +157,24 @@ def main() -> None:
         if rel.startswith("test/") and rel.endswith("_test.dart")
     )
 
+    verify_state = bw_verify.verify_shadow_state(
+        ROOT,
+        baseline=baseline,
+        target="HEAD",
+        expected_changed_files=changed_files,
+    )
+    (OUT / "breakwave_verify.json").write_text(
+        json.dumps(verify_state, indent=2, sort_keys=True) + "\n",
+        encoding="utf-8",
+    )
+
     identity = {
         "created_utc": datetime.now(timezone.utc).isoformat(),
         "stage_id": stage_id,
-        "branch": git("branch", "--show-current"),
+        "branch": (
+            os.environ.get("GITHUB_REF_NAME", "").strip()
+            or git("branch", "--show-current")
+        ),
         "commit": git("rev-parse", "HEAD"),
         "commit_subject": git("log", "-1", "--pretty=%s"),
         "tree": git("rev-parse", "HEAD^{tree}"),
@@ -246,16 +261,13 @@ def main() -> None:
             "message": "AAB was not produced.",
         })
 
-    changed_hashes = {}
-    for rel in changed_files:
-        path = ROOT / rel
-        if path.is_file():
-            changed_hashes[rel] = file_sha256(path)
+    changed_hashes = verify_state["git_blob_sha256"]
 
     summary = {
-        "schema_version": 2,
+        "schema_version": 3,
         "stage_id": stage_id,
         "identity": identity,
+        "breakwave_verify": verify_state,
         "steps": steps,
         "changed_file_sha256": changed_hashes,
         "passed": all(step.get("passed", False) for step in steps),

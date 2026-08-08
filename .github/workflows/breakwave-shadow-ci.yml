@@ -51,6 +51,9 @@ jobs:
           echo "Shadow stage: $stage_id"
           echo "Artifact prefix: $artifact_prefix"
 
+      - name: BreakWaveVerify engine preflight
+        run: python3 tools/breakwave_verify.py selftest
+
       - name: Set up Java
         uses: actions/setup-java@v5
         with:

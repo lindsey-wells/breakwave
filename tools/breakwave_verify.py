@@ -648,6 +648,75 @@ def detached_worktree_preflight(
         shutil.rmtree(parent, ignore_errors=True)
 
 
+
+def verify_shadow_state(
+    repo: Path,
+    *,
+    baseline: str,
+    target: str = "HEAD",
+    expected_changed_files: Iterable[str] | None = None,
+) -> dict:
+    # Multi-commit-safe Shadow candidate verification.
+    baseline_sha = git_text(repo, "rev-parse", baseline)
+    target_sha = git_text(repo, "rev-parse", target)
+
+    ancestor = _run(
+        ["git", "merge-base", "--is-ancestor", baseline_sha, target_sha],
+        cwd=repo,
+        text=True,
+        check=False,
+    )
+    if ancestor.returncode != 0:
+        raise VerificationError(
+            "Shadow baseline is not an ancestor of the target."
+        )
+
+    target_tree = git_text(
+        repo,
+        "rev-parse",
+        f"{target_sha}^{{tree}}",
+    )
+    changed = exact_changed_files(
+        repo,
+        baseline_sha,
+        target_sha,
+    )
+
+    if expected_changed_files is not None:
+        expected = sorted(set(expected_changed_files))
+        if sorted(changed) != expected:
+            raise VerificationError(
+                "Shadow changed-file contract mismatch.\n"
+                f"Expected: {expected}\n"
+                f"Actual: {sorted(changed)}"
+            )
+
+    blob_hashes = {}
+    for rel in changed:
+        exists = _run(
+            ["git", "cat-file", "-e", f"{target_sha}:{rel}"],
+            cwd=repo,
+            text=True,
+            check=False,
+        )
+        if exists.returncode == 0:
+            blob_hashes[rel] = git_blob_sha256(
+                repo,
+                target_sha,
+                rel,
+            )
+
+    return {
+        "schema_version": 1,
+        "baseline": baseline_sha,
+        "target": target_sha,
+        "target_tree": target_tree,
+        "changed_files": changed,
+        "git_blob_sha256": blob_hashes,
+        "baseline_is_ancestor": True,
+    }
+
+
 def _cli_package(args):
     result = verify_package_zip(
         Path(args.zip),
@@ -667,6 +736,18 @@ def _cli_contract(args):
     result = verify_git_contract(
         Path(args.repo_root),
         contract,
+    )
+    print(json.dumps(result, indent=2, sort_keys=True))
+
+
+
+def _cli_shadow_state(args):
+    expected = args.changed_file or None
+    result = verify_shadow_state(
+        Path(args.repo_root),
+        baseline=args.baseline,
+        target=args.target,
+        expected_changed_files=expected,
     )
     print(json.dumps(result, indent=2, sort_keys=True))
 
@@ -696,6 +777,13 @@ def build_parser():
     contract.add_argument("contract")
     contract.add_argument("--repo-root", default=".")
     contract.set_defaults(func=_cli_contract)
+
+    shadow = subs.add_parser("shadow-state")
+    shadow.add_argument("--baseline", required=True)
+    shadow.add_argument("--target", default="HEAD")
+    shadow.add_argument("--repo-root", default=".")
+    shadow.add_argument("--changed-file", action="append", default=[])
+    shadow.set_defaults(func=_cli_shadow_state)
 
     selftest = subs.add_parser("selftest")
     selftest.set_defaults(func=_cli_selftest)
