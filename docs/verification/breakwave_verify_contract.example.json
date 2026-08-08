@@ -1,0 +1,27 @@
+{
+  "base": "BASE_COMMIT_SHA",
+  "changed_files": [
+    "path/to/changed_file.dart",
+    "tools/verify_bw_example_01a.py"
+  ],
+  "primary_remote": "origin",
+  "proof": {
+    "allowed_files": [
+      ".github/workflows/example-proof.yml"
+    ],
+    "head": "OPTIONAL_PROOF_HEAD_SHA"
+  },
+  "release": {
+    "allowed_main_states": [
+      "BASE_COMMIT_SHA",
+      "TARGET_COMMIT_SHA"
+    ],
+    "tag": "bw-example-01a-green"
+  },
+  "repo": "lindsey-wells/breakwave",
+  "schema_version": 1,
+  "stage_id": "BW-EXAMPLE-01A",
+  "target": "TARGET_COMMIT_SHA",
+  "target_tree": "TARGET_TREE_SHA",
+  "validation_branch": "validation/bw-example-01a-v1"
+}
