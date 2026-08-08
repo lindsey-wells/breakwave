@@ -1,0 +1,113 @@
+name: BW-NOTIFY-01B Update Proof
+
+run-name: BW-NOTIFY-01B update-survival APK
+
+on:
+  push:
+    branches:
+      - 'proof/bw-notify-01b-update-survival-v1'
+
+permissions:
+  contents: read
+
+jobs:
+  build-update-proof:
+    name: Build update-survival APK
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout proof commit
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - name: Verify proof-only commit
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD^)" = "ea06fd1a31ce3f9075d42915cc5920217e063227"
+          test "$(git diff --name-only HEAD^..HEAD)" = ".github/workflows/bw-notify-01b-update-proof.yml"
+          test "$(git rev-parse HEAD^{tree})" = "6f6ba67af646b3bef14904b5b380819ded6b15eb"
+
+      - name: Set up Java
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - name: Prepare Android release signing
+        env:
+          ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ -z "${ANDROID_KEYSTORE_BASE64:-}" ]; then
+            echo "No signing secrets found; repository fallback remains active."
+            exit 0
+          fi
+          test -n "$ANDROID_KEYSTORE_PASSWORD"
+          test -n "$ANDROID_KEY_ALIAS"
+          test -n "$ANDROID_KEY_PASSWORD"
+          printf '%s' "$ANDROID_KEYSTORE_BASE64" |
+            base64 --decode > android/app/upload-keystore.jks
+          cat > android/key.properties <<EOF
+          storePassword=$ANDROID_KEYSTORE_PASSWORD
+          keyPassword=$ANDROID_KEY_PASSWORD
+          keyAlias=$ANDROID_KEY_ALIAS
+          storeFile=upload-keystore.jks
+          EOF
+
+      - name: Resolve dependencies
+        run: flutter pub get
+
+      - name: Run notification verifiers
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 tools/verify_bw_notify_01a.py
+          python3 tools/verify_bw_notify_01b.py
+
+      - name: Build update proof APK
+        run: flutter build apk --release --build-number 3
+
+      - name: Verify update proof APK
+        shell: bash
+        run: |
+          set -euo pipefail
+          APK="build/app/outputs/flutter-apk/app-release.apk"
+          test -s "$APK"
+          python3 tools/verify_bw88rc1a.py --artifact "$APK"
+          python3 tools/verify_bw88rc1b.py --artifact "$APK"
+
+          ANALYZER="$(command -v apkanalyzer || true)"
+          if [ -z "$ANALYZER" ]; then
+            ANALYZER="$(find "$ANDROID_SDK_ROOT" -type f -name apkanalyzer 2>/dev/null | head -n 1)"
+          fi
+          test -n "$ANALYZER"
+          VERSION_CODE="$("$ANALYZER" manifest version-code "$APK" | tr -d '\r\n ')"
+          echo "APK versionCode=$VERSION_CODE"
+          test "$VERSION_CODE" = "3"
+
+          sha256sum "$APK" | tee update-proof-apk.sha256
+          printf '%s\n' "ea06fd1a31ce3f9075d42915cc5920217e063227" > update-proof-source-commit.txt
+          printf '%s\n' "3" > update-proof-version-code.txt
+
+      - name: Upload update proof APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: bw-notify-01b-update-proof-apk
+          path: |
+            build/app/outputs/flutter-apk/app-release.apk
+            update-proof-apk.sha256
+            update-proof-source-commit.txt
+            update-proof-version-code.txt
+          if-no-files-found: error
