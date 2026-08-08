@@ -18,6 +18,7 @@ import '../privacy/privacy_settings.dart';
 import '../privacy/privacy_settings_store.dart';
 import '../triggers/triggers_selection.dart';
 import 'notification_readiness.dart';
+import 'notification_reliability.dart';
 import 'reminder_settings.dart';
 
 class BreakWaveNotifications {
@@ -27,6 +28,7 @@ class BreakWaveNotifications {
   static const int dailyReminderId = 2201;
   static const int riskyNudgeId = 2202;
   static const int testNotificationId = 2203;
+  static const int reliabilityProofId = 2204;
 
   static const String notificationIconName = 'ic_stat_breakwave';
   static const String fallbackNotificationIconName = '@mipmap/ic_launcher';
@@ -211,6 +213,157 @@ class BreakWaveNotifications {
     }
   }
 
+  static Future<bool> canScheduleExactAlarms() async {
+    try {
+      await initialize();
+      final android = _plugin.resolvePlatformSpecificImplementation<
+          AndroidFlutterLocalNotificationsPlugin>();
+      final bool? allowed = await android?.canScheduleExactNotifications();
+      return allowed ?? true;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  static Future<bool> requestExactAlarmAccess() async {
+    try {
+      await initialize();
+      final android = _plugin.resolvePlatformSpecificImplementation<
+          AndroidFlutterLocalNotificationsPlugin>();
+
+      final bool? alreadyAllowed =
+          await android?.canScheduleExactNotifications();
+      if (alreadyAllowed != false) {
+        return alreadyAllowed ?? true;
+      }
+
+      final bool? granted =
+          await android?.requestExactAlarmsPermission();
+      if (granted != null) {
+        return granted;
+      }
+      return canScheduleExactAlarms();
+    } catch (_) {
+      return false;
+    }
+  }
+
+  static Future<AndroidScheduleMode> _preferredScheduleMode() async {
+    final bool exactAllowed = await canScheduleExactAlarms();
+    return exactAllowed
+        ? AndroidScheduleMode.exactAllowWhileIdle
+        : AndroidScheduleMode.inexactAllowWhileIdle;
+  }
+
+  static Future<ScheduledProofResult> scheduleReliabilityProof({
+    Duration delay = const Duration(minutes: 5),
+  }) async {
+    final bool permissionGranted = await safeRequestPermissions();
+    NotificationReadiness readiness = await readReadiness();
+
+    if (!permissionGranted ||
+        readiness.permissionStatus ==
+            NotificationPermissionStatus.disabled) {
+      return ScheduledProofResult(
+        outcome: ScheduledProofOutcome.permissionDenied,
+        readiness: readiness,
+      );
+    }
+
+    if (!readiness.initialized) {
+      return ScheduledProofResult(
+        outcome: ScheduledProofOutcome.failed,
+        readiness: readiness,
+      );
+    }
+
+    if (!readiness.timeZoneReady ||
+        readiness.permissionStatus ==
+            NotificationPermissionStatus.unavailable) {
+      return ScheduledProofResult(
+        outcome: ScheduledProofOutcome.unavailable,
+        readiness: readiness,
+      );
+    }
+
+    try {
+      final PrivacySettings privacy = await PrivacySettingsStore.load();
+      final ScheduledProofCopy copy = ScheduledProofCopy.forPrivacy(
+        discreetNotifications: privacy.discreetNotifications,
+      );
+      final tz.TZDateTime scheduledDate =
+          tz.TZDateTime.now(tz.local).add(delay);
+
+      await _plugin.cancel(id: reliabilityProofId);
+      await _scheduleOneShotWithIconFallback(
+        id: reliabilityProofId,
+        title: copy.title,
+        body: copy.body,
+        scheduledDate: scheduledDate,
+      );
+
+      readiness = await readReadiness();
+      return ScheduledProofResult(
+        outcome: ScheduledProofOutcome.scheduled,
+        readiness: readiness,
+        scheduledFor: scheduledDate,
+      );
+    } catch (_) {
+      readiness = await readReadiness();
+      return ScheduledProofResult(
+        outcome: ScheduledProofOutcome.failed,
+        readiness: readiness,
+      );
+    }
+  }
+
+  static Future<void> _scheduleOneShotWithIconFallback({
+    required int id,
+    required String title,
+    required String body,
+    required tz.TZDateTime scheduledDate,
+  }) async {
+    try {
+      await _scheduleOneShot(
+        id: id,
+        title: title,
+        body: body,
+        scheduledDate: scheduledDate,
+        useCustomIcon: true,
+      );
+    } catch (_) {
+      await _scheduleOneShot(
+        id: id,
+        title: title,
+        body: body,
+        scheduledDate: scheduledDate,
+        useCustomIcon: false,
+      );
+    }
+  }
+
+  static Future<void> _scheduleOneShot({
+    required int id,
+    required String title,
+    required String body,
+    required tz.TZDateTime scheduledDate,
+    required bool useCustomIcon,
+  }) async {
+    final AndroidScheduleMode scheduleMode =
+        await _preferredScheduleMode();
+
+    await _plugin.zonedSchedule(
+      id: id,
+      title: title,
+      body: body,
+      scheduledDate: scheduledDate,
+      notificationDetails: _details(
+        useCustomIcon: useCustomIcon,
+      ),
+      androidScheduleMode: scheduleMode,
+    );
+  }
+
   static Future<bool> safeRescheduleAll({
     required ReminderSettings settings,
     required TriggersSelection triggersSelection,
@@ -306,8 +459,11 @@ class BreakWaveNotifications {
     required String body,
     required tz.TZDateTime scheduledDate,
     required bool useCustomIcon,
-  }) {
-    return _plugin.zonedSchedule(
+  }) async {
+    final AndroidScheduleMode scheduleMode =
+        await _preferredScheduleMode();
+
+    await _plugin.zonedSchedule(
       id: id,
       title: title,
       body: body,
@@ -315,7 +471,7 @@ class BreakWaveNotifications {
       notificationDetails: _details(
         useCustomIcon: useCustomIcon,
       ),
-      androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
+      androidScheduleMode: scheduleMode,
       matchDateTimeComponents: DateTimeComponents.time,
     );
   }

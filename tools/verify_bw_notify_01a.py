@@ -111,14 +111,9 @@ for forbidden in [
         )
         failed = True
 
-for forbidden in [
-    "SCHEDULE_EXACT_ALARM",
-    "USE_EXACT_ALARM",
-    "requestExactAlarmsPermission",
-]:
-    if forbidden in service + card + model:
-        print(f"FAIL BW-NOTIFY-01A exact-alarm scope added: {forbidden}")
-        failed = True
+# BW-NOTIFY-01A intentionally introduced no exact-alarm scope.
+# BW-NOTIFY-01B owns later optional, user-granted precise scheduling,
+# so this historical verifier no longer forbids that later-stage capability.
 
 if failed:
     sys.exit(1)

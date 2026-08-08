@@ -14,8 +14,10 @@
 
 import 'package:flutter/material.dart';
 
+import '../../../../core/reminders/android_notification_settings.dart';
 import '../../../../core/reminders/breakwave_notifications.dart';
 import '../../../../core/reminders/notification_readiness.dart';
+import '../../../../core/reminders/notification_reliability.dart';
 import '../../../../core/reminders/reminder_settings.dart';
 import '../../../../core/reminders/reminder_settings_store.dart';
 import '../../../../core/triggers/triggers_selection.dart';
@@ -26,10 +28,20 @@ class ReminderSettingsCard extends StatefulWidget {
     super.key,
     this.readinessLoader,
     this.testNotificationSender,
+    this.reliabilityProofScheduler,
+    this.notificationSettingsOpener,
+    this.appSettingsOpener,
+    this.exactAlarmRequester,
+    this.exactAlarmRescheduler,
   });
 
   final Future<NotificationReadiness> Function()? readinessLoader;
   final Future<TestNotificationResult> Function()? testNotificationSender;
+  final Future<ScheduledProofResult> Function()? reliabilityProofScheduler;
+  final Future<bool> Function()? notificationSettingsOpener;
+  final Future<bool> Function()? appSettingsOpener;
+  final Future<bool> Function()? exactAlarmRequester;
+  final Future<bool> Function()? exactAlarmRescheduler;
 
   @override
   State<ReminderSettingsCard> createState() =>
@@ -41,6 +53,10 @@ class _ReminderSettingsCardState extends State<ReminderSettingsCard> {
   bool _saving = false;
   bool _readinessLoading = false;
   bool _testingNotification = false;
+  bool _schedulingProof = false;
+  bool _openingNotificationSettings = false;
+  bool _openingAppSettings = false;
+  bool _requestingExactAlarm = false;
 
   ReminderSettings _settings = ReminderSettings.defaults;
   TriggersSelection _triggers = TriggersSelection.empty;
@@ -50,6 +66,10 @@ class _ReminderSettingsCardState extends State<ReminderSettingsCard> {
   String? _lastRefreshStatus;
   String? _testStatusMessage;
   bool _testStatusSuccess = false;
+  String? _proofStatusMessage;
+  bool _proofStatusSuccess = false;
+  String? _exactAlarmStatusMessage;
+  bool _exactAlarmStatusSuccess = false;
 
   @override
   void initState() {
@@ -167,6 +187,176 @@ class _ReminderSettingsCardState extends State<ReminderSettingsCard> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text(message)),
     );
+  }
+
+  Future<void> _requestExactAlarmAccess() async {
+    if (_requestingExactAlarm) return;
+
+    setState(() {
+      _requestingExactAlarm = true;
+      _exactAlarmStatusMessage = null;
+    });
+
+    bool granted = false;
+    bool refreshed = false;
+    try {
+      final requester = widget.exactAlarmRequester ??
+          BreakWaveNotifications.requestExactAlarmAccess;
+      granted = await requester();
+
+      if (granted) {
+        final refresher = widget.exactAlarmRescheduler ??
+            () => BreakWaveNotifications.safeRescheduleAll(
+                  settings: _settings,
+                  triggersSelection: _triggers,
+                );
+        refreshed = await refresher();
+      }
+    } catch (_) {
+      granted = false;
+      refreshed = false;
+    }
+
+    if (!mounted) return;
+
+    final String message;
+    if (granted && refreshed) {
+      message =
+          'Precise timing allowed. Saved reminders were refreshed.';
+    } else if (granted) {
+      message =
+          'Precise timing allowed. Reminder refresh may need another try.';
+    } else {
+      message =
+          'Precise timing was not enabled. BreakWave will keep using standard Android scheduling.';
+    }
+
+    setState(() {
+      _requestingExactAlarm = false;
+      _exactAlarmStatusMessage = message;
+      _exactAlarmStatusSuccess = granted;
+    });
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(message)),
+    );
+  }
+
+  Future<void> _scheduleReliabilityProof() async {
+    if (_schedulingProof) return;
+
+    setState(() {
+      _schedulingProof = true;
+      _proofStatusMessage = null;
+    });
+
+    ScheduledProofResult result;
+    try {
+      final scheduler = widget.reliabilityProofScheduler ??
+          BreakWaveNotifications.scheduleReliabilityProof;
+      result = await scheduler();
+    } catch (_) {
+      result = ScheduledProofResult(
+        outcome: ScheduledProofOutcome.failed,
+        readiness: _readiness ??
+            const NotificationReadiness(
+              initialized: false,
+              timeZoneReady: false,
+              timeZoneIdentifier: null,
+              permissionStatus:
+                  NotificationPermissionStatus.unavailable,
+            ),
+      );
+    }
+
+    if (!mounted) return;
+
+    final String message;
+    final bool success;
+    switch (result.outcome) {
+      case ScheduledProofOutcome.scheduled:
+        final DateTime? scheduledFor = result.scheduledFor;
+        final String target = scheduledFor == null
+            ? 'about 5 minutes from now'
+            : TimeOfDay.fromDateTime(scheduledFor).format(context);
+        message =
+            'Scheduled check set for about $target. Lock or background BreakWave and watch for it. Android may deliver it later.';
+        success = true;
+      case ScheduledProofOutcome.permissionDenied:
+        message =
+            'Notifications are turned off. Open Android notification settings, allow them, then schedule the check again.';
+        success = false;
+      case ScheduledProofOutcome.unavailable:
+        message =
+            'Scheduled delivery status is unavailable on this device right now.';
+        success = false;
+      case ScheduledProofOutcome.failed:
+        message = 'Unable to schedule the delivery check right now.';
+        success = false;
+    }
+
+    setState(() {
+      _readiness = result.readiness;
+      _schedulingProof = false;
+      _proofStatusMessage = message;
+      _proofStatusSuccess = success;
+    });
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(message)),
+    );
+  }
+
+  Future<void> _openNotificationSettings() async {
+    if (_openingNotificationSettings) return;
+    setState(() {
+      _openingNotificationSettings = true;
+    });
+
+    final opener = widget.notificationSettingsOpener ??
+        AndroidNotificationSettings.openNotificationSettings;
+    final bool opened = await opener();
+
+    if (!mounted) return;
+    setState(() {
+      _openingNotificationSettings = false;
+    });
+
+    if (!opened) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+            'Unable to open Android notification settings on this device.',
+          ),
+        ),
+      );
+    }
+  }
+
+  Future<void> _openAppSettings() async {
+    if (_openingAppSettings) return;
+    setState(() {
+      _openingAppSettings = true;
+    });
+
+    final opener =
+        widget.appSettingsOpener ?? AndroidNotificationSettings.openAppSettings;
+    final bool opened = await opener();
+
+    if (!mounted) return;
+    setState(() {
+      _openingAppSettings = false;
+    });
+
+    if (!opened) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+            'Unable to open Android app settings on this device.',
+          ),
+        ),
+      );
+    }
   }
 
   String _timeText(int hour, int minute) {
@@ -500,6 +690,167 @@ class _ReminderSettingsCardState extends State<ReminderSettingsCard> {
               ),
             ),
           ],
+          const SizedBox(height: 18),
+          Divider(color: colorScheme.outlineVariant),
+          const SizedBox(height: 14),
+          const SizedBox(height: 18),
+          Divider(color: colorScheme.outlineVariant),
+          const SizedBox(height: 14),
+          Text(
+            'Precise reminder timing',
+            style: theme.textTheme.titleSmall?.copyWith(
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            'Android can give BreakWave special Alarms & reminders access. When allowed, BreakWave can use exact timing designed to fire during low-power idle. If you leave it off, reminders continue with standard Android scheduling.',
+            style: theme.textTheme.bodySmall?.copyWith(
+              color: colorScheme.onSurfaceVariant,
+            ),
+          ),
+          const SizedBox(height: 10),
+          Text(
+            'This improves reminder timing but does not override every manufacturer battery restriction.',
+            style: theme.textTheme.bodySmall?.copyWith(
+              color: colorScheme.onSurfaceVariant,
+            ),
+          ),
+          const SizedBox(height: 12),
+          FilledButton.tonalIcon(
+            key: const Key('notification-exact-alarm-request'),
+            onPressed:
+                _requestingExactAlarm ? null : _requestExactAlarmAccess,
+            icon: const Icon(Icons.alarm_on_outlined),
+            label: Text(
+              _requestingExactAlarm
+                  ? 'Opening Android settings...'
+                  : 'Allow precise timing',
+            ),
+          ),
+          if (_exactAlarmStatusMessage != null) ...<Widget>[
+            const SizedBox(height: 12),
+            Container(
+              key: const Key('notification-exact-alarm-status'),
+              width: double.infinity,
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: _exactAlarmStatusSuccess
+                    ? colorScheme.primaryContainer.withOpacity(0.35)
+                    : colorScheme.errorContainer.withOpacity(0.35),
+                borderRadius: BorderRadius.circular(14),
+              ),
+              child: Text(
+                _exactAlarmStatusMessage!,
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+            ),
+          ],
+          Text(
+            'Scheduled delivery proof',
+            style: theme.textTheme.titleSmall?.copyWith(
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            'Schedule one private check for about 5 minutes from now. Then lock or background BreakWave and watch for it. This does not change your saved reminder times.',
+            style: theme.textTheme.bodySmall?.copyWith(
+              color: colorScheme.onSurfaceVariant,
+            ),
+          ),
+          const SizedBox(height: 12),
+          FilledButton.tonalIcon(
+            key: const Key('notification-proof-schedule'),
+            onPressed:
+                _schedulingProof ? null : _scheduleReliabilityProof,
+            icon: const Icon(Icons.schedule_send_outlined),
+            label: Text(
+              _schedulingProof
+                  ? 'Scheduling...'
+                  : 'Schedule 5-minute check',
+            ),
+          ),
+          if (_proofStatusMessage != null) ...<Widget>[
+            const SizedBox(height: 12),
+            Container(
+              key: const Key('notification-proof-status'),
+              width: double.infinity,
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: _proofStatusSuccess
+                    ? colorScheme.primaryContainer.withOpacity(0.35)
+                    : colorScheme.errorContainer.withOpacity(0.35),
+                borderRadius: BorderRadius.circular(14),
+              ),
+              child: Text(
+                _proofStatusMessage!,
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+            ),
+          ],
+          const SizedBox(height: 12),
+          Text(
+            'Restart/update proof: schedule the check, then restart the phone or reinstall/update BreakWave before it arrives. The check should still arrive, although Android may delay it.',
+            style: theme.textTheme.bodySmall?.copyWith(
+              color: colorScheme.onSurfaceVariant,
+            ),
+          ),
+          const SizedBox(height: 18),
+          Text(
+            'Android delivery controls',
+            style: theme.textTheme.titleSmall?.copyWith(
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            'BreakWave is configured to restore scheduled reminders after a phone restart or app update. Android can still delay them because of battery or background limits.',
+            style: theme.textTheme.bodySmall?.copyWith(
+              color: colorScheme.onSurfaceVariant,
+            ),
+          ),
+          const SizedBox(height: 12),
+          Wrap(
+            spacing: 10,
+            runSpacing: 10,
+            children: <Widget>[
+              OutlinedButton.icon(
+                key: const Key('notification-settings-open'),
+                onPressed: _openingNotificationSettings
+                    ? null
+                    : _openNotificationSettings,
+                icon: const Icon(Icons.notifications_outlined),
+                label: Text(
+                  _openingNotificationSettings
+                      ? 'Opening...'
+                      : 'Notification settings',
+                ),
+              ),
+              OutlinedButton.icon(
+                key: const Key('app-settings-open'),
+                onPressed:
+                    _openingAppSettings ? null : _openAppSettings,
+                icon: const Icon(Icons.settings_outlined),
+                label: Text(
+                  _openingAppSettings
+                      ? 'Opening...'
+                      : 'App settings',
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 10),
+          Text(
+            'For battery controls, open App settings and review Battery/background use as your Android version allows. Use Allow precise timing above when exact reminder delivery matters.',
+            style: theme.textTheme.bodySmall?.copyWith(
+              color: colorScheme.onSurfaceVariant,
+            ),
+          ),
         ],
       ),
     );

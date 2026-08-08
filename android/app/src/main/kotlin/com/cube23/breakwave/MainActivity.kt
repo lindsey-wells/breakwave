@@ -3,6 +3,7 @@ package com.cube23.breakwave
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
+import android.provider.Settings
 import android.view.WindowManager
 import io.flutter.embedding.android.FlutterActivity
 import io.flutter.embedding.engine.FlutterEngine
@@ -55,6 +56,21 @@ class MainActivity : FlutterActivity() {
                     } else {
                         result.success(openBrowserChooser(url))
                     }
+                }
+                else -> result.notImplemented()
+            }
+        }
+
+        MethodChannel(
+            flutterEngine.dartExecutor.binaryMessenger,
+            NOTIFICATION_SETTINGS_CHANNEL
+        ).setMethodCallHandler { call, result ->
+            when (call.method) {
+                "openNotificationSettings" -> {
+                    result.success(openNotificationSettings())
+                }
+                "openAppSettings" -> {
+                    result.success(openAppSettings())
                 }
                 else -> result.notImplemented()
             }
@@ -122,8 +138,34 @@ class MainActivity : FlutterActivity() {
         }
     }
 
+    private fun openNotificationSettings(): Boolean {
+        return try {
+            val intent = Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS).apply {
+                putExtra(Settings.EXTRA_APP_PACKAGE, packageName)
+            }
+            startActivity(intent)
+            true
+        } catch (_: Exception) {
+            openAppSettings()
+        }
+    }
+
+    private fun openAppSettings(): Boolean {
+        return try {
+            val intent = Intent(
+                Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
+                Uri.parse("package:$packageName")
+            )
+            startActivity(intent)
+            true
+        } catch (_: Exception) {
+            false
+        }
+    }
+
     companion object {
         private const val SCREEN_PRIVACY_CHANNEL = "breakwave/screen_privacy"
         private const val SOCIAL_LINKS_CHANNEL = "breakwave/social_links"
+        private const val NOTIFICATION_SETTINGS_CHANNEL = "breakwave/notification_settings"
     }
 }
