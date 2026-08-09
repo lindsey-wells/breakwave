@@ -6,6 +6,7 @@
 // Notes: Reduces empty-state clutter and keeps Rescue/action paths obvious.
 // Notes: BW-78A simplifies Home for launch and moves the user's why higher.
 // Notes: BW-81B adds clear Start here actions for check-in, Rescue, and Log.
+// Notes: BW-HOME-01A makes Rescue visually primary and maps Home to the recovery model.
 // ------------------------------------------------------------
 
 import 'package:flutter/material.dart';
@@ -25,6 +26,7 @@ import '../../triggers/presentation/triggers_watch_card.dart';
 import 'widgets/bedtime_danger_mode_card.dart';
 import 'widgets/daily_encouragement_card.dart';
 import 'widgets/fast_urge_entry_card.dart';
+import 'widgets/home_recovery_model_card.dart';
 import 'widgets/latest_logged_moment_card.dart';
 import 'widgets/recovery_cycle_preview_card.dart';
 import 'widgets/recovery_snapshot_card.dart';
@@ -157,6 +159,30 @@ class _HomeScreenState extends State<HomeScreen> {
                                 'Check in each day. If the wave is rising, open Rescue. Afterward, use Log to honestly record what happened.',
                               ),
                               const SizedBox(height: 14),
+                              SizedBox(
+                                width: double.infinity,
+                                child: FilledButton.icon(
+                                  key: const ValueKey<String>(
+                                    'home-primary-rescue',
+                                  ),
+                                  style: FilledButton.styleFrom(
+                                    minimumSize: const Size.fromHeight(56),
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 18,
+                                      vertical: 16,
+                                    ),
+                                  ),
+                                  onPressed: widget.onOpenRescue,
+                                  icon: const Icon(Icons.waves),
+                                  label: const Text('Open Rescue'),
+                                ),
+                              ),
+                              const SizedBox(height: 8),
+                              const Text(
+                                'Interrupt the wave before momentum takes over. '
+                                'Then choose one next right action.',
+                              ),
+                              const SizedBox(height: 12),
                               Wrap(
                                 spacing: 10,
                                 runSpacing: 10,
@@ -165,11 +191,6 @@ class _HomeScreenState extends State<HomeScreen> {
                                     onPressed: _scrollToDailyCheckIn,
                                     icon: const Icon(Icons.check_circle_outline),
                                     label: const Text('Check in'),
-                                  ),
-                                  OutlinedButton.icon(
-                                    onPressed: widget.onOpenRescue,
-                                    icon: const Icon(Icons.waves),
-                                    label: const Text('Open Rescue'),
                                   ),
                                   OutlinedButton.icon(
                                     onPressed: widget.onOpenLog,
@@ -181,6 +202,8 @@ class _HomeScreenState extends State<HomeScreen> {
                             ],
                           ),
                         ),
+                      const SizedBox(height: 12),
+                      const HomeRecoveryModelCard(),
                       const SizedBox(height: 12),
                       FastUrgeEntryCard(
                         onOpenRescue: widget.onOpenRescue,
