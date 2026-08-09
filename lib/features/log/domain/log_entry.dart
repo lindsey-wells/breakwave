@@ -9,6 +9,7 @@
 
 class LogEntry {
   static const String reflectionEntryType = 'Reflection';
+  static const String slipEntryType = 'Slip';
 
   final String id;
   final String entryType;
@@ -52,6 +53,10 @@ class LogEntry {
   bool get isReflection =>
       entryType.trim().toLowerCase() ==
       reflectionEntryType.toLowerCase();
+
+  bool get isSlip =>
+      entryType.trim().toLowerCase() ==
+      slipEntryType.toLowerCase();
 
   bool get hasIntensity => intensity != null;
 

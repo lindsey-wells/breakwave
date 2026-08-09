@@ -25,6 +25,7 @@ import 'widgets/log_notes_card.dart';
 import 'widgets/log_save_card.dart';
 import 'widgets/log_trigger_chips_section.dart';
 import 'widgets/log_cbt_reflection_card.dart';
+import 'widgets/slip_follow_up_card.dart';
 import 'widgets/recent_log_entries_card.dart';
 
 class LogScreen extends StatefulWidget {
@@ -76,6 +77,10 @@ class _LogScreenState extends State<LogScreen> {
   bool get _isReflectionDraft =>
       _entryType.trim().toLowerCase() ==
       LogEntry.reflectionEntryType.toLowerCase();
+
+  bool get _isSlipDraft =>
+      _entryType.trim().toLowerCase() ==
+      LogEntry.slipEntryType.toLowerCase();
 
   static const List<String> _availableTriggers = <String>[
     'Stress',
@@ -436,9 +441,16 @@ class _LogScreenState extends State<LogScreen> {
 
       if (!mounted) return;
 
-      final String saveMessage = editingId == null
-          ? '$savedType entry saved. You can review it below.'
-          : '$savedType entry updated. You can review it below.';
+      final bool savedSlip =
+          savedType.trim().toLowerCase() ==
+          LogEntry.slipEntryType.toLowerCase();
+      final String saveMessage = savedSlip
+          ? (editingId == null
+              ? 'Slip entry saved. You came back and captured what happened.'
+              : 'Slip entry updated. You came back and captured what happened.')
+          : (editingId == null
+              ? '$savedType entry saved. You can review it below.'
+              : '$savedType entry updated. You can review it below.');
 
       setState(() {
         _savedEntryCount = entries.length;
@@ -542,22 +554,39 @@ class _LogScreenState extends State<LogScreen> {
                         _selectedTriggers.contains(_otherLabel),
                   ),
                   const SizedBox(height: 16),
-                  LogCbtReflectionCard(
-                    isReflectionEntry: _isReflectionDraft,
-                    thoughtController: _thoughtController,
-                    actionTakenController: _actionTakenController,
-                    consequenceController: _consequenceController,
-                    betterPlanController: _betterPlanController,
-                    replacementActions: _healthyReplacementActions,
-                    selectedReplacementAction: _selectedReplacementAction,
-                    onReplacementSelected: _setReplacementAction,
-                    otherReplacementActionController:
-                        _otherReplacementActionController,
-                    showOtherReplacementField:
-                        _selectedReplacementAction == _otherLabel,
-                    onOpenRescue: widget.onOpenRescue,
-                    onOpenSupport: widget.onOpenSupport,
-                  ),
+                  if (_isSlipDraft)
+                    SlipFollowUpCard(
+                      thoughtController: _thoughtController,
+                      betterPlanController: _betterPlanController,
+                      replacementActions: _healthyReplacementActions,
+                      selectedReplacementAction:
+                          _selectedReplacementAction,
+                      onReplacementSelected: _setReplacementAction,
+                      otherReplacementActionController:
+                          _otherReplacementActionController,
+                      showOtherReplacementField:
+                          _selectedReplacementAction == _otherLabel,
+                      onOpenRescue: widget.onOpenRescue,
+                      onOpenSupport: widget.onOpenSupport,
+                    )
+                  else
+                    LogCbtReflectionCard(
+                      isReflectionEntry: _isReflectionDraft,
+                      thoughtController: _thoughtController,
+                      actionTakenController: _actionTakenController,
+                      consequenceController: _consequenceController,
+                      betterPlanController: _betterPlanController,
+                      replacementActions: _healthyReplacementActions,
+                      selectedReplacementAction:
+                          _selectedReplacementAction,
+                      onReplacementSelected: _setReplacementAction,
+                      otherReplacementActionController:
+                          _otherReplacementActionController,
+                      showOtherReplacementField:
+                          _selectedReplacementAction == _otherLabel,
+                      onOpenRescue: widget.onOpenRescue,
+                      onOpenSupport: widget.onOpenSupport,
+                    ),
                   const SizedBox(height: 16),
                   LogNotesCard(
                     controller: _notesController,
