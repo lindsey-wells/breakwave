@@ -61,6 +61,22 @@ void main() {
     expect(find.text('Practice Rescue — No Save'), findsOneWidget);
     expect(find.text('PRACTICE MODE'), findsOneWidget);
     expect(find.textContaining('No Log entry'), findsOneWidget);
+    expect(
+      find.byKey(const Key('practice-rescue-recovery-model')),
+      findsOneWidget,
+    );
+    expect(
+      find.text('Recognize → Interrupt → Redirect → Reinforce'),
+      findsOneWidget,
+    );
+    expect(
+      find.text('Recognize • Practice step 1'),
+      findsOneWidget,
+    );
+    expect(
+      find.text('Redirect • Practice step 4'),
+      findsOneWidget,
+    );
 
     await tester.tap(find.text('4 High Risk'));
     await tester.pump();
@@ -73,6 +89,12 @@ void main() {
 
     expect(
       find.text('Practice only. No message was opened.'),
+      findsOneWidget,
+    );
+
+    expect(find.text('Reinforce'), findsOneWidget);
+    expect(
+      find.textContaining('response worth practicing'),
       findsOneWidget,
     );
 

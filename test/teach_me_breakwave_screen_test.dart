@@ -29,12 +29,30 @@ void main() {
 
     expect(find.text('Part 1 of 6'), findsOneWidget);
     expect(find.text('What BreakWave is for'), findsOneWidget);
+    expect(
+      find.byKey(const Key('teach-me-breakwave-recovery-model')),
+      findsOneWidget,
+    );
+    expect(
+      find.text('Recognize → Interrupt → Redirect → Reinforce'),
+      findsOneWidget,
+    );
+    expect(
+      find.text(
+        'Notice it → Break it → Choose differently → Strengthen what works',
+      ),
+      findsOneWidget,
+    );
 
     await tester.tap(find.byKey(const Key('teach-me-breakwave-next')));
     await tester.pumpAndSettle();
 
     expect(find.text('Part 2 of 6'), findsOneWidget);
     expect(find.text('Rescue comes first'), findsOneWidget);
+    expect(
+      find.text('Interrupt the pattern before momentum takes over.'),
+      findsOneWidget,
+    );
 
     await tester.tap(find.byKey(const Key('teach-me-breakwave-back')));
     await tester.pumpAndSettle();

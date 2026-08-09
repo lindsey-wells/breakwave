@@ -177,13 +177,25 @@ class _PracticeRescueScreenState extends State<PracticeRescueScreen> {
                               Text(
                                 'No Log entry, insight, streak, plan, Personal Why, message, call, or emergency action will be created or opened.',
                               ),
+                              SizedBox(height: 12),
+                              Text(
+                                'Recognize → Interrupt → Redirect → Reinforce',
+                                key: Key('practice-rescue-recovery-model'),
+                                style: TextStyle(
+                                  fontWeight: FontWeight.w900,
+                                ),
+                              ),
+                              SizedBox(height: 4),
+                              Text(
+                                'Notice it → Break it → Choose differently → Strengthen what works',
+                              ),
                             ],
                           ),
                         ),
                         const SizedBox(height: 20),
                         const SectionHeader(
-                          eyebrow: 'Practice step 1',
-                          title: 'Name the wave',
+                          eyebrow: 'Recognize • Practice step 1',
+                          title: 'Notice the wave',
                         ),
                         UrgeIntensitySection(
                           selectedIntensity: _selectedIntensity,
@@ -195,7 +207,7 @@ class _PracticeRescueScreenState extends State<PracticeRescueScreen> {
                         ),
                         const SizedBox(height: 20),
                         const SectionHeader(
-                          eyebrow: 'Practice step 2',
+                          eyebrow: 'Interrupt • Practice step 2',
                           title: 'Bring your Personal Why into view',
                         ),
                         KeyedSubtree(
@@ -204,13 +216,13 @@ class _PracticeRescueScreenState extends State<PracticeRescueScreen> {
                         ),
                         const SizedBox(height: 20),
                         const SectionHeader(
-                          eyebrow: 'Practice step 3',
+                          eyebrow: 'Interrupt • Practice step 3',
                           title: 'Slow the body',
                         ),
                         const CalmResetCard(),
                         const SizedBox(height: 20),
                         const SectionHeader(
-                          eyebrow: 'Practice step 4',
+                          eyebrow: 'Redirect • Practice step 4',
                           title: 'Choose one next right action',
                         ),
                         _PracticeActionCard(
@@ -370,6 +382,14 @@ class _PracticeFinishCard extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
             Text(
+              'Reinforce',
+              style: theme.textTheme.labelLarge?.copyWith(
+                color: theme.colorScheme.primary,
+                fontWeight: FontWeight.w900,
+              ),
+            ),
+            const SizedBox(height: 4),
+            Text(
               'Practice summary',
               style: theme.textTheme.titleLarge,
             ),
@@ -379,7 +399,7 @@ class _PracticeFinishCard extends StatelessWidget {
             Text(
               selectedAction == null
                   ? 'Choose a next right action to finish practice.'
-                  : 'Practice action: $selectedAction',
+                  : 'In a real moment, interrupting the old pattern and choosing $selectedAction is a response worth practicing.',
             ),
             const SizedBox(height: 14),
             const Text(

@@ -69,8 +69,10 @@ class BreakWaveTutorialCatalog {
         topic: BreakWaveTutorialTopic.overview,
         title: 'What BreakWave is for',
         summary:
-            'BreakWave helps you interrupt an urge, understand your patterns, and prepare for future risk moments.',
+            'BreakWave helps you change what happens when an urge appears.',
         points: <String>[
+          'Recognize → Interrupt → Redirect → Reinforce is the recovery model that connects the tools you already use.',
+          'Notice it → Break it → Choose differently → Strengthen what works is the same idea in everyday language.',
           'Your recovery setup is local-first, and no account is required to use the core app.',
           modePoint,
           'BreakWave is a recovery support tool, not therapy, medical treatment, a diagnosis, a cure, or an emergency service.',
@@ -80,11 +82,12 @@ class BreakWaveTutorialCatalog {
         topic: BreakWaveTutorialTopic.rescue,
         title: 'Rescue comes first',
         summary:
-            'Open Rescue when an urge is building and you need a fast interruption before momentum takes over.',
+            'Interrupt the pattern before momentum takes over.',
         points: <String>[
-          'Choose the urge intensity that best matches the moment.',
-          'Bring your Personal Why back into view, then use breathing and reset tools to slow the wave.',
-          'Choose one next right action you can take immediately.',
+          'Recognize the wave by choosing the urge intensity that best matches the moment.',
+          'Bring your Personal Why back into view, then use breathing and reset tools to interrupt the old momentum.',
+          'Redirect by choosing one next right action you can take immediately.',
+          'A different response is progress worth noticing and repeating.',
           'Rescue remains available regardless of onboarding or Plus status.',
         ],
       ),
@@ -92,32 +95,35 @@ class BreakWaveTutorialCatalog {
         topic: BreakWaveTutorialTopic.home,
         title: 'Use Home to prepare',
         summary:
-            'Home keeps your current recovery direction visible before the next difficult moment arrives.',
+            'Home helps you recognize risk earlier and prepare a healthier response before the next difficult moment.',
         points: <String>[
           'Current Focus is the recovery reason shown on Home.',
           'Personal Why is the message or image brought into Rescue. They support different moments.',
-          'Use check-ins and risk signals to notice patterns early, and open Rescue quickly when needed.',
+          'Use check-ins and risk signals to recognize patterns early, and open Rescue quickly when needed.',
+          'Preparing a next right action ahead of time makes redirection easier when the wave arrives.',
         ],
       ),
       const BreakWaveTutorialStep(
         topic: BreakWaveTutorialTopic.log,
         title: 'Learn from your Log',
         summary:
-            'The private Log helps you record what happened without turning recovery into a shame scoreboard.',
+            'The private Log helps you recognize patterns and reinforce what helps without turning recovery into a shame scoreboard.',
         points: <String>[
           'Record an Urge, Slip, Victory, or Reflection.',
           'Urge, Slip, and Victory entries can show intensity. Reflections do not use intensity dots.',
           'Add triggers and notes about what helped, then edit or delete entries when needed.',
-          'Over time, the Log can help you recognize repeating patterns.',
+          'Over time, notice repeating triggers, risky moments, and responses that seem to help.',
+          'A slip can be something to learn from. A Victory can help you remember a response worth repeating.',
         ],
       ),
       BreakWaveTutorialStep(
         topic: BreakWaveTutorialTopic.recoveryTools,
         title: 'Build a recovery system',
         summary:
-            'BreakWave combines immediate interruption with planning, routines, insight, and support tools.',
+            'BreakWave connects interruption with redirection, planning, routines, insight, and reinforcement over time.',
         points: <String>[
           'Use reasons, triggers, reminders, trusted contacts, and the starter recovery plan to prepare ahead.',
+          'Next Right Actions help you redirect toward a healthier response instead of only trying to stop the old one.',
           'Deeper planning, guided routines, expanded insights, and richer reports are approved Plus candidates.',
           if (mode == RecoveryMode.christian)
             'Christian mode can also include explicitly Christian journeys and deeper faith-based recovery material.',

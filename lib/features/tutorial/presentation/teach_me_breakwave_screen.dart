@@ -314,6 +314,11 @@ class _TeachMeBreakWaveScreenState extends State<TeachMeBreakWaveScreen> {
                           fontWeight: FontWeight.w900,
                         ),
                       ),
+                      if (current.topic ==
+                          BreakWaveTutorialTopic.overview) ...<Widget>[
+                        const SizedBox(height: 16),
+                        const _RecoveryModelCard(),
+                      ],
                       const SizedBox(height: 12),
                       Text(
                         current.summary,
@@ -403,6 +408,56 @@ class _TeachMeBreakWaveScreenState extends State<TeachMeBreakWaveScreen> {
                   ),
                 ),
               ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _RecoveryModelCard extends StatelessWidget {
+  const _RecoveryModelCard();
+
+  @override
+  Widget build(BuildContext context) {
+    final ThemeData theme = Theme.of(context);
+    final ColorScheme colors = theme.colorScheme;
+
+    return Container(
+      key: const Key('teach-me-breakwave-recovery-model'),
+      width: double.infinity,
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: colors.primaryContainer.withOpacity(0.24),
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(
+          color: colors.primary.withOpacity(0.45),
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          Text(
+            'How BreakWave helps change what happens next',
+            style: theme.textTheme.titleMedium?.copyWith(
+              fontWeight: FontWeight.w900,
+            ),
+          ),
+          const SizedBox(height: 12),
+          Text(
+            'Recognize → Interrupt → Redirect → Reinforce',
+            style: theme.textTheme.bodyLarge?.copyWith(
+              color: colors.primary,
+              fontWeight: FontWeight.w900,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            'Notice it → Break it → Choose differently → Strengthen what works',
+            style: theme.textTheme.bodyMedium?.copyWith(
+              fontWeight: FontWeight.w700,
+              height: 1.4,
             ),
           ),
         ],
