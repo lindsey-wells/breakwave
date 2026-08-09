@@ -122,20 +122,23 @@ void main() {
       await tester.pumpWidget(buildCard());
       await tester.pump();
 
-      expect(
-        find.byKey(
-          const ValueKey<String>('slip-open-rescue-now'),
-        ),
-        findsOneWidget,
+      final Finder rescueButton = find.byKey(
+        const ValueKey<String>('slip-open-rescue-now'),
       );
+      expect(rescueButton, findsOneWidget);
 
-      await tester.tap(
-        find.byKey(
-          const ValueKey<String>('slip-open-rescue-now'),
-        ),
-      );
+      // The button is intentionally below the initial 800x600 test viewport.
+      // Scroll it into view just as a real user would before tapping it.
+      await tester.ensureVisible(rescueButton);
+      await tester.pumpAndSettle();
+      await tester.tap(rescueButton);
+      await tester.pump();
+
       expect(rescueCount, 1);
 
+      // Unmount before disposing controllers owned by this test.
+      await tester.pumpWidget(const SizedBox.shrink());
+      await tester.pump();
       thought.dispose();
       notice.dispose();
       other.dispose();
