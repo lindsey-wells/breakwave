@@ -67,11 +67,20 @@ failure, back-to-zero, or shame language.
 
 Home gains one compact card near the top that shows both forms of the model
 and explains how the existing architecture fits together. Existing section
-labels such as **Today** and **Pattern awareness** remain intact:
+labels such as **Today** and **Pattern awareness** remain intact.
 
-- Home helps the user notice and prepare.
-- Rescue helps interrupt the wave and choose what happens next.
-- Log helps remember what worked and learn the pattern.
+The card uses three scannable plain-language mappings rather than one dense
+paragraph:
+
+- **Notice It**
+  - Home helps you notice patterns and prepare.
+- **Break It → Choose Differently**
+  - Rescue helps you interrupt the wave and choose one next right action.
+- **Strengthen What Works**
+  - Your Log helps you remember what helped and learn the pattern.
+
+The wording intentionally uses **what helped** rather than claiming that one
+response is guaranteed to have caused a particular recovery outcome.
 
 The card is orientation, not a curriculum.
 
@@ -98,6 +107,10 @@ BW-HOME-01A does not:
 - add a new analytics engine;
 - add a new navigation tab;
 - change recovery data storage.
+
+The visual-copy repair after Moto G smoke changes only the recovery-model
+card, its widget test, this contract, and the existing BW-HOME-01A verifier.
+`home_screen.dart` remains unchanged from the first green Shadow candidate.
 
 Future Home work should continue to ask:
 

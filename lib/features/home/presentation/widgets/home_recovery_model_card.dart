@@ -52,17 +52,70 @@ class HomeRecoveryModelCard extends StatelessWidget {
               height: 1.4,
             ),
           ),
+          const SizedBox(height: 14),
+          const _RecoveryModelLink(
+            label: 'Notice It',
+            body: 'Home helps you notice patterns and prepare.',
+          ),
           const SizedBox(height: 12),
-          Text(
-            'Home helps you notice and prepare. Rescue helps you interrupt '
-            'the wave and choose one next right action. Your Log helps you '
-            'remember what worked and learn the pattern.',
-            style: theme.textTheme.bodyMedium?.copyWith(
-              height: 1.45,
-            ),
+          const _RecoveryModelLink(
+            label: 'Break It → Choose Differently',
+            body: 'Rescue helps you interrupt the wave and choose one next right action.',
+          ),
+          const SizedBox(height: 12),
+          const _RecoveryModelLink(
+            label: 'Strengthen What Works',
+            body: 'Your Log helps you remember what helped and learn the pattern.',
           ),
         ],
       ),
+    );
+  }
+}
+
+class _RecoveryModelLink extends StatelessWidget {
+  const _RecoveryModelLink({
+    required this.label,
+    required this.body,
+  });
+
+  final String label;
+  final String body;
+
+  @override
+  Widget build(BuildContext context) {
+    final TextTheme textTheme = Theme.of(context).textTheme;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: <Widget>[
+        Text(
+          label,
+          style: textTheme.bodyMedium?.copyWith(
+            fontWeight: FontWeight.w800,
+          ),
+        ),
+        const SizedBox(height: 3),
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            Text(
+              '• ',
+              style: textTheme.bodyMedium?.copyWith(
+                fontWeight: FontWeight.w800,
+              ),
+            ),
+            Expanded(
+              child: Text(
+                body,
+                style: textTheme.bodyMedium?.copyWith(
+                  height: 1.4,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ],
     );
   }
 }

@@ -72,10 +72,7 @@ for needle in [
 ]:
     require(home, needle, "Home")
 
-for historical_label in [
-    "Today",
-    "Pattern awareness",
-]:
+for historical_label in ["Today", "Pattern awareness"]:
     if historical_label not in home:
         print(
             "FAIL BW-HOME-01A historical Home label missing: "
@@ -118,9 +115,13 @@ for needle in [
     "Your recovery",
     "Recognize → Interrupt → Redirect → Reinforce",
     "Notice it → Break it → Choose differently → Strengthen what works",
-    "Home helps you notice and prepare.",
-    "choose one next right action",
-    "remember what worked",
+    "Notice It",
+    "Home helps you notice patterns and prepare.",
+    "Break It → Choose Differently",
+    "Rescue helps you interrupt the wave and choose one next right action.",
+    "Strengthen What Works",
+    "Your Log helps you remember what helped and learn the pattern.",
+    "class _RecoveryModelLink",
 ]:
     require(model, needle, "model card")
 
@@ -132,10 +133,11 @@ for forbidden in [
     "you failed",
     "back to zero",
     "streak reset",
+    "remember what worked",
 ]:
     if forbidden in model:
         print(
-            "FAIL BW-HOME-01A model card shame/paywall language: "
+            "FAIL BW-HOME-01A model card forbidden language: "
             + forbidden
         )
         failed = True
@@ -144,7 +146,11 @@ for needle in [
     "home-recovery-model-card",
     "Recognize → Interrupt → Redirect → Reinforce",
     "Notice it → Break it → Choose differently → Strengthen what works",
-    "choose one next right action",
+    "Notice It",
+    "Break It → Choose Differently",
+    "Strengthen What Works",
+    "remember what helped",
+    "find.textContaining('remember what worked'), findsNothing",
     "tester.takeException()",
 ]:
     require(test, needle, "Flutter test")
@@ -155,11 +161,16 @@ for needle in [
     "Rescue remains the clearest immediate action.",
     "direct **Open Rescue** action",
     "Fast Urge remains available",
+    "**Notice It**",
+    "**Break It → Choose Differently**",
+    "**Strengthen What Works**",
+    "what helped",
     "card is orientation, not a curriculum",
     "must not:",
     "gate Rescue behind Plus",
     "does not:",
     "add a new analytics engine",
+    "`home_screen.dart` remains unchanged",
 ]:
     require(contract, needle, "contract")
 
