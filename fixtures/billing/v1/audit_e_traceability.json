@@ -1,0 +1,496 @@
+{
+  "auditECaseCount": 98,
+  "cases": [
+    {
+      "contractArea": "free-safety",
+      "status": "contract_mapped_not_executed",
+      "testId": "SAF-001"
+    },
+    {
+      "contractArea": "free-safety",
+      "status": "contract_mapped_not_executed",
+      "testId": "SAF-002"
+    },
+    {
+      "contractArea": "free-safety",
+      "status": "contract_mapped_not_executed",
+      "testId": "SAF-003"
+    },
+    {
+      "contractArea": "free-safety",
+      "status": "contract_mapped_not_executed",
+      "testId": "SAF-004"
+    },
+    {
+      "contractArea": "free-safety",
+      "status": "contract_mapped_not_executed",
+      "testId": "SAF-005"
+    },
+    {
+      "contractArea": "free-safety",
+      "status": "contract_mapped_not_executed",
+      "testId": "SAF-006"
+    },
+    {
+      "contractArea": "free-safety",
+      "status": "contract_mapped_not_executed",
+      "testId": "SAF-007"
+    },
+    {
+      "contractArea": "free-safety",
+      "status": "contract_mapped_not_executed",
+      "testId": "SAF-008"
+    },
+    {
+      "contractArea": "catalog-boundary",
+      "status": "contract_mapped_not_executed",
+      "testId": "CAT-001"
+    },
+    {
+      "contractArea": "catalog-boundary",
+      "status": "contract_mapped_not_executed",
+      "testId": "CAT-002"
+    },
+    {
+      "contractArea": "catalog-boundary",
+      "status": "contract_mapped_not_executed",
+      "testId": "CAT-003"
+    },
+    {
+      "contractArea": "catalog-boundary",
+      "status": "contract_mapped_not_executed",
+      "testId": "CAT-004"
+    },
+    {
+      "contractArea": "catalog-boundary",
+      "status": "contract_mapped_not_executed",
+      "testId": "CAT-005"
+    },
+    {
+      "contractArea": "catalog-boundary",
+      "status": "contract_mapped_not_executed",
+      "testId": "CAT-006"
+    },
+    {
+      "contractArea": "request-verification",
+      "status": "contract_mapped_not_executed",
+      "testId": "PUR-001"
+    },
+    {
+      "contractArea": "request-verification",
+      "status": "contract_mapped_not_executed",
+      "testId": "PUR-002"
+    },
+    {
+      "contractArea": "request-verification",
+      "status": "contract_mapped_not_executed",
+      "testId": "PUR-003"
+    },
+    {
+      "contractArea": "request-verification",
+      "status": "contract_mapped_not_executed",
+      "testId": "PUR-004"
+    },
+    {
+      "contractArea": "request-verification",
+      "status": "contract_mapped_not_executed",
+      "testId": "PUR-005"
+    },
+    {
+      "contractArea": "request-verification",
+      "status": "contract_mapped_not_executed",
+      "testId": "PUR-006"
+    },
+    {
+      "contractArea": "request-verification",
+      "status": "contract_mapped_not_executed",
+      "testId": "PUR-007"
+    },
+    {
+      "contractArea": "request-verification",
+      "status": "contract_mapped_not_executed",
+      "testId": "PUR-008"
+    },
+    {
+      "contractArea": "request-verification",
+      "status": "contract_mapped_not_executed",
+      "testId": "PUR-009"
+    },
+    {
+      "contractArea": "request-verification",
+      "status": "contract_mapped_not_executed",
+      "testId": "PUR-010"
+    },
+    {
+      "contractArea": "acknowledgement",
+      "status": "contract_mapped_not_executed",
+      "testId": "ACK-001"
+    },
+    {
+      "contractArea": "acknowledgement",
+      "status": "contract_mapped_not_executed",
+      "testId": "ACK-002"
+    },
+    {
+      "contractArea": "acknowledgement",
+      "status": "contract_mapped_not_executed",
+      "testId": "ACK-003"
+    },
+    {
+      "contractArea": "acknowledgement",
+      "status": "contract_mapped_not_executed",
+      "testId": "ACK-004"
+    },
+    {
+      "contractArea": "acknowledgement",
+      "status": "contract_mapped_not_executed",
+      "testId": "ACK-005"
+    },
+    {
+      "contractArea": "acknowledgement",
+      "status": "contract_mapped_not_executed",
+      "testId": "ACK-006"
+    },
+    {
+      "contractArea": "lifecycle",
+      "status": "contract_mapped_not_executed",
+      "testId": "LIF-001"
+    },
+    {
+      "contractArea": "lifecycle",
+      "status": "contract_mapped_not_executed",
+      "testId": "LIF-002"
+    },
+    {
+      "contractArea": "lifecycle",
+      "status": "contract_mapped_not_executed",
+      "testId": "LIF-003"
+    },
+    {
+      "contractArea": "lifecycle",
+      "status": "contract_mapped_not_executed",
+      "testId": "LIF-004"
+    },
+    {
+      "contractArea": "lifecycle",
+      "status": "contract_mapped_not_executed",
+      "testId": "LIF-005"
+    },
+    {
+      "contractArea": "lifecycle",
+      "status": "contract_mapped_not_executed",
+      "testId": "LIF-006"
+    },
+    {
+      "contractArea": "lifecycle",
+      "status": "contract_mapped_not_executed",
+      "testId": "LIF-007"
+    },
+    {
+      "contractArea": "lifecycle",
+      "status": "contract_mapped_not_executed",
+      "testId": "LIF-008"
+    },
+    {
+      "contractArea": "lifecycle",
+      "status": "contract_mapped_not_executed",
+      "testId": "LIF-009"
+    },
+    {
+      "contractArea": "lifecycle",
+      "status": "contract_mapped_not_executed",
+      "testId": "LIF-010"
+    },
+    {
+      "contractArea": "lifecycle",
+      "status": "contract_mapped_not_executed",
+      "testId": "LIF-011"
+    },
+    {
+      "contractArea": "lifecycle",
+      "status": "contract_mapped_not_executed",
+      "testId": "LIF-012"
+    },
+    {
+      "contractArea": "lifecycle",
+      "status": "contract_mapped_not_executed",
+      "testId": "LIF-013"
+    },
+    {
+      "contractArea": "lifecycle",
+      "status": "contract_mapped_not_executed",
+      "testId": "LIF-014"
+    },
+    {
+      "contractArea": "lifecycle",
+      "status": "contract_mapped_not_executed",
+      "testId": "LIF-015"
+    },
+    {
+      "contractArea": "lifecycle",
+      "status": "contract_mapped_not_executed",
+      "testId": "LIF-016"
+    },
+    {
+      "contractArea": "rtdn",
+      "status": "contract_mapped_not_executed",
+      "testId": "RTD-001"
+    },
+    {
+      "contractArea": "rtdn",
+      "status": "contract_mapped_not_executed",
+      "testId": "RTD-002"
+    },
+    {
+      "contractArea": "rtdn",
+      "status": "contract_mapped_not_executed",
+      "testId": "RTD-003"
+    },
+    {
+      "contractArea": "rtdn",
+      "status": "contract_mapped_not_executed",
+      "testId": "RTD-004"
+    },
+    {
+      "contractArea": "rtdn",
+      "status": "contract_mapped_not_executed",
+      "testId": "RTD-005"
+    },
+    {
+      "contractArea": "rtdn",
+      "status": "contract_mapped_not_executed",
+      "testId": "RTD-006"
+    },
+    {
+      "contractArea": "rtdn",
+      "status": "contract_mapped_not_executed",
+      "testId": "RTD-007"
+    },
+    {
+      "contractArea": "rtdn",
+      "status": "contract_mapped_not_executed",
+      "testId": "RTD-008"
+    },
+    {
+      "contractArea": "restore-linked-token",
+      "status": "contract_mapped_not_executed",
+      "testId": "RST-001"
+    },
+    {
+      "contractArea": "restore-linked-token",
+      "status": "contract_mapped_not_executed",
+      "testId": "RST-002"
+    },
+    {
+      "contractArea": "restore-linked-token",
+      "status": "contract_mapped_not_executed",
+      "testId": "RST-003"
+    },
+    {
+      "contractArea": "restore-linked-token",
+      "status": "contract_mapped_not_executed",
+      "testId": "RST-004"
+    },
+    {
+      "contractArea": "restore-linked-token",
+      "status": "contract_mapped_not_executed",
+      "testId": "RST-005"
+    },
+    {
+      "contractArea": "restore-linked-token",
+      "status": "contract_mapped_not_executed",
+      "testId": "RST-006"
+    },
+    {
+      "contractArea": "restore-linked-token",
+      "status": "contract_mapped_not_executed",
+      "testId": "RST-007"
+    },
+    {
+      "contractArea": "restore-linked-token",
+      "status": "contract_mapped_not_executed",
+      "testId": "RST-008"
+    },
+    {
+      "contractArea": "snapshot-offline",
+      "status": "contract_mapped_not_executed",
+      "testId": "OFF-001"
+    },
+    {
+      "contractArea": "snapshot-offline",
+      "status": "contract_mapped_not_executed",
+      "testId": "OFF-002"
+    },
+    {
+      "contractArea": "snapshot-offline",
+      "status": "contract_mapped_not_executed",
+      "testId": "OFF-003"
+    },
+    {
+      "contractArea": "snapshot-offline",
+      "status": "contract_mapped_not_executed",
+      "testId": "OFF-004"
+    },
+    {
+      "contractArea": "snapshot-offline",
+      "status": "contract_mapped_not_executed",
+      "testId": "OFF-005"
+    },
+    {
+      "contractArea": "snapshot-offline",
+      "status": "contract_mapped_not_executed",
+      "testId": "OFF-006"
+    },
+    {
+      "contractArea": "snapshot-offline",
+      "status": "contract_mapped_not_executed",
+      "testId": "OFF-007"
+    },
+    {
+      "contractArea": "snapshot-offline",
+      "status": "contract_mapped_not_executed",
+      "testId": "OFF-008"
+    },
+    {
+      "contractArea": "snapshot-offline",
+      "status": "contract_mapped_not_executed",
+      "testId": "OFF-009"
+    },
+    {
+      "contractArea": "snapshot-offline",
+      "status": "contract_mapped_not_executed",
+      "testId": "OFF-010"
+    },
+    {
+      "contractArea": "security-privacy",
+      "status": "contract_mapped_not_executed",
+      "testId": "SEC-001"
+    },
+    {
+      "contractArea": "security-privacy",
+      "status": "contract_mapped_not_executed",
+      "testId": "SEC-002"
+    },
+    {
+      "contractArea": "security-privacy",
+      "status": "contract_mapped_not_executed",
+      "testId": "SEC-003"
+    },
+    {
+      "contractArea": "security-privacy",
+      "status": "contract_mapped_not_executed",
+      "testId": "SEC-004"
+    },
+    {
+      "contractArea": "security-privacy",
+      "status": "contract_mapped_not_executed",
+      "testId": "SEC-005"
+    },
+    {
+      "contractArea": "security-privacy",
+      "status": "contract_mapped_not_executed",
+      "testId": "SEC-006"
+    },
+    {
+      "contractArea": "security-privacy",
+      "status": "contract_mapped_not_executed",
+      "testId": "SEC-007"
+    },
+    {
+      "contractArea": "security-privacy",
+      "status": "contract_mapped_not_executed",
+      "testId": "SEC-008"
+    },
+    {
+      "contractArea": "security-privacy",
+      "status": "contract_mapped_not_executed",
+      "testId": "SEC-009"
+    },
+    {
+      "contractArea": "security-privacy",
+      "status": "contract_mapped_not_executed",
+      "testId": "SEC-010"
+    },
+    {
+      "contractArea": "safe-messaging",
+      "status": "contract_mapped_not_executed",
+      "testId": "UXS-001"
+    },
+    {
+      "contractArea": "safe-messaging",
+      "status": "contract_mapped_not_executed",
+      "testId": "UXS-002"
+    },
+    {
+      "contractArea": "safe-messaging",
+      "status": "contract_mapped_not_executed",
+      "testId": "UXS-003"
+    },
+    {
+      "contractArea": "safe-messaging",
+      "status": "contract_mapped_not_executed",
+      "testId": "UXS-004"
+    },
+    {
+      "contractArea": "safe-messaging",
+      "status": "contract_mapped_not_executed",
+      "testId": "UXS-005"
+    },
+    {
+      "contractArea": "safe-messaging",
+      "status": "contract_mapped_not_executed",
+      "testId": "UXS-006"
+    },
+    {
+      "contractArea": "safe-messaging",
+      "status": "contract_mapped_not_executed",
+      "testId": "UXS-007"
+    },
+    {
+      "contractArea": "safe-messaging",
+      "status": "contract_mapped_not_executed",
+      "testId": "UXS-008"
+    },
+    {
+      "contractArea": "operations-evidence",
+      "status": "contract_mapped_not_executed",
+      "testId": "OPS-001"
+    },
+    {
+      "contractArea": "operations-evidence",
+      "status": "contract_mapped_not_executed",
+      "testId": "OPS-002"
+    },
+    {
+      "contractArea": "operations-evidence",
+      "status": "contract_mapped_not_executed",
+      "testId": "OPS-003"
+    },
+    {
+      "contractArea": "operations-evidence",
+      "status": "contract_mapped_not_executed",
+      "testId": "OPS-004"
+    },
+    {
+      "contractArea": "operations-evidence",
+      "status": "contract_mapped_not_executed",
+      "testId": "OPS-005"
+    },
+    {
+      "contractArea": "operations-evidence",
+      "status": "contract_mapped_not_executed",
+      "testId": "OPS-006"
+    },
+    {
+      "contractArea": "operations-evidence",
+      "status": "contract_mapped_not_executed",
+      "testId": "OPS-007"
+    },
+    {
+      "contractArea": "operations-evidence",
+      "status": "contract_mapped_not_executed",
+      "testId": "OPS-008"
+    }
+  ],
+  "schemaVersion": "bw.billing.audit-e-traceability.v1"
+}

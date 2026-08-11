@@ -1,0 +1,68 @@
+{
+  "acknowledgementStates": [
+    "not_applicable",
+    "pending",
+    "acknowledged",
+    "retry_required"
+  ],
+  "breakWaveDerivedStates": {
+    "neverPurchased": "not_entitled",
+    "scheduledPauseWhileGoogleActive": "pause_scheduled_active",
+    "verifiedVoidOrRevocation": "revoked"
+  },
+  "googleSubscriptionStateMap": {
+    "SUBSCRIPTION_STATE_ACTIVE": "active",
+    "SUBSCRIPTION_STATE_CANCELED": "canceled_active",
+    "SUBSCRIPTION_STATE_EXPIRED": "expired",
+    "SUBSCRIPTION_STATE_IN_GRACE_PERIOD": "grace",
+    "SUBSCRIPTION_STATE_ON_HOLD": "on_hold",
+    "SUBSCRIPTION_STATE_PAUSED": "paused",
+    "SUBSCRIPTION_STATE_PENDING": "pending",
+    "SUBSCRIPTION_STATE_PENDING_PURCHASE_CANCELED": "pending_canceled",
+    "SUBSCRIPTION_STATE_UNSPECIFIED": "unverifiable"
+  },
+  "negativeOrSuspendedStates": [
+    "not_entitled",
+    "pending",
+    "paused",
+    "on_hold",
+    "expired",
+    "revoked",
+    "pending_canceled",
+    "unverifiable"
+  ],
+  "normalizedStates": [
+    "not_entitled",
+    "pending",
+    "active",
+    "grace",
+    "canceled_active",
+    "pause_scheduled_active",
+    "paused",
+    "on_hold",
+    "expired",
+    "revoked",
+    "pending_canceled",
+    "unverifiable"
+  ],
+  "positiveAccessStates": [
+    "active",
+    "grace",
+    "canceled_active",
+    "pause_scheduled_active"
+  ],
+  "positiveOfflineMaxHours": {
+    "active": 72,
+    "canceled_active": 72,
+    "grace": 24,
+    "pause_scheduled_active": 72
+  },
+  "rules": [
+    "first_grant_requires_online_verification",
+    "newer_verified_negative_overrides_older_positive",
+    "linked_new_token_becomes_authority_only_after_verification",
+    "rtdn_is_signal_not_proof",
+    "device_clock_cannot_extend_access"
+  ],
+  "schemaVersion": "bw.billing.lifecycle.v1"
+}

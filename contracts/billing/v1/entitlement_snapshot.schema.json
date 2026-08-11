@@ -1,0 +1,147 @@
+{
+  "$id": "urn:breakwave:billing:entitlement-snapshot:v1",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "payload": {
+      "additionalProperties": false,
+      "properties": {
+        "entitled": {
+          "type": "boolean"
+        },
+        "environment": {
+          "enum": [
+            "staging",
+            "production"
+          ]
+        },
+        "packageName": {
+          "const": "com.cube23.breakwave"
+        },
+        "pauseEffectiveAt": {
+          "format": "date-time",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "schemaVersion": {
+          "const": "bw.entitlement.payload.v1"
+        },
+        "sequence": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "snapshotId": {
+          "format": "uuid",
+          "type": "string"
+        },
+        "state": {
+          "enum": [
+            "not_entitled",
+            "pending",
+            "active",
+            "grace",
+            "canceled_active",
+            "pause_scheduled_active",
+            "paused",
+            "on_hold",
+            "expired",
+            "revoked",
+            "pending_canceled",
+            "unverifiable"
+          ]
+        },
+        "subscriptionChainRef": {
+          "maxLength": 128,
+          "minLength": 16,
+          "pattern": "^hmac256:[A-Za-z0-9_-]+$",
+          "type": "string"
+        },
+        "subscriptionExpiry": {
+          "format": "date-time",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "testPurchase": {
+          "type": "boolean"
+        },
+        "tier": {
+          "enum": [
+            "free",
+            "plus"
+          ]
+        },
+        "validThrough": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "verifiedAt": {
+          "format": "date-time",
+          "type": "string"
+        }
+      },
+      "required": [
+        "schemaVersion",
+        "snapshotId",
+        "environment",
+        "packageName",
+        "tier",
+        "state",
+        "entitled",
+        "subscriptionChainRef",
+        "sequence",
+        "verifiedAt",
+        "validThrough",
+        "testPurchase"
+      ],
+      "type": "object"
+    },
+    "schemaVersion": {
+      "const": "bw.entitlement.snapshot.v1"
+    },
+    "signature": {
+      "additionalProperties": false,
+      "properties": {
+        "algorithm": {
+          "const": "EC_SIGN_P256_SHA256"
+        },
+        "canonicalization": {
+          "const": "RFC8785-JCS"
+        },
+        "encoding": {
+          "const": "base64url-der"
+        },
+        "keyId": {
+          "maxLength": 200,
+          "minLength": 1,
+          "type": "string"
+        },
+        "value": {
+          "maxLength": 512,
+          "minLength": 16,
+          "pattern": "^[A-Za-z0-9_-]+$",
+          "type": "string",
+          "x-sensitive": false
+        }
+      },
+      "required": [
+        "algorithm",
+        "canonicalization",
+        "encoding",
+        "keyId",
+        "value"
+      ],
+      "type": "object"
+    }
+  },
+  "required": [
+    "schemaVersion",
+    "payload",
+    "signature"
+  ],
+  "title": "BreakWave Signed Entitlement Snapshot v1",
+  "type": "object"
+}

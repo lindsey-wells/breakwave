@@ -1,0 +1,103 @@
+{
+  "$id": "urn:breakwave:billing:client-verification-request:v1",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "appVersion": {
+      "maxLength": 32,
+      "minLength": 1,
+      "type": "string"
+    },
+    "appVersionCode": {
+      "minimum": 1,
+      "type": "integer"
+    },
+    "installationRef": {
+      "maxLength": 128,
+      "minLength": 16,
+      "pattern": "^[A-Za-z0-9_.:-]+$",
+      "type": "string",
+      "x-pseudonymous": true
+    },
+    "integrity": {
+      "additionalProperties": false,
+      "properties": {
+        "provider": {
+          "const": "play_integrity_standard"
+        },
+        "requestHash": {
+          "maxLength": 128,
+          "minLength": 43,
+          "pattern": "^[A-Za-z0-9_-]+$",
+          "type": "string"
+        },
+        "token": {
+          "maxLength": 16384,
+          "minLength": 16,
+          "type": "string",
+          "x-log-policy": "never",
+          "x-sensitive": true
+        }
+      },
+      "required": [
+        "provider",
+        "token",
+        "requestHash"
+      ],
+      "type": "object"
+    },
+    "packageName": {
+      "const": "com.cube23.breakwave"
+    },
+    "platform": {
+      "const": "android"
+    },
+    "productId": {
+      "maxLength": 128,
+      "minLength": 1,
+      "type": "string"
+    },
+    "purchaseToken": {
+      "maxLength": 4096,
+      "minLength": 16,
+      "type": "string",
+      "x-log-policy": "never",
+      "x-sensitive": true
+    },
+    "requestId": {
+      "format": "uuid",
+      "type": "string"
+    },
+    "requestNonce": {
+      "maxLength": 128,
+      "minLength": 22,
+      "pattern": "^[A-Za-z0-9_-]+$",
+      "type": "string",
+      "x-sensitive": true
+    },
+    "requestPurpose": {
+      "enum": [
+        "verify_purchase",
+        "restore",
+        "refresh"
+      ]
+    },
+    "schemaVersion": {
+      "const": "bw.billing.verify.v1"
+    }
+  },
+  "required": [
+    "schemaVersion",
+    "requestId",
+    "requestNonce",
+    "requestPurpose",
+    "packageName",
+    "platform",
+    "appVersion",
+    "appVersionCode",
+    "purchaseToken",
+    "integrity"
+  ],
+  "title": "BreakWave Billing Verification Request v1",
+  "type": "object"
+}

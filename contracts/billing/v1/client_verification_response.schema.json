@@ -1,0 +1,70 @@
+{
+  "$id": "urn:breakwave:billing:client-verification-response:v1",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "errorCategory": {
+      "enum": [
+        "none",
+        "malformed_request",
+        "unsupported_protocol",
+        "unauthorized_client",
+        "integrity_unavailable",
+        "integrity_rejected",
+        "package_mismatch",
+        "product_mismatch",
+        "purchase_token_invalid",
+        "purchase_token_expired",
+        "purchase_token_reused",
+        "play_not_found",
+        "play_unavailable",
+        "rate_limited",
+        "state_unverifiable",
+        "internal_retryable"
+      ]
+    },
+    "requestId": {
+      "format": "uuid",
+      "type": "string"
+    },
+    "result": {
+      "enum": [
+        "verified",
+        "retryable_error",
+        "permanent_error"
+      ]
+    },
+    "retryAfterSeconds": {
+      "maximum": 86400,
+      "minimum": 1,
+      "type": "integer"
+    },
+    "schemaVersion": {
+      "const": "bw.billing.verify.v1"
+    },
+    "serverTime": {
+      "format": "date-time",
+      "type": "string"
+    },
+    "snapshot": {
+      "oneOf": [
+        {
+          "type": "null"
+        },
+        {
+          "$ref": "entitlement_snapshot.schema.json"
+        }
+      ]
+    }
+  },
+  "required": [
+    "schemaVersion",
+    "requestId",
+    "serverTime",
+    "result",
+    "errorCategory",
+    "snapshot"
+  ],
+  "title": "BreakWave Billing Verification Response v1",
+  "type": "object"
+}
