@@ -34,7 +34,9 @@ BW-EDU-01A does not change Rescue behavior, persistence, completion,
 support escalation, or navigation.
 
 ## Log
-The Log education appears after the existing Pattern Log introduction.
+The Log education appears immediately after the existing entry-type selector.
+The user can therefore choose Urge, Slip, Victory, or Reflection before any
+first-visit education increases the vertical distance to that first action.
 
 **Recognize + Reinforce**
 
@@ -42,6 +44,9 @@ The Log education appears after the existing Pattern Log introduction.
 - Use your Log to make patterns visible
 - Record an urge, slip, victory, or reflection when it helps. Notice triggers,
   what you tried, and what helped—without grading yourself.
+
+This placement preserves the established Log first-action hierarchy and keeps
+existing Slip selection behavior reachable before contextual education.
 
 BW-EDU-01A does not change Log entry types, recovery data, Slip Follow-Up,
 edit/delete behavior, or navigation.
@@ -73,6 +78,12 @@ and does not change billing, entitlement, or Plus access.
 The contextual copy is intentionally neutral and valid in both Christian and
 Secular mode. BW-EDU-01A does not add mode-specific branches.
 
+## Test model
+The widget regression test gives each synthetic education surface a distinct
+key. That models the real BreakWave shell, where Rescue, Log, and Support are
+independent tab elements rather than one stateful widget changing surfaces in
+place.
+
 ## Guardrails
 BW-EDU-01A must not:
 - block or gate Rescue;
@@ -84,4 +95,5 @@ BW-EDU-01A must not:
 - change BreakWaveAccessPolicy;
 - add an upgrade prompt;
 - duplicate Teach Me BreakWave;
-- automatically mark offscreen tabs dismissed.
+- automatically mark offscreen tabs dismissed;
+- push the Log entry-type selector behind contextual education.

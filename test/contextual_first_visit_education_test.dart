@@ -12,6 +12,7 @@ Widget _host({
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: ContextualFirstVisitEducationCard(
+          key: ValueKey<String>('education-${surface.name}'),
           surface: surface,
           eyebrow: 'First visit',
           title: title,

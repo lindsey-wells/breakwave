@@ -525,16 +525,6 @@ class _LogScreenState extends State<LogScreen> {
                     ),
                   ),
                   const SizedBox(height: 12),
-                  const ContextualFirstVisitEducationCard(
-                    surface: BreakWaveEducationSurface.log,
-                    eyebrow: 'First visit • Recognize + Reinforce',
-                    title: 'Use your Log to make patterns visible',
-                    body:
-                        'Record an urge, slip, victory, or reflection when it '
-                        'helps. Notice triggers, what you tried, and what '
-                        'helped—without grading yourself.',
-                  ),
-                  const SizedBox(height: 12),
                   Text(
                     'Saved locally on this device: $_savedEntryCount',
                     style: Theme.of(context).textTheme.titleMedium,
@@ -547,6 +537,16 @@ class _LogScreenState extends State<LogScreen> {
                   LogEntryTypeSection(
                     selectedType: _entryType,
                     onSelected: _setEntryType,
+                  ),
+                  const SizedBox(height: 12),
+                  const ContextualFirstVisitEducationCard(
+                    surface: BreakWaveEducationSurface.log,
+                    eyebrow: 'First visit • Recognize + Reinforce',
+                    title: 'Use your Log to make patterns visible',
+                    body:
+                        'Record an urge, slip, victory, or reflection when it '
+                        'helps. Notice triggers, what you tried, and what '
+                        'helped—without grading yourself.',
                   ),
                   const SizedBox(height: 16),
                   if (!_isReflectionDraft) ...<Widget>[

@@ -146,16 +146,23 @@ if not (
     failed = True
 
 log_intro = log.find("'Pattern Log'")
-log_education = log.find("BreakWaveEducationSurface.log")
 log_count = log.find("Saved locally on this device:")
+log_entry_type = log.find("LogEntryTypeSection(")
+log_education = log.find("BreakWaveEducationSurface.log")
+log_intensity = log.find("LogIntensitySection(")
 
 if not (
     log_intro != -1
-    and log_education != -1
     and log_count != -1
-    and log_intro < log_education < log_count
+    and log_entry_type != -1
+    and log_education != -1
+    and log_intensity != -1
+    and log_intro < log_count < log_entry_type < log_education < log_intensity
 ):
-    print("FAIL BW-EDU-01A Log education placement mismatch")
+    print(
+        "FAIL BW-EDU-01A Log education must appear "
+        "after entry type and before intensity"
+    )
     failed = True
 
 support_intro = support.find("'Support Harbor'")
@@ -174,6 +181,7 @@ if not (
 for needle in [
     "dismissal persists per surface",
     "building a card never dismisses it automatically",
+    "key: ValueKey<String>('education-${surface.name}')",
     "BreakWaveEducationSurface.rescue",
     "BreakWaveEducationSurface.log",
     "BreakWaveEducationSurface.support",
@@ -185,13 +193,17 @@ for needle in [
 for needle in [
     "BW-EDU-01A",
     "Got it",
-    "not",
     "marked dismissed merely because its widget is built",
     "after the existing urge-intensity control",
+    "immediately after the existing entry-type selector",
+    "first-action hierarchy",
+    "distinct",
+    "key.",
     "is not recovery data",
     "does not change onboarding/tutorial progress",
     "does not change billing, entitlement, or Plus access",
     "automatically mark offscreen tabs dismissed",
+    "push the Log entry-type selector behind contextual education",
 ]:
     require(contract, needle, "contract")
 
