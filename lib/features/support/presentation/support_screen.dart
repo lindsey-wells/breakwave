@@ -12,6 +12,7 @@
 
 import 'package:flutter/material.dart';
 
+import '../../../core/education/contextual_first_visit_education.dart';
 import '../../../core/ui/breakwave_app_bar.dart';
 import '../../../core/ui/wave_surface.dart';
 import '../../guided_routines/domain/recovery_routine.dart';
@@ -83,6 +84,16 @@ class SupportScreen extends StatelessWidget {
                         ),
                       ],
                     ),
+                  ),
+                  const SizedBox(height: 12),
+                  const ContextualFirstVisitEducationCard(
+                    surface: BreakWaveEducationSurface.support,
+                    eyebrow: 'First visit • Redirect',
+                    title: 'Support is organized by what you need next',
+                    body:
+                        'Immediate help stays first. Recovery setup, learning, '
+                        'privacy, and contact tools are grouped below so you '
+                        'can find the next useful step.',
                   ),
                   const SizedBox(height: 16),
 

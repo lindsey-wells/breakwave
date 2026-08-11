@@ -8,6 +8,7 @@
 
 import 'package:flutter/material.dart';
 
+import '../../../core/education/contextual_first_visit_education.dart';
 import '../../../core/ui/wave_surface.dart';
 import '../../../core/ui/section_header.dart';
 import '../../../core/ui/breakwave_app_bar.dart';
@@ -352,6 +353,16 @@ class _RescueScreenState extends State<RescueScreen> {
                   UrgeIntensitySection(
                     selectedIntensity: _selectedIntensity,
                     onSelected: _setIntensity,
+                  ),
+                  const SizedBox(height: 12),
+                  const ContextualFirstVisitEducationCard(
+                    surface: BreakWaveEducationSurface.rescue,
+                    eyebrow: 'First visit • Interrupt + Redirect',
+                    title: 'Use Rescue when the wave is rising',
+                    body:
+                        'Name the intensity, bring your Personal Why into view, '
+                        'then choose one next right action. You do not need to '
+                        'Log anything before using Rescue.',
                   ),
                   const SizedBox(height: 16),
                   KeyedSubtree(
