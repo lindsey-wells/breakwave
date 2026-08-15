@@ -177,6 +177,69 @@ void main() {
       expect(snapshot.busiestTimeWindow30Days, 'Evening');
     });
 
+
+    test('reflection is supported but excluded from behavioral analytics', () {
+      final DateTime now = DateTime(2026, 7, 11, 20);
+
+      final snapshot = calculator.calculate(
+        entries: <LogEntry>[
+          LogEntry.reflection(
+            id: 'reflection',
+            triggers: const <String>['Stress'],
+            notes: '',
+            createdAtIso: now
+                .subtract(const Duration(days: 1))
+                .toIso8601String(),
+          ),
+          buildEntry(
+            id: 'urge',
+            occurredAt: now.subtract(const Duration(days: 2)),
+            entryType: 'Urge',
+            intensity: 4,
+            triggers: const <String>['Stress'],
+          ),
+        ],
+        now: now,
+      );
+
+      expect(snapshot.reflectionEntryCount, 1);
+      expect(snapshot.supportedEntryCount, 2);
+      expect(snapshot.validEntryCount, 1);
+      expect(snapshot.ignoredEntryCount, 0);
+      expect(snapshot.last30Days.total, 1);
+      expect(snapshot.last30Days.averageIntensity, 4);
+      expect(snapshot.topTriggers30Days.single.trigger, 'Stress');
+      expect(snapshot.topTriggers30Days.single.count, 1);
+      expect(snapshot.hasEnoughForTimePatterns, isFalse);
+    });
+
+    test('operational metadata never becomes a top trigger', () {
+      final DateTime now = DateTime(2026, 7, 11, 20);
+      const List<String> operational = <String>[
+        'Rescue Completion',
+        'Wave Timer',
+        'Lower Now',
+        'Still Strong',
+        'Slipped',
+      ];
+
+      final snapshot = calculator.calculate(
+        entries: List<LogEntry>.generate(
+          5,
+          (int index) => buildEntry(
+            id: 'entry-$index',
+            occurredAt: now.subtract(Duration(days: index)),
+            triggers: <String>[...operational, 'Stress'],
+          ),
+        ),
+        now: now,
+      );
+
+      expect(snapshot.topTriggers30Days.length, 1);
+      expect(snapshot.topTriggers30Days.single.trigger, 'Stress');
+      expect(snapshot.topTriggers30Days.single.count, 5);
+    });
+
     test('returns an honest empty snapshot when no valid logs exist', () {
       final snapshot = calculator.calculate(
         entries: const <LogEntry>[],

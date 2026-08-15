@@ -40,6 +40,7 @@ class RecoveryInsightsSnapshot {
   const RecoveryInsightsSnapshot({
     required this.validEntryCount,
     required this.ignoredEntryCount,
+    this.reflectionEntryCount = 0,
     required this.last7Days,
     required this.last30Days,
     required this.last90Days,
@@ -51,6 +52,10 @@ class RecoveryInsightsSnapshot {
 
   final int validEntryCount;
   final int ignoredEntryCount;
+  final int reflectionEntryCount;
+
+  int get supportedEntryCount =>
+      validEntryCount + reflectionEntryCount;
 
   final RecoveryPeriodSummary last7Days;
   final RecoveryPeriodSummary last30Days;

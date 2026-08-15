@@ -16,6 +16,7 @@ import '../../guided_routines/domain/recovery_routine_progress.dart';
 import '../../insights/domain/recovery_insights_calculator.dart';
 import '../../insights/domain/recovery_insights_snapshot.dart';
 import '../../log/domain/log_entry.dart';
+import '../../log/domain/log_signal_classifier.dart';
 import '../../personal_plan/domain/personal_recovery_plan.dart';
 import 'recovery_report_selection.dart';
 import 'recovery_report_snapshot.dart';
@@ -30,19 +31,8 @@ class RecoveryReportSnapshotBuilder {
       RecoveryInsightsCalculator
           .minimumEntriesForTimePatterns;
 
-  static const Set<String> _supportedTypes =
-      <String>{
-    'urge',
-    'slip',
-    'victory',
-  };
-
-  static const Set<String>
-      _operationalTriggersExcludedFromReport =
-      <String>{
-    'rescue completion',
-    'wave timer',
-  };
+  static const LogSignalClassifier _signalClassifier =
+      LogSignalClassifier();
 
   final RecoveryInsightsCalculator insightsCalculator;
 
@@ -161,7 +151,7 @@ class RecoveryReportSnapshotBuilder {
       final String normalizedType =
           entry.entryType.trim().toLowerCase();
 
-      if (!_supportedTypes.contains(
+      if (!_signalClassifier.isBehavioralEntryType(
             normalizedType,
           ) ||
           occurredAt.isBefore(boundary) ||
@@ -204,9 +194,7 @@ class RecoveryReportSnapshotBuilder {
         final String key =
             display.toLowerCase();
 
-        if (display.isEmpty ||
-            _operationalTriggersExcludedFromReport
-                .contains(key) ||
+        if (!_signalClassifier.isUserTrigger(display) ||
             !seenInEntry.add(key)) {
           continue;
         }
