@@ -114,6 +114,7 @@ jobs:
           name: breakwave-release-apk
           path: build/app/outputs/flutter-apk/app-release.apk
           if-no-files-found: error
+          retention-days: 7
 
       - name: Build release AAB
         run: flutter build appbundle --release
@@ -134,6 +135,7 @@ jobs:
           name: breakwave-release-aab
           path: build/app/outputs/bundle/release/app-release.aab
           if-no-files-found: error
+          retention-days: 7
 
       - name: Upload Play Store icon artifact
         uses: actions/upload-artifact@v4
@@ -141,3 +143,4 @@ jobs:
           name: breakwave-play-store-icon
           path: assets/branding/play_store_icon_512.png
           if-no-files-found: error
+          retention-days: 7
