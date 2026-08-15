@@ -5,9 +5,11 @@
 // Purpose: Pure calculations for 7/30/90-day recovery insights.
 // Notes: BW-87B2A uses only real local log entries.
 // Notes: Invalid, future, and unsupported entries are ignored.
+// Notes: Reflection is supported but excluded from behavioral timing/intensity analytics.
 // ------------------------------------------------------------
 
 import '../../log/domain/log_entry.dart';
+import '../../log/domain/log_signal_classifier.dart';
 import 'recovery_insights_snapshot.dart';
 
 class RecoveryInsightsCalculator {
@@ -15,11 +17,8 @@ class RecoveryInsightsCalculator {
 
   static const int minimumEntriesForTimePatterns = 5;
 
-  static const Set<String> _supportedTypes = <String>{
-    'urge',
-    'slip',
-    'victory',
-  };
+  static const LogSignalClassifier _signalClassifier =
+      LogSignalClassifier();
 
   RecoveryInsightsSnapshot calculate({
     required List<LogEntry> entries,
@@ -29,6 +28,7 @@ class RecoveryInsightsCalculator {
     final List<_DatedLogEntry> validEntries = <_DatedLogEntry>[];
 
     int ignoredEntryCount = 0;
+    int reflectionEntryCount = 0;
 
     for (final LogEntry entry in entries) {
       final DateTime? parsed = DateTime.tryParse(entry.createdAtIso);
@@ -41,8 +41,17 @@ class RecoveryInsightsCalculator {
       final DateTime occurredAt = parsed.toLocal();
       final String normalizedType = entry.entryType.trim().toLowerCase();
 
-      if (occurredAt.isAfter(localNow) ||
-          !_supportedTypes.contains(normalizedType)) {
+      if (occurredAt.isAfter(localNow)) {
+        ignoredEntryCount += 1;
+        continue;
+      }
+
+      if (_signalClassifier.isReflectionEntryType(normalizedType)) {
+        reflectionEntryCount += 1;
+        continue;
+      }
+
+      if (!_signalClassifier.isBehavioralEntryType(normalizedType)) {
         ignoredEntryCount += 1;
         continue;
       }
@@ -91,6 +100,7 @@ class RecoveryInsightsCalculator {
     return RecoveryInsightsSnapshot(
       validEntryCount: validEntries.length,
       ignoredEntryCount: ignoredEntryCount,
+      reflectionEntryCount: reflectionEntryCount,
       last7Days: last7Days,
       last30Days: last30Days,
       last90Days: last90Days,
@@ -185,7 +195,8 @@ class RecoveryInsightsCalculator {
         final String display = rawTrigger.trim();
         final String key = display.toLowerCase();
 
-        if (display.isEmpty || !seenInEntry.add(key)) {
+        if (!_signalClassifier.isUserTrigger(display) ||
+            !seenInEntry.add(key)) {
           continue;
         }
 
