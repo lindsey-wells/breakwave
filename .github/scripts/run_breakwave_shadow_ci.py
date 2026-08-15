@@ -141,12 +141,53 @@ def resolve_stage_id() -> str:
     return "BW-SHADOW"
 
 
+
+def resolve_flutter_toolchain() -> dict:
+    expected = os.environ.get("BREAKWAVE_FLUTTER_VERSION", "").strip()
+    result = subprocess.run(
+        ["flutter", "--version", "--machine"],
+        cwd=ROOT,
+        text=True,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.STDOUT,
+    )
+    if result.returncode != 0:
+        raise RuntimeError(
+            "flutter --version --machine failed: " + result.stdout
+        )
+    try:
+        machine = json.loads(result.stdout)
+    except json.JSONDecodeError as exc:
+        raise RuntimeError(
+            "Could not decode Flutter machine-version output"
+        ) from exc
+
+    actual = str(machine.get("frameworkVersion", "")).strip()
+    if not expected:
+        raise RuntimeError(
+            "BREAKWAVE_FLUTTER_VERSION is not configured"
+        )
+    if actual != expected:
+        raise RuntimeError(
+            f"Flutter toolchain drift: expected {expected}, got {actual}"
+        )
+
+    return {
+        "expected_framework_version": expected,
+        "actual_framework_version": actual,
+        "channel": machine.get("channel"),
+        "framework_revision": machine.get("frameworkRevision"),
+        "engine_revision": machine.get("engineRevision"),
+        "dart_sdk_version": machine.get("dartSdkVersion"),
+    }
+
 def main() -> None:
     OUT.mkdir(parents=True, exist_ok=True)
     steps: list[dict] = []
 
     baseline = resolve_baseline()
     stage_id = resolve_stage_id()
+    toolchain = resolve_flutter_toolchain()
     changed_files = git("diff", "--name-only", f"{baseline}..HEAD").splitlines()
     changed_verifiers = sorted(
         rel for rel in changed_files
@@ -180,6 +221,7 @@ def main() -> None:
         "tree": git("rev-parse", "HEAD^{tree}"),
         "baseline": baseline,
         "origin_main": git("rev-parse", "origin/main"),
+        "toolchain": toolchain,
         "changed_files": changed_files,
         "changed_verifiers": changed_verifiers,
         "changed_tests": changed_tests,
