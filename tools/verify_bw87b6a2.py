@@ -70,8 +70,8 @@ for needle in [
     "'Afternoon'",
     "'Evening'",
     "'Late night'",
-    "'rescue completion'",
-    "'wave timer'",
+    "LogSignalClassifier",
+    "_signalClassifier.isUserTrigger",
 ]:
     if needle not in builder:
         print(
