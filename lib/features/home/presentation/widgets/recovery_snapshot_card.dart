@@ -14,6 +14,7 @@ class RecoverySnapshotCard extends StatelessWidget {
   final int urgeCount;
   final int slipCount;
   final int victoryCount;
+  final int reflectionCount;
   final VoidCallback onOpenLog;
 
   const RecoverySnapshotCard({
@@ -22,6 +23,7 @@ class RecoverySnapshotCard extends StatelessWidget {
     required this.urgeCount,
     required this.slipCount,
     required this.victoryCount,
+    required this.reflectionCount,
     required this.onOpenLog,
   });
 
@@ -69,6 +71,11 @@ class RecoverySnapshotCard extends StatelessWidget {
                 _MetricPill(
                   label: 'Victories',
                   value: '$victoryCount',
+                  onTap: onOpenLog,
+                ),
+                _MetricPill(
+                  label: 'Reflections',
+                  value: '$reflectionCount',
                   onTap: onOpenLog,
                 ),
               ],

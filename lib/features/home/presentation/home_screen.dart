@@ -89,6 +89,7 @@ class _HomeScreenState extends State<HomeScreen> {
     int urgeCount = 0;
     int slipCount = 0;
     int victoryCount = 0;
+    int reflectionCount = 0;
 
     for (final LogEntry entry in entries) {
       switch (entry.entryType) {
@@ -101,6 +102,9 @@ class _HomeScreenState extends State<HomeScreen> {
         case 'Victory':
           victoryCount += 1;
           break;
+        case 'Reflection':
+          reflectionCount += 1;
+          break;
       }
     }
 
@@ -109,6 +113,7 @@ class _HomeScreenState extends State<HomeScreen> {
       urgeCount: urgeCount,
       slipCount: slipCount,
       victoryCount: victoryCount,
+      reflectionCount: reflectionCount,
       latestEntry: entries.isEmpty ? null : entries.first,
       privacy: privacy,
     );
@@ -242,6 +247,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           urgeCount: summary.urgeCount,
                           slipCount: summary.slipCount,
                           victoryCount: summary.victoryCount,
+                          reflectionCount: summary.reflectionCount,
                           onOpenLog: widget.onOpenLog,
                         ),
                         if (!summary.privacy.hideLatestLoggedMoment) ...<Widget>[
@@ -278,6 +284,7 @@ class _HomeSummaryData {
   final int urgeCount;
   final int slipCount;
   final int victoryCount;
+  final int reflectionCount;
   final LogEntry? latestEntry;
   final PrivacySettings privacy;
 
@@ -286,6 +293,7 @@ class _HomeSummaryData {
     required this.urgeCount,
     required this.slipCount,
     required this.victoryCount,
+    required this.reflectionCount,
     required this.latestEntry,
     required this.privacy,
   });
@@ -295,6 +303,7 @@ class _HomeSummaryData {
         urgeCount = 0,
         slipCount = 0,
         victoryCount = 0,
+        reflectionCount = 0,
         latestEntry = null,
         privacy = PrivacySettings.defaults;
 }
