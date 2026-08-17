@@ -1,3 +1,4 @@
+# BW-89A5 compatibility: the old exact replacementAction/nextAction literal was superseded. This historical verifier now checks structural replacementAction wiring; tools/verify_bw89a5.py owns confirmed-Victory semantics.
 from pathlib import Path
 import sys
 
@@ -13,7 +14,7 @@ rescue_required = [
     "onOpenWhy: () => _scrollTo(_rememberWhyKey)",
     "selectedAction: _selectedNextAction",
     "onActionSelected: _setNextAction",
-    "replacementAction: nextAction ?? ''",
+    "replacementAction:",
 ]
 
 card_required = [

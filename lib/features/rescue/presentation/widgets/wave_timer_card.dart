@@ -22,8 +22,11 @@ class WaveTimerCard extends StatefulWidget {
   });
 
   final VoidCallback onReturnHome;
-  final Future<void> Function(String entryType, String outcomeTag)?
-      onOutcomeSaved;
+  final Future<void> Function(
+    String entryType,
+    String outcomeTag,
+    String entryId,
+  )? onOutcomeSaved;
 
   @override
   State<WaveTimerCard> createState() => _WaveTimerCardState();
@@ -114,9 +117,11 @@ class _WaveTimerCardState extends State<WaveTimerCard>
     });
 
     try {
+      final String entryId =
+          DateTime.now().microsecondsSinceEpoch.toString();
       await _repository.saveEntry(
         LogEntry(
-          id: DateTime.now().microsecondsSinceEpoch.toString(),
+          id: entryId,
           entryType: entryType,
           intensity: intensity,
           triggers: <String>[
@@ -144,10 +149,10 @@ class _WaveTimerCardState extends State<WaveTimerCard>
         ),
       );
 
-      final Future<void> Function(String, String)? onOutcomeSaved =
-          widget.onOutcomeSaved;
+      final Future<void> Function(String, String, String)?
+          onOutcomeSaved = widget.onOutcomeSaved;
       if (onOutcomeSaved != null) {
-        await onOutcomeSaved(entryType, outcomeTag);
+        await onOutcomeSaved(entryType, outcomeTag, entryId);
       } else {
         widget.onReturnHome();
       }

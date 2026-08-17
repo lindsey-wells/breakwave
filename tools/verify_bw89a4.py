@@ -60,9 +60,11 @@ for needle in screen_required:
 
 timer_required = (
     'this.onOutcomeSaved,',
-    'final Future<void> Function(String entryType, String outcomeTag)?',
+    'final Future<void> Function(',
+    'String outcomeTag,',
+    'String entryId,',
     'widget.onOutcomeSaved;',
-    'await onOutcomeSaved(entryType, outcomeTag);',
+    'await onOutcomeSaved(entryType, outcomeTag, entryId);',
     'widget.onReturnHome();',
     "'Lower Now'",
     "'Still Strong'",
@@ -124,6 +126,7 @@ test_required = (
     'standalone timer keeps its historical Return Home fallback',
     "expect(entryType, 'Victory');",
     "expect(outcomeTag, 'Lower Now');",
+    'expect(savedEntryId, isNotEmpty);',
     'expect(returnedHome, isFalse);',
     'expect(returnedHome, isTrue);',
 )

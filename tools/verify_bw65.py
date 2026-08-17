@@ -1,3 +1,4 @@
+# BW-89A5 compatibility: the old exact replacementAction/nextAction literal was superseded. This historical verifier now checks structural replacementAction wiring; tools/verify_bw89a5.py owns confirmed-Victory semantics.
 from pathlib import Path
 import sys
 
@@ -27,7 +28,7 @@ checks = [
         "final String? nextAction = _selectedNextAction;",
         "actionTaken: nextAction == null",
         "betterPlan: nextAction == null",
-        "replacementAction: nextAction ?? ''",
+        "replacementAction:",
         "Made it through this wave from Rescue using:",
         "RedirectActionsCard(",
         "selectedAction: _selectedNextAction",

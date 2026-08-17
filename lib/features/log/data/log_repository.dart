@@ -53,6 +53,54 @@ class LogRepository {
     await prefs.setStringList(BreakWaveStorageKeys.logEntries, encoded);
   }
 
+
+  Future<bool> confirmVictoryReplacementAction({
+    required String entryId,
+    required String replacementAction,
+  }) async {
+    final String confirmedAction = replacementAction.trim();
+    if (entryId.trim().isEmpty || confirmedAction.isEmpty) {
+      return false;
+    }
+
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    final List<LogEntry> existing = await loadEntries();
+    bool updatedEntry = false;
+
+    final List<LogEntry> updated = existing.map((LogEntry item) {
+      if (item.id != entryId ||
+          item.entryType.trim().toLowerCase() != 'victory') {
+        return item;
+      }
+
+      updatedEntry = true;
+      return LogEntry(
+        id: item.id,
+        entryType: item.entryType,
+        intensity: item.intensity,
+        triggers: item.triggers,
+        thought: item.thought,
+        actionTaken: item.actionTaken,
+        consequence: item.consequence,
+        betterPlan: item.betterPlan,
+        replacementAction: confirmedAction,
+        notes: item.notes,
+        createdAtIso: item.createdAtIso,
+      );
+    }).toList();
+
+    if (!updatedEntry) {
+      return false;
+    }
+
+    final List<String> encoded = updated
+        .map((LogEntry item) => jsonEncode(item.toMap()))
+        .toList();
+
+    await prefs.setStringList(BreakWaveStorageKeys.logEntries, encoded);
+    return true;
+  }
+
   Future<void> deleteEntry(String id) async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     final List<LogEntry> existing = await loadEntries();

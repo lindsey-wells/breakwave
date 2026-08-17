@@ -10,8 +10,11 @@ void main() {
 
   Widget host({
     required VoidCallback onReturnHome,
-    Future<void> Function(String entryType, String outcomeTag)?
-        onOutcomeSaved,
+    Future<void> Function(
+      String entryType,
+      String outcomeTag,
+      String entryId,
+    )? onOutcomeSaved,
   }) {
     return MaterialApp(
       home: Scaffold(
@@ -23,9 +26,7 @@ void main() {
     );
   }
 
-  Future<void> finishTimer(
-    WidgetTester tester,
-  ) async {
+  Future<void> finishTimer(WidgetTester tester) async {
     await tester.tap(find.text('Start 90-second timer'));
     await tester.pump();
     await tester.pump(const Duration(seconds: 90));
@@ -38,6 +39,7 @@ void main() {
       bool returnedHome = false;
       String? entryType;
       String? outcomeTag;
+      String savedEntryId = '';
 
       await tester.pumpWidget(
         host(
@@ -47,9 +49,11 @@ void main() {
           onOutcomeSaved: (
             String savedEntryType,
             String savedOutcomeTag,
+            String incomingEntryId,
           ) async {
             entryType = savedEntryType;
             outcomeTag = savedOutcomeTag;
+            savedEntryId = incomingEntryId;
           },
         ),
       );
@@ -61,6 +65,7 @@ void main() {
 
       expect(entryType, 'Victory');
       expect(outcomeTag, 'Lower Now');
+      expect(savedEntryId, isNotEmpty);
       expect(returnedHome, isFalse);
     },
   );

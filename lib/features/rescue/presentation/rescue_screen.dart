@@ -50,6 +50,8 @@ class _RescueScreenState extends State<RescueScreen> {
   int _selectedIntensity = 3;
   String? _selectedNextAction;
   String? _completedNextAction;
+  String? _pendingVictoryEntryId;
+  String? _confirmedVictoryAction;
   bool _showStillStrongFollowUp = false;
   bool _showWaveSavedFollowUp = false;
 
@@ -66,7 +68,9 @@ class _RescueScreenState extends State<RescueScreen> {
   }
 
   String? get _redirectBridgeAction =>
-      _selectedNextAction ?? _completedNextAction;
+      _confirmedVictoryAction ??
+      _selectedNextAction ??
+      _completedNextAction;
 
   void _scrollToOutcomeFollowUpAfterBuild() {
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -78,6 +82,7 @@ class _RescueScreenState extends State<RescueScreen> {
   Future<void> _handleWaveTimerOutcomeSaved(
     String entryType,
     String _outcomeTag,
+    String entryId,
   ) async {
     if (!mounted) return;
 
@@ -85,6 +90,8 @@ class _RescueScreenState extends State<RescueScreen> {
       setState(() {
         _selectedNextAction = null;
         _completedNextAction = null;
+        _pendingVictoryEntryId = null;
+        _confirmedVictoryAction = null;
         _showStillStrongFollowUp = false;
         _showWaveSavedFollowUp = false;
       });
@@ -96,10 +103,14 @@ class _RescueScreenState extends State<RescueScreen> {
       if (entryType == 'Victory') {
         _completedNextAction = _selectedNextAction;
         _selectedNextAction = null;
+        _pendingVictoryEntryId = entryId;
+        _confirmedVictoryAction = null;
         _showStillStrongFollowUp = false;
         _showWaveSavedFollowUp = true;
       } else {
         _completedNextAction = null;
+        _pendingVictoryEntryId = null;
+        _confirmedVictoryAction = null;
         _showStillStrongFollowUp = true;
         _showWaveSavedFollowUp = false;
       }
@@ -153,9 +164,11 @@ class _RescueScreenState extends State<RescueScreen> {
     required bool openSupport,
   }) async {
     final String? nextAction = _selectedNextAction;
+    final String entryId =
+        DateTime.now().microsecondsSinceEpoch.toString();
 
     final LogEntry entry = LogEntry(
-      id: DateTime.now().microsecondsSinceEpoch.toString(),
+      id: entryId,
       entryType: entryType,
       intensity: _selectedIntensity,
       triggers: const <String>['Rescue Completion'],
@@ -165,7 +178,9 @@ class _RescueScreenState extends State<RescueScreen> {
       betterPlan: nextAction == null
           ? betterPlan
           : '$betterPlan Use $nextAction earlier when this wave appears again.',
-      replacementAction: nextAction ?? '',
+      replacementAction: entryType == 'Victory'
+          ? ''
+          : (nextAction ?? ''),
       notes: nextAction == null
           ? notes
           : entryType == 'Victory'
@@ -183,18 +198,24 @@ class _RescueScreenState extends State<RescueScreen> {
         setState(() {
           _completedNextAction = nextAction;
           _selectedNextAction = null;
+          _pendingVictoryEntryId = entryId;
+          _confirmedVictoryAction = null;
           _showStillStrongFollowUp = false;
           _showWaveSavedFollowUp = true;
         });
       } else if (entryType == 'Urge') {
         setState(() {
           _completedNextAction = null;
+          _pendingVictoryEntryId = null;
+          _confirmedVictoryAction = null;
           _showStillStrongFollowUp = true;
           _showWaveSavedFollowUp = false;
         });
       } else if (entryType == 'Slip') {
         setState(() {
           _completedNextAction = null;
+          _pendingVictoryEntryId = null;
+          _confirmedVictoryAction = null;
           _showStillStrongFollowUp = false;
           _showWaveSavedFollowUp = false;
         });
@@ -265,6 +286,53 @@ class _RescueScreenState extends State<RescueScreen> {
     );
   }
 
+
+  Future<void> _confirmVictoryActionHelped() async {
+    final String? entryId = _pendingVictoryEntryId;
+    final String action = (_redirectBridgeAction ?? '').trim();
+
+    if (entryId == null || action.isEmpty) {
+      return;
+    }
+
+    try {
+      final bool updated =
+          await _repository.confirmVictoryReplacementAction(
+        entryId: entryId,
+        replacementAction: action,
+      );
+
+      if (!mounted) return;
+
+      if (!updated) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Unable to match that saved victory right now.'),
+          ),
+        );
+        return;
+      }
+
+      setState(() {
+        _confirmedVictoryAction = action;
+        _completedNextAction = action;
+        _selectedNextAction = null;
+        _pendingVictoryEntryId = null;
+      });
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Saved what helped: $action')),
+      );
+    } catch (_) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Unable to save what helped right now.'),
+        ),
+      );
+    }
+  }
+
   Widget _buildWaveSavedFollowUpCard(BuildContext context) {
     final ThemeData theme = Theme.of(context);
     final String? redirectAction = _redirectBridgeAction;
@@ -316,11 +384,38 @@ class _RescueScreenState extends State<RescueScreen> {
                 style: theme.textTheme.bodyMedium,
               ),
               const SizedBox(height: 12),
-              OutlinedButton.icon(
-                onPressed: () => _scrollTo(_redirectActionsKey),
-                icon: const Icon(Icons.swap_horiz_outlined),
-                label: const Text('Choose a different action'),
-              ),
+              if (_confirmedVictoryAction == null)
+                OutlinedButton.icon(
+                  onPressed: () => _scrollTo(_redirectActionsKey),
+                  icon: const Icon(Icons.swap_horiz_outlined),
+                  label: const Text('Choose a different action'),
+                ),
+              const SizedBox(height: 14),
+              if (_confirmedVictoryAction == null &&
+                  _pendingVictoryEntryId != null) ...<Widget>[
+                Text(
+                  'When you have tried it, tell BreakWave what happened.',
+                  style: theme.textTheme.bodyMedium,
+                ),
+                const SizedBox(height: 10),
+                FilledButton.icon(
+                  onPressed: _confirmVictoryActionHelped,
+                  icon: const Icon(Icons.check_circle_outline),
+                  label: const Text('That helped'),
+                ),
+              ] else if (_confirmedVictoryAction != null) ...<Widget>[
+                Text(
+                  'You chose differently. Keep what worked.',
+                  style: theme.textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+                const SizedBox(height: 6),
+                Text(
+                  '${_confirmedVictoryAction!} was saved as something that helped during this victory.',
+                  style: theme.textTheme.bodyMedium,
+                ),
+              ],
             ],
             const SizedBox(height: 16),
             FilledButton.icon(
@@ -340,6 +435,8 @@ class _RescueScreenState extends State<RescueScreen> {
                 setState(() {
                   _showWaveSavedFollowUp = false;
                   _completedNextAction = null;
+                  _pendingVictoryEntryId = null;
+                  _confirmedVictoryAction = null;
                 });
               },
               icon: const Icon(Icons.waves_outlined),
