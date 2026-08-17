@@ -20,6 +20,8 @@ import '../../../core/ui/wave_surface.dart';
 import '../../../core/ui/breakwave_app_bar.dart';
 import '../data/log_repository.dart';
 import '../domain/log_entry.dart';
+import '../../patterns/domain/pattern_observation.dart';
+import '../../patterns/domain/pattern_observation_engine.dart';
 import 'widgets/log_entry_type_section.dart';
 import 'widgets/log_intensity_section.dart';
 import 'widgets/log_notes_card.dart';
@@ -28,6 +30,7 @@ import 'widgets/log_trigger_chips_section.dart';
 import 'widgets/log_cbt_reflection_card.dart';
 import 'widgets/slip_follow_up_card.dart';
 import 'widgets/recent_log_entries_card.dart';
+import 'widgets/pattern_observation_card.dart';
 
 class LogScreen extends StatefulWidget {
   final VoidCallback onReturnHome;
@@ -66,6 +69,7 @@ class _LogScreenState extends State<LogScreen> {
   int _savedEntryCount = 0;
   bool _isSaving = false;
   List<LogEntry> _recentEntries = const <LogEntry>[];
+  PatternObservationResult? _patternObservationResult;
   String? _editingEntryId;
   String? _editingCreatedAtIso;
   String? _lastSaveMessage;
@@ -134,13 +138,25 @@ class _LogScreenState extends State<LogScreen> {
     super.dispose();
   }
 
+  PatternObservationResult _evaluatePatternObservations(
+    List<LogEntry> entries,
+  ) {
+    return const PatternObservationEngine().evaluate(
+      entries: entries,
+      now: DateTime.now(),
+    );
+  }
+
   Future<void> _refreshFromStorage() async {
     try {
       final List<LogEntry> entries = await _repository.loadEntries();
+      final PatternObservationResult patternResult =
+          _evaluatePatternObservations(entries);
       if (!mounted) return;
       setState(() {
         _savedEntryCount = entries.length;
         _recentEntries = entries.take(5).toList();
+        _patternObservationResult = patternResult;
       });
     } catch (_) {}
   }
@@ -159,10 +175,14 @@ class _LogScreenState extends State<LogScreen> {
 
     if (!mounted) return;
 
+    final PatternObservationResult patternResult =
+        _evaluatePatternObservations(entries);
+
     setState(() {
       _showAllEntries = nextShowAllEntries;
       _savedEntryCount = entries.length;
       _recentEntries = nextShowAllEntries ? entries : entries.take(5).toList();
+      _patternObservationResult = patternResult;
     });
   }
 
@@ -439,6 +459,8 @@ class _LogScreenState extends State<LogScreen> {
       }
 
       final List<LogEntry> entries = await _repository.loadEntries();
+      final PatternObservationResult patternResult =
+          _evaluatePatternObservations(entries);
 
       if (!mounted) return;
 
@@ -456,6 +478,7 @@ class _LogScreenState extends State<LogScreen> {
       setState(() {
         _savedEntryCount = entries.length;
         _recentEntries = _visibleEntries(entries);
+        _patternObservationResult = patternResult;
         _clearDraft();
           _recentlyUpdatedEntryId = editingId;
         _lastSaveMessage = saveMessage;
@@ -615,6 +638,14 @@ class _LogScreenState extends State<LogScreen> {
                       onCancelEdit: _cancelEdit,
                     ),
                   const SizedBox(height: 16),
+                  if (_patternObservationResult != null) ...<Widget>[
+                    PatternObservationCard(
+                      result: _patternObservationResult!,
+                      minimumBehavioralEntries:
+                          PatternObservationEngine.minimumBehavioralEntries,
+                    ),
+                    const SizedBox(height: 16),
+                  ],
                   RecentLogEntriesCard(
                       entries: _recentEntries,
                       totalEntryCount: _savedEntryCount,

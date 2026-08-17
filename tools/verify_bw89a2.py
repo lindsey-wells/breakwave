@@ -89,15 +89,30 @@ for forbidden in (
         print(f'FAIL BW-89A2 unsafe wording present: {forbidden}')
         sys.exit(1)
 
-ui_paths = (
-    ROOT / 'lib/features/log/presentation/log_screen.dart',
-    ROOT / 'lib/features/home/presentation/home_screen.dart',
-)
-for ui_path in ui_paths:
-    if 'PatternObservationEngine' in ui_path.read_text(encoding='utf-8'):
-        print(
-            'FAIL BW-89A2 must remain domain-only; UI integration belongs to A3'
-        )
-        sys.exit(1)
+log_screen_path = ROOT / 'lib/features/log/presentation/log_screen.dart'
+home_screen_path = ROOT / 'lib/features/home/presentation/home_screen.dart'
+
+home_screen = home_screen_path.read_text(encoding='utf-8')
+if 'PatternObservationEngine' in home_screen:
+    print(
+        'FAIL BW-89A2/A3 boundary: Pattern Observation Engine must not '
+        'be integrated into Home'
+    )
+    sys.exit(1)
+
+log_screen = log_screen_path.read_text(encoding='utf-8')
+if 'PatternObservationEngine' in log_screen:
+    for needle in (
+        "import '../../patterns/domain/pattern_observation_engine.dart';",
+        "import 'widgets/pattern_observation_card.dart';",
+        'PatternObservationCard(',
+        'PatternObservationEngine.minimumBehavioralEntries',
+    ):
+        if needle not in log_screen:
+            print(
+                'FAIL BW-89A2/A3 boundary: unauthorized or incomplete '
+                f'Log UI integration missing {needle}'
+            )
+            sys.exit(1)
 
 print('PASS: BW-89A2 cautious Pattern Observation Engine verified.')
