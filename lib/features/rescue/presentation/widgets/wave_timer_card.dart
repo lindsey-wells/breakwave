@@ -18,9 +18,12 @@ class WaveTimerCard extends StatefulWidget {
   const WaveTimerCard({
     super.key,
     required this.onReturnHome,
+    this.onOutcomeSaved,
   });
 
   final VoidCallback onReturnHome;
+  final Future<void> Function(String entryType, String outcomeTag)?
+      onOutcomeSaved;
 
   @override
   State<WaveTimerCard> createState() => _WaveTimerCardState();
@@ -141,7 +144,13 @@ class _WaveTimerCardState extends State<WaveTimerCard>
         ),
       );
 
-      widget.onReturnHome();
+      final Future<void> Function(String, String)? onOutcomeSaved =
+          widget.onOutcomeSaved;
+      if (onOutcomeSaved != null) {
+        await onOutcomeSaved(entryType, outcomeTag);
+      } else {
+        widget.onReturnHome();
+      }
     } catch (_) {
       if (!mounted) return;
 

@@ -45,9 +45,11 @@ class _RescueScreenState extends State<RescueScreen> {
   final GlobalKey _rememberWhyKey = GlobalKey();
   final GlobalKey _redirectActionsKey = GlobalKey();
   final GlobalKey _calmResetKey = GlobalKey();
+  final GlobalKey _outcomeFollowUpKey = GlobalKey();
 
   int _selectedIntensity = 3;
   String? _selectedNextAction;
+  String? _completedNextAction;
   bool _showStillStrongFollowUp = false;
   bool _showWaveSavedFollowUp = false;
 
@@ -61,6 +63,49 @@ class _RescueScreenState extends State<RescueScreen> {
     setState(() {
       _selectedNextAction = value;
     });
+  }
+
+  String? get _redirectBridgeAction =>
+      _selectedNextAction ?? _completedNextAction;
+
+  void _scrollToOutcomeFollowUpAfterBuild() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      _scrollTo(_outcomeFollowUpKey);
+    });
+  }
+
+  Future<void> _handleWaveTimerOutcomeSaved(
+    String entryType,
+    String _outcomeTag,
+  ) async {
+    if (!mounted) return;
+
+    if (entryType == 'Slip') {
+      setState(() {
+        _selectedNextAction = null;
+        _completedNextAction = null;
+        _showStillStrongFollowUp = false;
+        _showWaveSavedFollowUp = false;
+      });
+      widget.onOpenSupport();
+      return;
+    }
+
+    setState(() {
+      if (entryType == 'Victory') {
+        _completedNextAction = _selectedNextAction;
+        _selectedNextAction = null;
+        _showStillStrongFollowUp = false;
+        _showWaveSavedFollowUp = true;
+      } else {
+        _completedNextAction = null;
+        _showStillStrongFollowUp = true;
+        _showWaveSavedFollowUp = false;
+      }
+    });
+
+    _scrollToOutcomeFollowUpAfterBuild();
   }
 
   @override
@@ -136,20 +181,27 @@ class _RescueScreenState extends State<RescueScreen> {
 
       if (entryType == 'Victory') {
         setState(() {
+          _completedNextAction = nextAction;
           _selectedNextAction = null;
           _showStillStrongFollowUp = false;
           _showWaveSavedFollowUp = true;
         });
       } else if (entryType == 'Urge') {
         setState(() {
+          _completedNextAction = null;
           _showStillStrongFollowUp = true;
           _showWaveSavedFollowUp = false;
         });
       } else if (entryType == 'Slip') {
         setState(() {
+          _completedNextAction = null;
           _showStillStrongFollowUp = false;
           _showWaveSavedFollowUp = false;
         });
+      }
+
+      if (entryType == 'Victory' || entryType == 'Urge') {
+        _scrollToOutcomeFollowUpAfterBuild();
       }
 
       ScaffoldMessenger.of(context).showSnackBar(
@@ -215,6 +267,7 @@ class _RescueScreenState extends State<RescueScreen> {
 
   Widget _buildWaveSavedFollowUpCard(BuildContext context) {
     final ThemeData theme = Theme.of(context);
+    final String? redirectAction = _redirectBridgeAction;
 
     return Card(
       child: Padding(
@@ -232,6 +285,44 @@ class _RescueScreenState extends State<RescueScreen> {
               style: theme.textTheme.bodyMedium,
             ),
             const SizedBox(height: 16),
+            Text(
+              'Protect the next few minutes',
+              style: theme.textTheme.titleMedium?.copyWith(
+                fontWeight: FontWeight.w800,
+              ),
+            ),
+            const SizedBox(height: 8),
+            if (redirectAction == null) ...<Widget>[
+              Text(
+                'Choose one next right action before returning to the same environment.',
+                style: theme.textTheme.bodyMedium,
+              ),
+              const SizedBox(height: 12),
+              FilledButton.tonalIcon(
+                onPressed: () => _scrollTo(_redirectActionsKey),
+                icon: const Icon(Icons.directions_walk_outlined),
+                label: const Text('Choose a next right action'),
+              ),
+            ] else ...<Widget>[
+              Text(
+                'Your next right action: $redirectAction',
+                style: theme.textTheme.bodyLarge?.copyWith(
+                  fontWeight: FontWeight.w800,
+                ),
+              ),
+              const SizedBox(height: 6),
+              Text(
+                'Do that now. Keep the interruption going before returning to the same environment.',
+                style: theme.textTheme.bodyMedium,
+              ),
+              const SizedBox(height: 12),
+              OutlinedButton.icon(
+                onPressed: () => _scrollTo(_redirectActionsKey),
+                icon: const Icon(Icons.swap_horiz_outlined),
+                label: const Text('Choose a different action'),
+              ),
+            ],
+            const SizedBox(height: 16),
             FilledButton.icon(
               onPressed: widget.onOpenLog,
               icon: const Icon(Icons.edit_note_outlined),
@@ -248,6 +339,7 @@ class _RescueScreenState extends State<RescueScreen> {
               onPressed: () {
                 setState(() {
                   _showWaveSavedFollowUp = false;
+                  _completedNextAction = null;
                 });
               },
               icon: const Icon(Icons.waves_outlined),
@@ -389,6 +481,7 @@ class _RescueScreenState extends State<RescueScreen> {
                   ),
                   WaveTimerCard(
                     onReturnHome: widget.onReturnHome,
+                    onOutcomeSaved: _handleWaveTimerOutcomeSaved,
                   ),
                   const SizedBox(height: 16),
                   KeyedSubtree(
@@ -407,6 +500,12 @@ class _RescueScreenState extends State<RescueScreen> {
                     onStillStrong: _logStillStrong,
                     onSlipped: _logSlip,
                   ),
+                  if (_showWaveSavedFollowUp ||
+                      _showStillStrongFollowUp)
+                    SizedBox(
+                      key: _outcomeFollowUpKey,
+                      height: 0,
+                    ),
                     if (_showWaveSavedFollowUp) ...<Widget>[
                       const SizedBox(height: 16),
                       _buildWaveSavedFollowUpCard(context),
