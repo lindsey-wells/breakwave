@@ -11,6 +11,8 @@ import 'package:flutter/material.dart';
 import '../../../core/checkin/daily_check_in_entry.dart';
 import '../../../core/checkin/daily_check_in_store.dart';
 import '../../../core/widget/home_widget_sync.dart';
+import '../../patterns/domain/daily_context_observation.dart';
+import '../../patterns/domain/daily_context_observation_engine.dart';
 
 class DailyCheckInCard extends StatefulWidget {
   const DailyCheckInCard({super.key});
@@ -31,6 +33,8 @@ class _DailyCheckInCardState extends State<DailyCheckInCard> {
   bool _saving = false;
   String? _todayStatus;
   int _recentCheckInCount = 0;
+  DailyContextObservationResult _dailyContext =
+      const DailyContextObservationResult.empty();
 
   @override
   void initState() {
@@ -41,12 +45,18 @@ class _DailyCheckInCardState extends State<DailyCheckInCard> {
   Future<void> _load() async {
     final DailyCheckInEntry? todayEntry = await DailyCheckInStore.loadTodayEntry();
     final List<DailyCheckInEntry> entries = await DailyCheckInStore.loadEntries();
+    final DailyContextObservationResult dailyContext =
+        const DailyContextObservationEngine().evaluate(
+      entries: entries,
+      now: DateTime.now(),
+    );
 
     if (!mounted) return;
 
     setState(() {
       _todayStatus = todayEntry?.status;
       _recentCheckInCount = _countRecentEntries(entries, days: 7);
+      _dailyContext = dailyContext;
       _loading = false;
     });
   }
@@ -165,6 +175,39 @@ class _DailyCheckInCardState extends State<DailyCheckInCard> {
                     );
                   }).toList(),
                 ),
+                const SizedBox(height: 18),
+                Divider(color: colorScheme.outlineVariant),
+                const SizedBox(height: 12),
+                Text(
+                  'Recognize',
+                  style: theme.textTheme.labelMedium?.copyWith(
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  'Daily context',
+                  style: theme.textTheme.titleSmall?.copyWith(
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+                const SizedBox(height: 6),
+                Text(
+                  'Learn from the days around the waves.',
+                  style: theme.textTheme.bodyMedium,
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  _dailyContext.message,
+                  style: theme.textTheme.bodyMedium,
+                ),
+                if (_dailyContext.hasEnoughData) ...<Widget>[
+                  const SizedBox(height: 8),
+                  Text(
+                    'This reflects what you recorded—it does not explain why a wave happened or predict what happens next.',
+                    style: theme.textTheme.bodySmall,
+                  ),
+                ],
               ],
             ),
     );
