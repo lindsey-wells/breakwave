@@ -7,6 +7,7 @@
 // Notes: BW-72C keeps the replacement action visible and collapses optional reflection details.
 // Notes: BW-76D adds real actions for Open Rescue and trusted support choices.
 // Notes: BW-LOG-01B2 adds calm Reflection-specific language.
+// Notes: BW-89A7 gives Reflection a journal-aligned presentation without changing stored fields.
 // ------------------------------------------------------------
 
 import 'package:flutter/material.dart';
@@ -43,20 +44,23 @@ class LogCbtReflectionCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    if (isReflectionEntry) {
+      return _buildReflectionJournal(context);
+    }
+
+    return _buildBehavioralCard(context);
+  }
+
+  Widget _buildBehavioralCard(BuildContext context) {
     final ThemeData theme = Theme.of(context);
     final ColorScheme colorScheme = theme.colorScheme;
 
-    final String cardTitle =
-        isReflectionEntry ? 'Simple reflection' : 'Next better move';
-    final String cardPrompt = isReflectionEntry
-        ? 'Capture what you noticed and the next choice you want to make.'
-        : 'Choose the clean action you want to take next.';
-    final String reflectionSubtitle = isReflectionEntry
-        ? 'Optional: Notice → Action → What happened → Next step'
-        : 'Optional: Trigger → Thought → Urge → Action';
-    final String reflectionPrompt = isReflectionEntry
-        ? 'Notice the pattern without judging yourself.'
-        : 'Name the thought, then choose the next better move.';
+    const String cardTitle = 'Next better move';
+    const String cardPrompt = 'Choose the clean action you want to take next.';
+    const String reflectionSubtitle =
+        'Optional: Trigger → Thought → Urge → Action';
+    const String reflectionPrompt =
+        'Name the thought, then choose the next better move.';
 
     return Card(
       child: Padding(
@@ -69,7 +73,7 @@ class LogCbtReflectionCard extends StatelessWidget {
               style: theme.textTheme.titleLarge,
             ),
             const SizedBox(height: 8),
-            Text(cardPrompt),
+            const Text(cardPrompt),
             const SizedBox(height: 16),
             Text(
               'Healthy replacement action',
@@ -136,7 +140,8 @@ class LogCbtReflectionCard extends StatelessWidget {
                 maxLines: 2,
                 decoration: const InputDecoration(
                   labelText: 'Other replacement action',
-                  hintText: 'Example: call sponsor, do pushups, sit outside.',
+                  hintText:
+                      'Example: call sponsor, do pushups, sit outside.',
                 ),
               ),
             ],
@@ -150,9 +155,9 @@ class LogCbtReflectionCard extends StatelessWidget {
                   fontWeight: FontWeight.w700,
                 ),
               ),
-              subtitle: Text(reflectionSubtitle),
+              subtitle: const Text(reflectionSubtitle),
               children: <Widget>[
-                Align(
+                const Align(
                   alignment: Alignment.centerLeft,
                   child: Text(reflectionPrompt),
                 ),
@@ -161,13 +166,9 @@ class LogCbtReflectionCard extends StatelessWidget {
                   controller: thoughtController,
                   minLines: 1,
                   maxLines: 3,
-                  decoration: InputDecoration(
-                    labelText: isReflectionEntry
-                        ? 'Thought or pattern noticed'
-                        : 'Thought before the urge',
-                    hintText: isReflectionEntry
-                        ? 'Example: I reach for my phone when I feel disconnected.'
-                        : 'Example: I need this to calm down.',
+                  decoration: const InputDecoration(
+                    labelText: 'Thought before the urge',
+                    hintText: 'Example: I need this to calm down.',
                   ),
                 ),
                 const SizedBox(height: 14),
@@ -175,13 +176,10 @@ class LogCbtReflectionCard extends StatelessWidget {
                   controller: actionTakenController,
                   minLines: 1,
                   maxLines: 3,
-                  decoration: InputDecoration(
-                    labelText: isReflectionEntry
-                        ? 'Action you took'
-                        : 'Action taken',
-                    hintText: isReflectionEntry
-                        ? 'Example: paused, put the phone down, and took a walk.'
-                        : 'Example: opened Rescue, left the room, texted Alex.',
+                  decoration: const InputDecoration(
+                    labelText: 'Action taken',
+                    hintText:
+                        'Example: opened Rescue, left the room, texted Alex.',
                   ),
                 ),
                 const SizedBox(height: 14),
@@ -189,13 +187,10 @@ class LogCbtReflectionCard extends StatelessWidget {
                   controller: consequenceController,
                   minLines: 1,
                   maxLines: 3,
-                  decoration: InputDecoration(
-                    labelText: isReflectionEntry
-                        ? 'What happened next'
-                        : 'Consequence / what happened next',
-                    hintText: isReflectionEntry
-                        ? 'Example: I felt calmer and more present.'
-                        : 'Example: the urge dropped after ten minutes.',
+                  decoration: const InputDecoration(
+                    labelText: 'Consequence / what happened next',
+                    hintText:
+                        'Example: the urge dropped after ten minutes.',
                   ),
                 ),
                 const SizedBox(height: 14),
@@ -203,16 +198,85 @@ class LogCbtReflectionCard extends StatelessWidget {
                   controller: betterPlanController,
                   minLines: 1,
                   maxLines: 3,
-                  decoration: InputDecoration(
-                    labelText: isReflectionEntry
-                        ? 'What you want to try next'
-                        : 'Better plan for next time',
-                    hintText: isReflectionEntry
-                        ? 'Example: check in before scrolling late at night.'
-                        : 'Example: charge phone outside the bedroom.',
+                  decoration: const InputDecoration(
+                    labelText: 'Better plan for next time',
+                    hintText:
+                        'Example: charge phone outside the bedroom.',
                   ),
                 ),
               ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildReflectionJournal(BuildContext context) {
+    final ThemeData theme = Theme.of(context);
+
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            Text(
+              'Simple reflection',
+              style: theme.textTheme.titleLarge,
+            ),
+            const SizedBox(height: 8),
+            const Text(
+              'Capture what you noticed. There is nothing to grade here.',
+            ),
+            const SizedBox(height: 6),
+            Text(
+              'Notice the pattern without judging yourself.',
+              style: theme.textTheme.bodySmall,
+            ),
+            const SizedBox(height: 18),
+            TextField(
+              controller: thoughtController,
+              minLines: 2,
+              maxLines: 5,
+              decoration: const InputDecoration(
+                labelText: 'What are you noticing?',
+                hintText:
+                    'Thought or pattern noticed — what keeps getting your attention?',
+              ),
+            ),
+            const SizedBox(height: 14),
+            TextField(
+              controller: actionTakenController,
+              minLines: 2,
+              maxLines: 5,
+              decoration: const InputDecoration(
+                labelText: 'What felt important?',
+                hintText:
+                    'A feeling, choice, moment, conversation, or change you want to remember.',
+              ),
+            ),
+            const SizedBox(height: 14),
+            TextField(
+              controller: consequenceController,
+              minLines: 2,
+              maxLines: 5,
+              decoration: const InputDecoration(
+                labelText: 'What did you learn?',
+                hintText:
+                    'What became clearer when you looked at the moment honestly?',
+              ),
+            ),
+            const SizedBox(height: 14),
+            TextField(
+              controller: betterPlanController,
+              minLines: 2,
+              maxLines: 5,
+              decoration: const InputDecoration(
+                labelText: 'What do you want to carry forward?',
+                hintText:
+                    'A reminder, value, boundary, or next choice worth keeping.',
+              ),
             ),
           ],
         ),

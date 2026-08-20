@@ -187,8 +187,20 @@ class _LogScreenState extends State<LogScreen> {
   }
 
   void _setEntryType(String value) {
+    final bool enteringReflection =
+        value.trim().toLowerCase() ==
+        LogEntry.reflectionEntryType.toLowerCase();
+    final bool wasReflection = _isReflectionDraft;
+
     setState(() {
       _entryType = value;
+
+      if (enteringReflection && !wasReflection) {
+        _selectedTriggers.clear();
+        _otherTriggerController.clear();
+        _selectedReplacementAction = null;
+        _otherReplacementActionController.clear();
+      }
     });
   }
 
@@ -433,8 +445,18 @@ class _LogScreenState extends State<LogScreen> {
           savedType.trim().toLowerCase() ==
           LogEntry.reflectionEntryType.toLowerCase();
       final String? editingId = _editingEntryId;
-      final List<String> resolvedTriggers = _resolvedTriggers();
-      final String replacementActionForSave = _resolvedReplacementAction();
+      final bool preserveLegacyReflectionMetadata =
+          isReflectionEntry && editingId != null;
+      final List<String> resolvedTriggers = isReflectionEntry
+          ? (preserveLegacyReflectionMetadata
+              ? _resolvedTriggers()
+              : const <String>[])
+          : _resolvedTriggers();
+      final String replacementActionForSave = isReflectionEntry
+          ? (preserveLegacyReflectionMetadata
+              ? _resolvedReplacementAction()
+              : '')
+          : _resolvedReplacementAction();
 
       final LogEntry entry = LogEntry(
         id: editingId ?? DateTime.now().microsecondsSinceEpoch.toString(),
@@ -579,15 +601,17 @@ class _LogScreenState extends State<LogScreen> {
                     ),
                     const SizedBox(height: 16),
                   ],
-                  LogTriggerChipsSection(
-                    availableTriggers: _availableTriggers,
-                    selectedTriggers: _selectedTriggers,
-                    onToggle: _toggleTrigger,
-                    otherTriggerController: _otherTriggerController,
-                    showOtherTriggerField:
-                        _selectedTriggers.contains(_otherLabel),
-                  ),
-                  const SizedBox(height: 16),
+                  if (!_isReflectionDraft) ...<Widget>[
+                    LogTriggerChipsSection(
+                      availableTriggers: _availableTriggers,
+                      selectedTriggers: _selectedTriggers,
+                      onToggle: _toggleTrigger,
+                      otherTriggerController: _otherTriggerController,
+                      showOtherTriggerField:
+                          _selectedTriggers.contains(_otherLabel),
+                    ),
+                    const SizedBox(height: 16),
+                  ],
                   if (_isSlipDraft)
                     SlipFollowUpCard(
                       thoughtController: _thoughtController,
@@ -629,7 +653,9 @@ class _LogScreenState extends State<LogScreen> {
                     LogSaveCard(
                       entryType: _entryType,
                       intensity: _isReflectionDraft ? null : _intensity,
-                      triggerCount: _resolvedTriggers().length,
+                      triggerCount: _isReflectionDraft
+                          ? 0
+                          : _resolvedTriggers().length,
                       savedEntryCount: _savedEntryCount,
                       isSaving: _isSaving,
                       isEditing: isEditing,

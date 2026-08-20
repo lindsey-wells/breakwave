@@ -3,6 +3,7 @@
 // Project: BreakWave
 // File: log_reflection_user_experience_test.dart
 // Purpose: BW-LOG-01B2 Reflection UX widget coverage.
+// Notes: BW-89A7 aligns Reflection with a calm journal experience.
 // ------------------------------------------------------------
 
 import 'package:breakwave/features/log/domain/log_entry.dart';
@@ -136,7 +137,10 @@ void main() {
             actionTakenController: action,
             consequenceController: consequence,
             betterPlanController: plan,
-            replacementActions: const <String>[],
+            replacementActions: const <String>[
+              'Open Rescue',
+              'Take a short walk',
+            ],
             selectedReplacementAction: null,
             onReplacementSelected: (_) {},
             otherReplacementActionController: other,
@@ -150,19 +154,67 @@ void main() {
       expect(find.text('Simple reflection'), findsOneWidget);
       expect(
         find.text(
-          'Capture what you noticed and the next choice you want to make.',
+          'Capture what you noticed. There is nothing to grade here.',
         ),
         findsOneWidget,
       );
-
-      await tester.tap(find.text('Add reflection details'));
-      await tester.pumpAndSettle();
-
       expect(
         find.text('Notice the pattern without judging yourself.'),
         findsOneWidget,
       );
-      expect(find.text('Thought or pattern noticed'), findsOneWidget);
+
+      expect(find.text('What are you noticing?'), findsOneWidget);
+      expect(find.text('What felt important?'), findsOneWidget);
+      expect(find.text('What did you learn?'), findsOneWidget);
+      expect(
+        find.text('What do you want to carry forward?'),
+        findsOneWidget,
+      );
+    },
+  );
+
+  testWidgets(
+    'Reflection journal hides behavioral replacement actions',
+    (WidgetTester tester) async {
+      final TextEditingController thought = TextEditingController();
+      final TextEditingController action = TextEditingController();
+      final TextEditingController consequence = TextEditingController();
+      final TextEditingController plan = TextEditingController();
+      final TextEditingController other = TextEditingController();
+      addTearDown(thought.dispose);
+      addTearDown(action.dispose);
+      addTearDown(consequence.dispose);
+      addTearDown(plan.dispose);
+      addTearDown(other.dispose);
+
+      await tester.pumpWidget(
+        _host(
+          LogCbtReflectionCard(
+            isReflectionEntry: true,
+            thoughtController: thought,
+            actionTakenController: action,
+            consequenceController: consequence,
+            betterPlanController: plan,
+            replacementActions: const <String>[
+              'Open Rescue',
+              'Leave the room',
+              'Text someone safe',
+            ],
+            selectedReplacementAction: null,
+            onReplacementSelected: (_) {},
+            otherReplacementActionController: other,
+            showOtherReplacementField: false,
+            onOpenRescue: () {},
+            onOpenSupport: () {},
+          ),
+        ),
+      );
+
+      expect(find.text('Healthy replacement action'), findsNothing);
+      expect(find.text('Open Rescue'), findsNothing);
+      expect(find.text('Leave the room'), findsNothing);
+      expect(find.text('Text someone safe'), findsNothing);
+      expect(find.byType(ChoiceChip), findsNothing);
     },
   );
 }
