@@ -1,0 +1,121 @@
+#!/usr/bin/env python3
+from pathlib import Path
+import hashlib
+import sys
+
+ROOT = Path(__file__).resolve().parent.parent
+
+store_path = ROOT / 'lib/core/bedtime/bedtime_mode_store.dart'
+entry_path = ROOT / 'lib/core/bedtime/bedtime_mode_entry.dart'
+card_path = (
+    ROOT
+    / 'lib/features/home/presentation/widgets/bedtime_danger_mode_card.dart'
+)
+home_path = ROOT / 'lib/features/home/presentation/home_screen.dart'
+widget_path = ROOT / 'lib/core/widget/home_widget_sync.dart'
+pattern_path = (
+    ROOT
+    / 'lib/features/patterns/domain/pattern_observation_engine.dart'
+)
+daily_context_path = (
+    ROOT
+    / 'lib/features/patterns/domain/daily_context_observation_engine.dart'
+)
+test_path = ROOT / 'test/bedtime_mode_history_store_test.dart'
+
+for path in (
+    store_path,
+    entry_path,
+    card_path,
+    home_path,
+    widget_path,
+    pattern_path,
+    daily_context_path,
+    test_path,
+):
+    if not path.is_file():
+        print(
+            f'FAIL BW-89A8A missing file: {path.relative_to(ROOT)}'
+        )
+        sys.exit(1)
+
+store = store_path.read_text(encoding='utf-8')
+tests = test_path.read_text(encoding='utf-8')
+
+for needle in (
+    "static const String storageKey = 'bw_bedtime_mode_v1';",
+    "static const String historyStorageKey = 'bw_bedtime_mode_history_v1';",
+    'static Future<BedtimeModeEntry?> loadTodayEntry()',
+    'static Future<List<BedtimeModeEntry>> loadEntries()',
+    'static Future<void> saveTodayRisk(bool isRisky)',
+    'prefs.getString(storageKey)',
+    'prefs.setString(storageKey, jsonEncode(entry.toMap()))',
+    'prefs.getStringList(historyStorageKey)',
+    'prefs.setStringList(',
+    'historyStorageKey,',
+    'historyByDate[entry.dateKey] = entry;',
+    'Migrate/preserve the previous single-record value before replacing it.',
+    'await prefs.remove(storageKey);',
+    'await prefs.remove(historyStorageKey);',
+):
+    if needle not in store:
+        print(f'FAIL BW-89A8A storage contract missing: {needle}')
+        sys.exit(1)
+
+for needle in (
+    'loadEntries includes legacy single-record bedtime context',
+    'loadEntries keeps one latest entry per date',
+    'saveTodayRisk preserves previous legacy night before replacement',
+    'saveTodayRisk retains original current-night storage contract',
+    'clear removes current-night and bedtime-history storage',
+):
+    if needle not in tests:
+        print(f'FAIL BW-89A8A regression test missing: {needle}')
+        sys.exit(1)
+
+# This foundation milestone must not alter the existing model/UI/widget/
+# pattern engines. Their audited A7-green SHA-256 values are locked here.
+protected = {
+    'lib/core/bedtime/bedtime_mode_entry.dart':
+        'cb11e965909d597363e832d2b3270264f516f1a85ae46e95972bb3542b578526',
+    'lib/features/home/presentation/widgets/bedtime_danger_mode_card.dart':
+        'a24a0082eab0885ef046bb6638b324daae2e0e3548dc263622e3c7e8b61ea1ad',
+    'lib/features/home/presentation/home_screen.dart':
+        '958d99a316ccdba6bc79492cedd91349e82ad8070dd6c197314699e43e4c89c4',
+    'lib/core/widget/home_widget_sync.dart':
+        '76f2f816cb93b9ad352208cb0a34050c41e941c1ba1a95c16a392441871e87f6',
+    'lib/features/patterns/domain/pattern_observation_engine.dart':
+        'df134a04cc81f54f2cef39be5a9a7e2338b2ffdaf983d249f0e936d38d9c780f',
+    'lib/features/patterns/domain/daily_context_observation_engine.dart':
+        '97dad84b8e222aec873631f26c4e7e9311ffae5c440c477e0033c6befb0b2fba',
+}
+
+for rel, expected in protected.items():
+    actual = hashlib.sha256((ROOT / rel).read_bytes()).hexdigest()
+    if actual != expected:
+        print(
+            f'FAIL BW-89A8A protected surface drift: {rel} '
+            f'expected {expected} got {actual}'
+        )
+        sys.exit(1)
+
+for forbidden in (
+    'LogEntry',
+    'LogRepository',
+    'PatternObservationEngine(',
+    'DailyContextObservationEngine(',
+    'BreakWaveAccessPolicy',
+    'billing',
+    'cloud',
+):
+    if forbidden in store:
+        print(
+            f'FAIL BW-89A8A bedtime history store has forbidden coupling: '
+            f'{forbidden}'
+        )
+        sys.exit(1)
+
+print(
+    'PASS: BW-89A8A Bedtime History Foundation verified — '
+    'history added beside unchanged current-night contract.'
+)
