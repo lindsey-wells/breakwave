@@ -13,6 +13,8 @@ import '../../../../core/bedtime/bedtime_mode_store.dart';
 import '../../../../core/recovery/recovery_mode.dart';
 import '../../../../core/recovery/recovery_mode_store.dart';
 import '../../../../core/widget/home_widget_sync.dart';
+import '../../../patterns/domain/bedtime_context_observation.dart';
+import '../../../patterns/domain/bedtime_context_observation_engine.dart';
 
 class BedtimeDangerModeCard extends StatefulWidget {
   const BedtimeDangerModeCard({
@@ -31,6 +33,8 @@ class _BedtimeDangerModeCardState extends State<BedtimeDangerModeCard> {
   bool _saving = false;
   bool? _isRiskyTonight;
   RecoveryMode _mode = RecoveryMode.secular;
+  BedtimeContextObservationResult _bedtimeContext =
+      const BedtimeContextObservationResult.empty();
 
   @override
   void initState() {
@@ -40,6 +44,13 @@ class _BedtimeDangerModeCardState extends State<BedtimeDangerModeCard> {
 
   Future<void> _load() async {
     final BedtimeModeEntry? entry = await BedtimeModeStore.loadTodayEntry();
+    final List<BedtimeModeEntry> entries =
+        await BedtimeModeStore.loadEntries();
+    final BedtimeContextObservationResult bedtimeContext =
+        const BedtimeContextObservationEngine().evaluate(
+      entries: entries,
+      now: DateTime.now(),
+    );
     final RecoveryMode mode =
         await RecoveryModeStore.loadMode() ?? RecoveryMode.secular;
 
@@ -48,6 +59,7 @@ class _BedtimeDangerModeCardState extends State<BedtimeDangerModeCard> {
     setState(() {
       _isRiskyTonight = entry?.isRisky;
       _mode = mode;
+      _bedtimeContext = bedtimeContext;
       _loading = false;
     });
   }
@@ -61,11 +73,19 @@ class _BedtimeDangerModeCardState extends State<BedtimeDangerModeCard> {
 
     try {
       await BedtimeModeStore.saveTodayRisk(isRisky);
+      final List<BedtimeModeEntry> entries =
+          await BedtimeModeStore.loadEntries();
+      final BedtimeContextObservationResult bedtimeContext =
+          const BedtimeContextObservationEngine().evaluate(
+        entries: entries,
+        now: DateTime.now(),
+      );
       await BreakWaveHomeWidgetSync.sync();
       if (!mounted) return;
 
       setState(() {
         _isRiskyTonight = isRisky;
+        _bedtimeContext = bedtimeContext;
       });
 
       ScaffoldMessenger.of(context).showSnackBar(
@@ -181,6 +201,38 @@ class _BedtimeDangerModeCardState extends State<BedtimeDangerModeCard> {
                       padding: EdgeInsets.symmetric(vertical: 12),
                       child: Text('Open Rescue now'),
                     ),
+                  ),
+                ],
+                const SizedBox(height: 18),
+                Divider(color: colorScheme.outlineVariant),
+                const SizedBox(height: 12),
+                Text(
+                  'Recognize',
+                  style: theme.textTheme.labelMedium?.copyWith(
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  'Bedtime context',
+                  style: theme.textTheme.titleSmall?.copyWith(
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+                const SizedBox(height: 6),
+                const Text(
+                  'Learn from the nights around the waves.',
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  _bedtimeContext.message,
+                  style: theme.textTheme.bodyMedium,
+                ),
+                if (_bedtimeContext.hasEnoughData) ...<Widget>[
+                  const SizedBox(height: 8),
+                  Text(
+                    'This reflects what you marked at bedtime—it does not explain why a wave happened or predict what happens next.',
+                    style: theme.textTheme.bodySmall,
                   ),
                 ],
               ],

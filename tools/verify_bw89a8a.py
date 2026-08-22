@@ -40,6 +40,7 @@ for path in (
         sys.exit(1)
 
 store = store_path.read_text(encoding='utf-8')
+card = card_path.read_text(encoding='utf-8')
 tests = test_path.read_text(encoding='utf-8')
 
 for needle in (
@@ -73,13 +74,48 @@ for needle in (
         print(f'FAIL BW-89A8A regression test missing: {needle}')
         sys.exit(1)
 
-# This foundation milestone must not alter the existing model/UI/widget/
-# pattern engines. Their audited A7-green SHA-256 values are locked here.
+# Successor presentation boundary derived from the exact A8A-green card.
+# Do not freeze the whole card; preserve the behavior A8A actually owns.
+for needle in (
+    'BedtimeModeStore.loadTodayEntry()',
+    'BedtimeModeStore.saveTodayRisk(isRisky)',
+    'BreakWaveHomeWidgetSync.sync()',
+    "label: const Text('Tonight feels steady')",
+    '_save(false);',
+    "label: const Text('Tonight feels risky')",
+    '_save(true);',
+    'onPressed: widget.onOpenRescue',
+    "Text('Open Rescue now')",
+    "'Saved bedtime risk for tonight.'",
+    "'Saved tonight as steady.'",
+    "'Unable to save bedtime mode right now.'",
+    'RecoveryMode.christian',
+):
+    if needle not in card:
+        print(
+            f'FAIL BW-89A8A bedtime control compatibility missing: {needle}'
+        )
+        sys.exit(1)
+
+steady_index = card.find("label: const Text('Tonight feels steady')")
+risky_index = card.find("label: const Text('Tonight feels risky')")
+rescue_callback_index = card.find('onPressed: widget.onOpenRescue')
+rescue_text_index = card.find("Text('Open Rescue now')")
+if not (
+    -1 < steady_index
+    < risky_index
+    < rescue_callback_index
+    < rescue_text_index
+):
+    print(
+        'FAIL BW-89A8A bedtime control order changed unexpectedly'
+    )
+    sys.exit(1)
+
+# Foundation-owned protected surfaces remain exact.
 protected = {
     'lib/core/bedtime/bedtime_mode_entry.dart':
         'cb11e965909d597363e832d2b3270264f516f1a85ae46e95972bb3542b578526',
-    'lib/features/home/presentation/widgets/bedtime_danger_mode_card.dart':
-        'a24a0082eab0885ef046bb6638b324daae2e0e3548dc263622e3c7e8b61ea1ad',
     'lib/features/home/presentation/home_screen.dart':
         '958d99a316ccdba6bc79492cedd91349e82ad8070dd6c197314699e43e4c89c4',
     'lib/core/widget/home_widget_sync.dart':
@@ -94,7 +130,7 @@ for rel, expected in protected.items():
     actual = hashlib.sha256((ROOT / rel).read_bytes()).hexdigest()
     if actual != expected:
         print(
-            f'FAIL BW-89A8A protected surface drift: {rel} '
+            f'FAIL BW-89A8A protected foundation drift: {rel} '
             f'expected {expected} got {actual}'
         )
         sys.exit(1)
@@ -117,5 +153,6 @@ for forbidden in (
 
 print(
     'PASS: BW-89A8A Bedtime History Foundation verified — '
-    'history added beside unchanged current-night contract.'
+    'history/current-night storage preserved and bedtime controls remain '
+    'compatible under the BW-89A8B successor presentation boundary.'
 )
