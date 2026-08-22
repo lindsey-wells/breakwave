@@ -28,6 +28,7 @@ import 'widgets/daily_encouragement_card.dart';
 import 'widgets/fast_urge_entry_card.dart';
 import 'widgets/home_recovery_model_card.dart';
 import 'widgets/latest_logged_moment_card.dart';
+import 'widgets/pattern_picture_card.dart';
 import 'widgets/recovery_cycle_preview_card.dart';
 import 'widgets/recovery_snapshot_card.dart';
 
@@ -266,6 +267,8 @@ class _HomeScreenState extends State<HomeScreen> {
                         eyebrow: 'Pattern awareness',
                         title: 'Learn the pattern',
                       ),
+                      const PatternPictureCard(),
+                      const SizedBox(height: 12),
                       const RecoveryCyclePreviewCard(),
                     ],
                   ),

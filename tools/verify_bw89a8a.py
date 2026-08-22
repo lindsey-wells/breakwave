@@ -41,6 +41,7 @@ for path in (
 
 store = store_path.read_text(encoding='utf-8')
 card = card_path.read_text(encoding='utf-8')
+home = home_path.read_text(encoding='utf-8')
 tests = test_path.read_text(encoding='utf-8')
 
 for needle in (
@@ -74,8 +75,7 @@ for needle in (
         print(f'FAIL BW-89A8A regression test missing: {needle}')
         sys.exit(1)
 
-# Successor presentation boundary derived from the exact A8A-green card.
-# Do not freeze the whole card; preserve the behavior A8A actually owns.
+# Bedtime card successor presentation boundary inherited from BW-89A8B.
 for needle in (
     'BedtimeModeStore.loadTodayEntry()',
     'BedtimeModeStore.saveTodayRisk(isRisky)',
@@ -112,12 +112,43 @@ if not (
     )
     sys.exit(1)
 
+# A8A's former whole-file Home SHA was broader than its actual ownership.
+# Preserve the Home behavior A8A needs semantically so later Home presentation
+# work can evolve without disabling Bedtime Danger Mode.
+for needle in (
+    "import 'widgets/bedtime_danger_mode_card.dart';",
+    'BedtimeDangerModeCard(',
+    'onOpenRescue: widget.onOpenRescue,',
+):
+    if needle not in home:
+        print(
+            f'FAIL BW-89A8A Home bedtime integration missing: {needle}'
+        )
+        sys.exit(1)
+
+bedtime_import_index = home.find(
+    "import 'widgets/bedtime_danger_mode_card.dart';"
+)
+bedtime_card_index = home.find('BedtimeDangerModeCard(')
+bedtime_rescue_index = home.find(
+    'onOpenRescue: widget.onOpenRescue,',
+    bedtime_card_index,
+)
+if not (
+    -1 < bedtime_import_index
+    and -1 < bedtime_card_index < bedtime_rescue_index
+):
+    print(
+        'FAIL BW-89A8A Home bedtime integration ordering changed'
+    )
+    sys.exit(1)
+
 # Foundation-owned protected surfaces remain exact.
+# home_screen.dart is intentionally NOT hash-pinned here; its A8A-owned
+# semantics are asserted above.
 protected = {
     'lib/core/bedtime/bedtime_mode_entry.dart':
         'cb11e965909d597363e832d2b3270264f516f1a85ae46e95972bb3542b578526',
-    'lib/features/home/presentation/home_screen.dart':
-        '958d99a316ccdba6bc79492cedd91349e82ad8070dd6c197314699e43e4c89c4',
     'lib/core/widget/home_widget_sync.dart':
         '76f2f816cb93b9ad352208cb0a34050c41e941c1ba1a95c16a392441871e87f6',
     'lib/features/patterns/domain/pattern_observation_engine.dart':
@@ -153,6 +184,6 @@ for forbidden in (
 
 print(
     'PASS: BW-89A8A Bedtime History Foundation verified — '
-    'history/current-night storage preserved and bedtime controls remain '
-    'compatible under the BW-89A8B successor presentation boundary.'
+    'history/current-night storage, bedtime controls, and Home Rescue wiring '
+    'remain intact under the BW-89A9 successor Home presentation boundary.'
 )
