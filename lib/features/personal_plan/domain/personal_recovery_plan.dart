@@ -22,6 +22,7 @@ class PersonalRecoveryPlan {
     required this.faithSupport,
     required this.createdAtIso,
     required this.updatedAtIso,
+    this.preferredPreparationAction = '',
     this.importedReasons = const <String>[],
     this.importedPrimaryReason = '',
     this.importedTriggers = const <String>[],
@@ -42,6 +43,7 @@ class PersonalRecoveryPlan {
   final String faithSupport;
   final String createdAtIso;
   final String updatedAtIso;
+  final String preferredPreparationAction;
 
   final List<String> importedReasons;
   final String importedPrimaryReason;
@@ -76,7 +78,8 @@ class PersonalRecoveryPlan {
       phoneBoundary.trim().isNotEmpty ||
       bedtimeStrategy.trim().isNotEmpty ||
       afterSlipReset.trim().isNotEmpty ||
-      faithSupport.trim().isNotEmpty;
+      faithSupport.trim().isNotEmpty ||
+      preferredPreparationAction.trim().isNotEmpty;
 
   PersonalRecoveryPlan copyWith({
     List<String>? reasons,
@@ -91,6 +94,7 @@ class PersonalRecoveryPlan {
     String? faithSupport,
     String? createdAtIso,
     String? updatedAtIso,
+    String? preferredPreparationAction,
     List<String>? importedReasons,
     String? importedPrimaryReason,
     List<String>? importedTriggers,
@@ -122,6 +126,9 @@ class PersonalRecoveryPlan {
           createdAtIso ?? this.createdAtIso,
       updatedAtIso:
           updatedAtIso ?? this.updatedAtIso,
+      preferredPreparationAction:
+          preferredPreparationAction ??
+              this.preferredPreparationAction,
       importedReasons:
           importedReasons ?? this.importedReasons,
       importedPrimaryReason:
@@ -167,6 +174,8 @@ class PersonalRecoveryPlan {
       'faithSupport': faithSupport,
       'createdAtIso': createdAtIso,
       'updatedAtIso': updatedAtIso,
+      'preferredPreparationAction':
+          preferredPreparationAction,
       'importedReasons': importedReasons,
       'importedPrimaryReason':
           importedPrimaryReason,
@@ -207,6 +216,10 @@ class PersonalRecoveryPlan {
           _normalizedText(map['createdAtIso']),
       updatedAtIso:
           _normalizedText(map['updatedAtIso']),
+      preferredPreparationAction:
+          _normalizedText(
+        map['preferredPreparationAction'],
+      ),
       importedReasons:
           _normalizedList(map['importedReasons']),
       importedPrimaryReason:

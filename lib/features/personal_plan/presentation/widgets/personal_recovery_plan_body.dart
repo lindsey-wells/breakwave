@@ -240,6 +240,61 @@ class PersonalRecoveryPlanBody extends StatelessWidget {
                   value,
                 ),
               ),
+              const SizedBox(height: 18),
+              const PersonalPlanSectionTitle(
+                'Preferred preparation action',
+              ),
+              const SizedBox(height: 8),
+              const Text(
+                'Choose one action you want ready before the next wave.',
+              ),
+              const SizedBox(height: 10),
+              Builder(
+                builder: (BuildContext context) {
+                  final List<String> choices =
+                      draftControllers.redirectActionChoices.isNotEmpty
+                          ? draftControllers.redirectActionChoices
+                          : redirectSuggestions;
+                  final String selected = draftControllers
+                      .preferredPreparationAction.text
+                      .trim();
+
+                  return Wrap(
+                    spacing: 8,
+                    runSpacing: 8,
+                    children: choices.map((String action) {
+                      return ChoiceChip(
+                        label: Text(action),
+                        selected: selected == action,
+                        onSelected: (bool value) {
+                          draftControllers
+                              .setPreferredPreparationAction(
+                            value ? action : '',
+                          );
+                        },
+                      );
+                    }).toList(),
+                  );
+                },
+              ),
+              const SizedBox(height: 12),
+              TextField(
+                controller:
+                    draftControllers.preferredPreparationAction,
+                decoration: const InputDecoration(
+                  labelText: 'My preferred preparation action',
+                  hintText:
+                      'Example: Put the phone down and leave the room.',
+                  helperText:
+                      'You can choose above or name your own clear action.',
+                ),
+                textCapitalization:
+                    TextCapitalization.sentences,
+              ),
+              const SizedBox(height: 10),
+              const Text(
+                'This is your plan for what you intend to try. Rescue still records what you actually choose during a live wave.',
+              ),
             ],
           ),
         ),
