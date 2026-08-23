@@ -8,8 +8,9 @@ SCREEN = ROOT / 'lib/features/personal_plan/presentation/personal_recovery_plan_
 BODY = ROOT / 'lib/features/personal_plan/presentation/widgets/personal_recovery_plan_body.dart'
 PICKER = ROOT / 'lib/features/personal_plan/presentation/widgets/confirmed_helpful_actions_picker.dart'
 TEST = ROOT / 'test/confirmed_helpful_actions_picker_test.dart'
+BODY_TEST = ROOT / 'test/personal_recovery_plan_body_test.dart'
 
-for path in (SCREEN, BODY, PICKER, TEST):
+for path in (SCREEN, BODY, PICKER, TEST, BODY_TEST):
     if not path.is_file():
         print(f'FAIL BW-89A11C missing required file: {path.relative_to(ROOT)}')
         raise SystemExit(1)
@@ -37,6 +38,7 @@ screen = SCREEN.read_text(encoding='utf-8')
 body = BODY.read_text(encoding='utf-8')
 picker = PICKER.read_text(encoding='utf-8')
 test = TEST.read_text(encoding='utf-8')
+body_test = BODY_TEST.read_text(encoding='utf-8')
 
 for needle in (
     'List<String> _confirmedHelpfulActions = const <String>[];',
@@ -117,6 +119,18 @@ for needle in (
 ):
     if needle not in test:
         print(f'FAIL BW-89A11C widget regression missing: {needle}')
+        raise SystemExit(1)
+
+for needle in (
+    'List<String> confirmedHelpfulActions = const <String>[]',
+    'confirmedHelpfulActions: confirmedHelpfulActions',
+    'confirmed helpful actions stay user owned through the body integration',
+    "confirmedHelpfulActions: const <String>['Leave the room']",
+    'controllers.preferredPreparationAction.text',
+    "'Use Leave the room in my plan'",
+):
+    if needle not in body_test:
+        print(f'FAIL BW-89A11C body integration regression missing: {needle}')
         raise SystemExit(1)
 
 print(

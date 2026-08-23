@@ -33,6 +33,7 @@ void main() {
     bool saving = false,
     bool hasSavedPlan = false,
     RecoveryMode mode = RecoveryMode.secular,
+    List<String> confirmedHelpfulActions = const <String>[],
     String? statusMessage,
     VoidCallback? onRetry,
     Future<void> Function()? onRefresh,
@@ -55,6 +56,7 @@ void main() {
           triggerSuggestions: const <String>['Stress'],
           dangerWindowSuggestions: const <String>['Late night'],
           redirectSuggestions: const <String>['Open Rescue'],
+          confirmedHelpfulActions: confirmedHelpfulActions,
           statusMessage: statusMessage,
           onRetry: onRetry ?? () {},
           onRefresh: onRefresh ?? () async {},
@@ -121,6 +123,51 @@ void main() {
         find.text('Refresh from current BreakWave choices'),
       );
       expect(refreshes, 1);
+    },
+  );
+
+  testWidgets(
+    'confirmed helpful actions stay user owned through the body integration',
+    (WidgetTester tester) async {
+      await tester.pumpWidget(
+        buildBody(
+          confirmedHelpfulActions: const <String>['Leave the room'],
+        ),
+      );
+
+      expect(
+        controllers.preferredPreparationAction.text,
+        isEmpty,
+      );
+
+      await tester.scrollUntilVisible(
+        find.text('Helpful actions you confirmed'),
+        450,
+        scrollable: find.byType(Scrollable).first,
+      );
+
+      expect(
+        find.text('Use Leave the room in my plan'),
+        findsOneWidget,
+      );
+      expect(
+        controllers.preferredPreparationAction.text,
+        isEmpty,
+      );
+
+      final Finder useAction = find.text(
+        'Use Leave the room in my plan',
+      );
+      await tester.ensureVisible(useAction);
+      await tester.pumpAndSettle();
+      await tester.tap(useAction);
+      await tester.pump();
+
+      expect(
+        controllers.preferredPreparationAction.text,
+        'Leave the room',
+      );
+      expect(tester.takeException(), isNull);
     },
   );
 
