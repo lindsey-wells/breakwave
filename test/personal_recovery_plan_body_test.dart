@@ -145,8 +145,11 @@ void main() {
       );
       expect(find.text('Faith support'), findsOneWidget);
 
-      final Finder saveButton =
-          filledButtonWithText('Save recovery plan');
+      final Finder saveButton = find.ancestor(
+        of: find.text('Save recovery plan'),
+        matching: find.byType(FilledButton),
+      );
+      expect(saveButton, findsOneWidget);
       await tester.scrollUntilVisible(
         saveButton,
         450,
