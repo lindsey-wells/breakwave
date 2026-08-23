@@ -29,6 +29,7 @@ import 'widgets/fast_urge_entry_card.dart';
 import 'widgets/home_recovery_model_card.dart';
 import 'widgets/latest_logged_moment_card.dart';
 import 'widgets/pattern_picture_card.dart';
+import 'widgets/pattern_helpful_actions_card.dart';
 import 'widgets/pattern_prepare_card.dart';
 import 'widgets/recovery_cycle_preview_card.dart';
 import 'widgets/recovery_snapshot_card.dart';
@@ -97,6 +98,7 @@ class _HomeScreenState extends State<HomeScreen> {
     int reflectionCount = 0;
     final List<String> helpfulActions = <String>[];
     final Set<String> seenHelpfulActions = <String>{};
+    final Map<String, int> helpfulActionCounts = <String, int>{};
 
     for (final LogEntry entry in entries) {
       switch (entry.entryType) {
@@ -114,10 +116,15 @@ class _HomeScreenState extends State<HomeScreen> {
           break;
       }
 
-      if (entry.entryType == 'Victory' && helpfulActions.length < 3) {
+      if (entry.entryType == 'Victory') {
         final String action = entry.replacementAction.trim();
-        if (action.isNotEmpty && seenHelpfulActions.add(action)) {
-          helpfulActions.add(action);
+        if (action.isNotEmpty) {
+          helpfulActionCounts[action] =
+              (helpfulActionCounts[action] ?? 0) + 1;
+          if (helpfulActions.length < 3 &&
+              seenHelpfulActions.add(action)) {
+            helpfulActions.add(action);
+          }
         }
       }
     }
@@ -130,6 +137,7 @@ class _HomeScreenState extends State<HomeScreen> {
       reflectionCount: reflectionCount,
       latestEntry: entries.isEmpty ? null : entries.first,
       helpfulActions: helpfulActions,
+      helpfulActionCounts: helpfulActionCounts,
       privacy: privacy,
     );
   }
@@ -289,6 +297,13 @@ class _HomeScreenState extends State<HomeScreen> {
                         title: 'Learn the pattern',
                       ),
                       const PatternPictureCard(),
+                      if (!summary.privacy.hideHomeInsights &&
+                          summary.helpfulActionCounts.isNotEmpty) ...<Widget>[
+                        const SizedBox(height: 12),
+                        PatternHelpfulActionsCard(
+                          actionCounts: summary.helpfulActionCounts,
+                        ),
+                      ],
                       const SizedBox(height: 12),
                       PatternPrepareCard(
                         onPrepare: widget.onOpenPersonalPlan,
@@ -315,6 +330,7 @@ class _HomeSummaryData {
   final int reflectionCount;
   final LogEntry? latestEntry;
   final List<String> helpfulActions;
+  final Map<String, int> helpfulActionCounts;
   final PrivacySettings privacy;
 
   const _HomeSummaryData({
@@ -325,6 +341,7 @@ class _HomeSummaryData {
     required this.reflectionCount,
     required this.latestEntry,
     required this.helpfulActions,
+    required this.helpfulActionCounts,
     required this.privacy,
   });
 
@@ -336,5 +353,6 @@ class _HomeSummaryData {
         reflectionCount = 0,
         latestEntry = null,
         helpfulActions = const <String>[],
+        helpfulActionCounts = const <String, int>{},
         privacy = PrivacySettings.defaults;
 }
