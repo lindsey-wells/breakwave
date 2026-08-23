@@ -10,6 +10,7 @@ import 'package:flutter/material.dart';
 
 import '../../../../core/recovery/recovery_mode.dart';
 import '../personal_recovery_plan_draft_controllers.dart';
+import 'confirmed_helpful_actions_picker.dart';
 import 'personal_recovery_plan_widgets.dart';
 
 class PersonalRecoveryPlanBody extends StatelessWidget {
@@ -29,6 +30,7 @@ class PersonalRecoveryPlanBody extends StatelessWidget {
     required this.triggerSuggestions,
     required this.dangerWindowSuggestions,
     required this.redirectSuggestions,
+    required this.confirmedHelpfulActions,
     required this.statusMessage,
     required this.onRetry,
     required this.onRefresh,
@@ -49,6 +51,7 @@ class PersonalRecoveryPlanBody extends StatelessWidget {
   final List<String> triggerSuggestions;
   final List<String> dangerWindowSuggestions;
   final List<String> redirectSuggestions;
+  final List<String> confirmedHelpfulActions;
   final String? statusMessage;
   final VoidCallback onRetry;
   final Future<void> Function() onRefresh;
@@ -278,6 +281,16 @@ class PersonalRecoveryPlanBody extends StatelessWidget {
                 },
               ),
               const SizedBox(height: 12),
+              ConfirmedHelpfulActionsPicker(
+                actions: confirmedHelpfulActions,
+                selectedAction:
+                    draftControllers.preferredPreparationAction.text.trim(),
+                onUseAction: (String action) {
+                  draftControllers.setPreferredPreparationAction(action);
+                },
+              ),
+              if (confirmedHelpfulActions.isNotEmpty)
+                const SizedBox(height: 12),
               TextField(
                 controller:
                     draftControllers.preferredPreparationAction,

@@ -43,6 +43,8 @@ class _PersonalRecoveryPlanScreenState
   bool _dirty = false;
   bool _sourceUpdateAvailable = false;
 
+  List<String> _confirmedHelpfulActions = const <String>[];
+
   String? _statusMessage;
   String? _loadError;
 
@@ -149,15 +151,48 @@ class _PersonalRecoveryPlanScreenState
       return;
     }
 
+    final List<String> confirmedHelpfulActions =
+        await _loadConfirmedHelpfulActions();
+    if (!mounted) return;
+
     _mode = result.mode;
     _savedPlan = result.savedPlan;
     _applyPlan(result.basePlan, dirty: false);
 
     setState(() {
+      _confirmedHelpfulActions = confirmedHelpfulActions;
       _sourceUpdateAvailable =
           result.sourceUpdateAvailable;
       _loading = false;
     });
+  }
+
+  Future<List<String>> _loadConfirmedHelpfulActions() async {
+    try {
+      final entries = await const LogRepository().loadEntries();
+      final List<String> actions = <String>[];
+      final Set<String> seen = <String>{};
+
+      for (final entry in entries) {
+        if (entry.entryType != 'Victory') {
+          continue;
+        }
+
+        final String action = entry.replacementAction.trim();
+        if (action.isEmpty || !seen.add(action.toLowerCase())) {
+          continue;
+        }
+
+        actions.add(action);
+        if (actions.length == 3) {
+          break;
+        }
+      }
+
+      return actions;
+    } catch (_) {
+      return const <String>[];
+    }
   }
 
   void _applyPlan(
@@ -336,6 +371,7 @@ class _PersonalRecoveryPlanScreenState
             dangerWindowSuggestions:
                 _dangerWindowSuggestions,
             redirectSuggestions: _redirectSuggestions,
+            confirmedHelpfulActions: _confirmedHelpfulActions,
             statusMessage: _statusMessage,
             onRetry: _retryLoadPlan,
             onRefresh: _importCurrentChoices,
