@@ -11,6 +11,7 @@ import 'package:flutter/material.dart';
 import '../../log/data/log_repository.dart';
 import '../domain/recovery_insights_calculator.dart';
 import '../domain/recovery_insights_snapshot.dart';
+import 'widgets/helpful_actions_history_section.dart';
 
 class RecoveryInsightsScreen extends StatefulWidget {
   const RecoveryInsightsScreen({super.key});
@@ -193,6 +194,10 @@ class _RecoveryInsightsScreenState
           _PeriodCard(
             title: 'Last 90 days',
             summary: snapshot.last90Days,
+          ),
+          const SizedBox(height: 16),
+          HelpfulActionsHistorySection(
+            actions: snapshot.helpfulActionsOverTime,
           ),
           const SizedBox(height: 16),
           _TriggerCard(

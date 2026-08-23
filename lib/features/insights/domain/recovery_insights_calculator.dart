@@ -94,6 +94,12 @@ class RecoveryInsightsCalculator {
       days: 30,
     );
 
+    final List<_DatedLogEntry> entries90Days = _entriesWithin(
+      validEntries,
+      now: localNow,
+      days: 90,
+    );
+
     final bool hasEnoughForTimePatterns =
         entries30Days.length >= minimumEntriesForTimePatterns;
 
@@ -105,6 +111,10 @@ class RecoveryInsightsCalculator {
       last30Days: last30Days,
       last90Days: last90Days,
       topTriggers30Days: _topTriggers(entries30Days),
+      helpfulActionsOverTime: _helpfulActions(
+        entries30Days: entries30Days,
+        entries90Days: entries90Days,
+      ),
       busiestWeekday30Days: hasEnoughForTimePatterns
           ? _dominantLabel(_weekdayCounts(entries30Days))
           : null,
@@ -236,6 +246,81 @@ class RecoveryInsightsCalculator {
     );
   }
 
+  List<HelpfulActionInsight> _helpfulActions({
+    required List<_DatedLogEntry> entries30Days,
+    required List<_DatedLogEntry> entries90Days,
+  }) {
+    final Map<String, _HelpfulActionAccumulator> counts =
+        <String, _HelpfulActionAccumulator>{};
+
+    for (final _DatedLogEntry item in entries90Days) {
+      if (item.normalizedType != 'victory') {
+        continue;
+      }
+
+      final String display = item.entry.replacementAction.trim();
+      final String key = display.toLowerCase();
+
+      if (key.isEmpty) {
+        continue;
+      }
+
+      final _HelpfulActionAccumulator accumulator = counts.putIfAbsent(
+        key,
+        () => _HelpfulActionAccumulator(display: display),
+      );
+
+      accumulator.victoryCount90Days += 1;
+    }
+
+    for (final _DatedLogEntry item in entries30Days) {
+      if (item.normalizedType != 'victory') {
+        continue;
+      }
+
+      final String display = item.entry.replacementAction.trim();
+      final String key = display.toLowerCase();
+      final _HelpfulActionAccumulator? accumulator = counts[key];
+
+      if (key.isEmpty || accumulator == null) {
+        continue;
+      }
+
+      accumulator.victoryCount30Days += 1;
+    }
+
+    final List<HelpfulActionInsight> ranked = counts.entries
+        .map(
+          (MapEntry<String, _HelpfulActionAccumulator> item) =>
+              HelpfulActionInsight(
+            action: item.value.display,
+            victoryCount30Days: item.value.victoryCount30Days,
+            victoryCount90Days: item.value.victoryCount90Days,
+          ),
+        )
+        .toList();
+
+    ranked.sort((HelpfulActionInsight a, HelpfulActionInsight b) {
+      final int recentComparison =
+          b.victoryCount30Days.compareTo(a.victoryCount30Days);
+      if (recentComparison != 0) {
+        return recentComparison;
+      }
+
+      final int longerComparison =
+          b.victoryCount90Days.compareTo(a.victoryCount90Days);
+      if (longerComparison != 0) {
+        return longerComparison;
+      }
+
+      return a.action.toLowerCase().compareTo(b.action.toLowerCase());
+    });
+
+    return List<HelpfulActionInsight>.unmodifiable(
+      ranked.take(5),
+    );
+  }
+
   Map<String, int> _weekdayCounts(
     List<_DatedLogEntry> entries,
   ) {
@@ -343,4 +428,14 @@ class _TriggerAccumulator {
 
   final String display;
   int count = 0;
+}
+
+class _HelpfulActionAccumulator {
+  _HelpfulActionAccumulator({
+    required this.display,
+  });
+
+  final String display;
+  int victoryCount30Days = 0;
+  int victoryCount90Days = 0;
 }

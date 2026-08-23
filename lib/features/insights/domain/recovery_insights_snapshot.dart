@@ -36,6 +36,18 @@ class TriggerInsight {
   final int count;
 }
 
+class HelpfulActionInsight {
+  const HelpfulActionInsight({
+    required this.action,
+    required this.victoryCount30Days,
+    required this.victoryCount90Days,
+  });
+
+  final String action;
+  final int victoryCount30Days;
+  final int victoryCount90Days;
+}
+
 class RecoveryInsightsSnapshot {
   const RecoveryInsightsSnapshot({
     required this.validEntryCount,
@@ -45,6 +57,7 @@ class RecoveryInsightsSnapshot {
     required this.last30Days,
     required this.last90Days,
     required this.topTriggers30Days,
+    required this.helpfulActionsOverTime,
     required this.busiestWeekday30Days,
     required this.busiestTimeWindow30Days,
     required this.hasEnoughForTimePatterns,
@@ -62,6 +75,7 @@ class RecoveryInsightsSnapshot {
   final RecoveryPeriodSummary last90Days;
 
   final List<TriggerInsight> topTriggers30Days;
+  final List<HelpfulActionInsight> helpfulActionsOverTime;
 
   final String? busiestWeekday30Days;
   final String? busiestTimeWindow30Days;

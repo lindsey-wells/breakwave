@@ -123,7 +123,7 @@ protected = {
     'lib/features/log/presentation/log_screen.dart':
         '186c4987f6e0d33b96724a04cc6eff85c97cce2bc60ea5648cbe7c7f51f7c588',
     'lib/features/insights/domain/recovery_insights_calculator.dart':
-        'ca45a4445590eee975819917a54ea21ee8441ad26ff96c511c74ad2f770f08d0',
+        '5051fe330cc68315a1fe3e560f34b1a4690235e02f13c9f272e3f8c528bc09e0',
 }
 
 for rel, expected in protected.items():

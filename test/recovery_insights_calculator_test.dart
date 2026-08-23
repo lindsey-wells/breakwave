@@ -11,12 +11,14 @@ LogEntry buildEntry({
   String entryType = 'Urge',
   int intensity = 3,
   List<String> triggers = const <String>[],
+  String replacementAction = '',
 }) {
   return LogEntry(
     id: id,
     entryType: entryType,
     intensity: intensity,
     triggers: triggers,
+    replacementAction: replacementAction,
     notes: '',
     createdAtIso: occurredAt.toIso8601String(),
   );
@@ -119,6 +121,91 @@ void main() {
       expect(snapshot.topTriggers30Days[1].trigger, 'Boredom');
       expect(snapshot.topTriggers30Days[1].count, 1);
     });
+
+
+    test(
+      'groups helpful actions case-insensitively across 30 and 90 days',
+      () {
+        final DateTime now = DateTime(2026, 7, 15, 12);
+
+        final snapshot = calculator.calculate(
+          entries: <LogEntry>[
+            buildEntry(
+              id: 'walk-new',
+              occurredAt: now.subtract(const Duration(days: 5)),
+              entryType: 'Victory',
+              replacementAction: 'Take a Short Walk',
+            ),
+            buildEntry(
+              id: 'walk-recent',
+              occurredAt: now.subtract(const Duration(days: 20)),
+              entryType: 'Victory',
+              replacementAction: 'take a short walk',
+            ),
+            buildEntry(
+              id: 'walk-older',
+              occurredAt: now.subtract(const Duration(days: 60)),
+              entryType: 'Victory',
+              replacementAction: 'TAKE A SHORT WALK',
+            ),
+            buildEntry(
+              id: 'phone-new',
+              occurredAt: now.subtract(const Duration(days: 10)),
+              entryType: 'Victory',
+              replacementAction: 'Put the phone down',
+            ),
+            buildEntry(
+              id: 'phone-older',
+              occurredAt: now.subtract(const Duration(days: 40)),
+              entryType: 'Victory',
+              replacementAction: 'Put the phone down',
+            ),
+            buildEntry(
+              id: 'text',
+              occurredAt: now.subtract(const Duration(days: 15)),
+              entryType: 'Victory',
+              replacementAction: 'Text someone safe',
+            ),
+            buildEntry(
+              id: 'urge-ignored',
+              occurredAt: now.subtract(const Duration(days: 2)),
+              entryType: 'Urge',
+              replacementAction: 'Not a victory action',
+            ),
+            buildEntry(
+              id: 'blank-ignored',
+              occurredAt: now.subtract(const Duration(days: 3)),
+              entryType: 'Victory',
+              replacementAction: '   ',
+            ),
+            buildEntry(
+              id: 'too-old',
+              occurredAt: now.subtract(const Duration(days: 91)),
+              entryType: 'Victory',
+              replacementAction: 'Old action',
+            ),
+          ],
+          now: now,
+        );
+
+        expect(snapshot.helpfulActionsOverTime.length, 3);
+
+        final first = snapshot.helpfulActionsOverTime[0];
+        expect(first.action, 'Take a Short Walk');
+        expect(first.victoryCount30Days, 2);
+        expect(first.victoryCount90Days, 3);
+
+        final second = snapshot.helpfulActionsOverTime[1];
+        expect(second.action, 'Put the phone down');
+        expect(second.victoryCount30Days, 1);
+        expect(second.victoryCount90Days, 2);
+
+        final third = snapshot.helpfulActionsOverTime[2];
+        expect(third.action, 'Text someone safe');
+        expect(third.victoryCount30Days, 1);
+        expect(third.victoryCount90Days, 1);
+      },
+    );
 
     test('withholds time patterns when fewer than five entries exist', () {
       final DateTime now = DateTime(2026, 7, 11, 20);
@@ -252,6 +339,7 @@ void main() {
       expect(snapshot.last30Days.total, 0);
       expect(snapshot.last90Days.total, 0);
       expect(snapshot.topTriggers30Days, isEmpty);
+      expect(snapshot.helpfulActionsOverTime, isEmpty);
     });
   });
 }
