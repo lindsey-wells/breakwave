@@ -54,6 +54,7 @@ class RecoveryInsightsSnapshot {
     required this.ignoredEntryCount,
     this.reflectionEntryCount = 0,
     required this.last7Days,
+    required this.previous7Days,
     required this.last30Days,
     required this.last90Days,
     required this.topTriggers30Days,
@@ -71,6 +72,7 @@ class RecoveryInsightsSnapshot {
       validEntryCount + reflectionEntryCount;
 
   final RecoveryPeriodSummary last7Days;
+  final RecoveryPeriodSummary previous7Days;
   final RecoveryPeriodSummary last30Days;
   final RecoveryPeriodSummary last90Days;
 

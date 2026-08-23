@@ -12,6 +12,7 @@ import '../../log/data/log_repository.dart';
 import '../domain/recovery_insights_calculator.dart';
 import '../domain/recovery_insights_snapshot.dart';
 import 'widgets/helpful_actions_history_section.dart';
+import 'widgets/weekly_recovery_review_section.dart';
 
 class RecoveryInsightsScreen extends StatefulWidget {
   const RecoveryInsightsScreen({super.key});
@@ -184,6 +185,11 @@ class _RecoveryInsightsScreenState
                 Text(_weeklySummary(snapshot.last7Days)),
               ],
             ),
+          ),
+          const SizedBox(height: 16),
+          WeeklyRecoveryReviewSection(
+            current: snapshot.last7Days,
+            previous: snapshot.previous7Days,
           ),
           const SizedBox(height: 16),
           _PeriodCard(

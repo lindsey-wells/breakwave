@@ -76,6 +76,12 @@ class RecoveryInsightsCalculator {
       days: 7,
     );
 
+    final RecoveryPeriodSummary previous7Days = _periodSummaryBetween(
+      validEntries,
+      startInclusive: localNow.subtract(const Duration(days: 14)),
+      endExclusive: localNow.subtract(const Duration(days: 7)),
+    );
+
     final RecoveryPeriodSummary last30Days = _periodSummary(
       validEntries,
       now: localNow,
@@ -108,6 +114,7 @@ class RecoveryInsightsCalculator {
       ignoredEntryCount: ignoredEntryCount,
       reflectionEntryCount: reflectionEntryCount,
       last7Days: last7Days,
+      previous7Days: previous7Days,
       last30Days: last30Days,
       last90Days: last90Days,
       topTriggers30Days: _topTriggers(entries30Days),
@@ -167,6 +174,57 @@ class RecoveryInsightsCalculator {
     return RecoveryPeriodSummary(
       days: days,
       total: total,
+      urges: urges,
+      slips: slips,
+      victories: victories,
+      averageIntensity: intensityEntryCount == 0
+          ? 0
+          : totalIntensity / intensityEntryCount,
+    );
+  }
+
+  RecoveryPeriodSummary _periodSummaryBetween(
+    List<_DatedLogEntry> entries, {
+    required DateTime startInclusive,
+    required DateTime endExclusive,
+  }) {
+    final List<_DatedLogEntry> periodEntries = entries
+        .where(
+          (_DatedLogEntry item) =>
+              !item.occurredAt.isBefore(startInclusive) &&
+              item.occurredAt.isBefore(endExclusive),
+        )
+        .toList(growable: false);
+
+    int urges = 0;
+    int slips = 0;
+    int victories = 0;
+    int totalIntensity = 0;
+    int intensityEntryCount = 0;
+
+    for (final _DatedLogEntry item in periodEntries) {
+      final int? intensity = item.entry.intensity;
+      if (intensity != null) {
+        totalIntensity += intensity;
+        intensityEntryCount += 1;
+      }
+
+      switch (item.normalizedType) {
+        case 'urge':
+          urges += 1;
+          break;
+        case 'slip':
+          slips += 1;
+          break;
+        case 'victory':
+          victories += 1;
+          break;
+      }
+    }
+
+    return RecoveryPeriodSummary(
+      days: 7,
+      total: periodEntries.length,
       urges: urges,
       slips: slips,
       victories: victories,

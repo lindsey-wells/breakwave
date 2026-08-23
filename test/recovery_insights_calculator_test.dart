@@ -207,6 +207,58 @@ void main() {
       },
     );
 
+    test('builds adjacent non-overlapping 7-day review windows', () {
+      final DateTime now = DateTime(2026, 8, 23, 17, 30);
+
+      final snapshot = calculator.calculate(
+        entries: <LogEntry>[
+          buildEntry(
+            id: 'current-six-days',
+            occurredAt: now.subtract(const Duration(days: 6)),
+            entryType: 'Victory',
+            intensity: 2,
+          ),
+          buildEntry(
+            id: 'current-boundary',
+            occurredAt: now.subtract(const Duration(days: 7)),
+            entryType: 'Urge',
+            intensity: 4,
+          ),
+          buildEntry(
+            id: 'previous-ten-days',
+            occurredAt: now.subtract(const Duration(days: 10)),
+            entryType: 'Slip',
+            intensity: 5,
+          ),
+          buildEntry(
+            id: 'previous-start-boundary',
+            occurredAt: now.subtract(const Duration(days: 14)),
+            entryType: 'Victory',
+            intensity: 1,
+          ),
+          buildEntry(
+            id: 'too-old',
+            occurredAt: now.subtract(const Duration(days: 15)),
+            entryType: 'Urge',
+            intensity: 3,
+          ),
+        ],
+        now: now,
+      );
+
+      expect(snapshot.last7Days.total, 2);
+      expect(snapshot.last7Days.urges, 1);
+      expect(snapshot.last7Days.victories, 1);
+      expect(snapshot.last7Days.slips, 0);
+      expect(snapshot.last7Days.averageIntensity, 3);
+
+      expect(snapshot.previous7Days.total, 2);
+      expect(snapshot.previous7Days.urges, 0);
+      expect(snapshot.previous7Days.victories, 1);
+      expect(snapshot.previous7Days.slips, 1);
+      expect(snapshot.previous7Days.averageIntensity, 3);
+    });
+
     test('withholds time patterns when fewer than five entries exist', () {
       final DateTime now = DateTime(2026, 7, 11, 20);
 

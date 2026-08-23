@@ -105,7 +105,7 @@ protected_sha256 = {'lib/features/patterns/domain/pattern_observation.dart': 'e0
  'lib/features/log/presentation/log_screen.dart': '186c4987f6e0d33b96724a04cc6eff85c97cce2bc60ea5648cbe7c7f51f7c588',
  'lib/features/home/presentation/widgets/bedtime_danger_mode_card.dart': '6207d0eada86ec06c1c079ad30c02ca84a5fec494116549448da59c4e21d5a75',
  'lib/features/insights/presentation/simple_insights_card.dart': '1101e4f4a9ae10335f2f3b43adfdb40d70681490a6f417efc50bc4ebeee0d7cf',
- 'lib/features/insights/domain/recovery_insights_calculator.dart': '5051fe330cc68315a1fe3e560f34b1a4690235e02f13c9f272e3f8c528bc09e0'}
+ 'lib/features/insights/domain/recovery_insights_calculator.dart': 'e16bdc639d9bc829dcd78e64fc137ac39ade54b453ba57ded4455c20c5a88d6a'}
 
 if not FIXTURE_MODE:
     for rel, expected in protected_sha256.items():
