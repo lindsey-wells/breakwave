@@ -29,17 +29,20 @@ import 'widgets/fast_urge_entry_card.dart';
 import 'widgets/home_recovery_model_card.dart';
 import 'widgets/latest_logged_moment_card.dart';
 import 'widgets/pattern_picture_card.dart';
+import 'widgets/pattern_prepare_card.dart';
 import 'widgets/recovery_cycle_preview_card.dart';
 import 'widgets/recovery_snapshot_card.dart';
 
 class HomeScreen extends StatefulWidget {
   final VoidCallback onOpenRescue;
   final VoidCallback onOpenLog;
+  final VoidCallback onOpenPersonalPlan;
 
   const HomeScreen({
     super.key,
     required this.onOpenRescue,
     required this.onOpenLog,
+    required this.onOpenPersonalPlan,
   });
 
   @override
@@ -268,6 +271,10 @@ class _HomeScreenState extends State<HomeScreen> {
                         title: 'Learn the pattern',
                       ),
                       const PatternPictureCard(),
+                      const SizedBox(height: 12),
+                      PatternPrepareCard(
+                        onPrepare: widget.onOpenPersonalPlan,
+                      ),
                       const SizedBox(height: 12),
                       const RecoveryCyclePreviewCard(),
                     ],

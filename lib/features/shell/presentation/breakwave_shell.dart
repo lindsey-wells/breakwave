@@ -202,6 +202,11 @@ class _BreakWaveShellState extends State<BreakWaveShell>
         key: ValueKey<int>(_homeRefreshTick),
         onOpenRescue: () => _onDestinationSelected(1),
         onOpenLog: () => _onDestinationSelected(2),
+        onOpenPersonalPlan: () => Navigator.of(context).push<void>(
+          MaterialPageRoute<void>(
+            builder: (_) => const PersonalRecoveryPlanScreen(),
+          ),
+        ),
       ),
       RescueScreen(
         onReturnHome: _returnHome,
