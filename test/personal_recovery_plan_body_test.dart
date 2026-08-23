@@ -145,12 +145,17 @@ void main() {
       );
       expect(find.text('Faith support'), findsOneWidget);
 
+      final Finder saveButton =
+          filledButtonWithText('Save recovery plan');
       await tester.scrollUntilVisible(
-        find.text('Save recovery plan'),
+        saveButton,
         450,
         scrollable: find.byType(Scrollable).first,
       );
-      await tester.tap(find.text('Save recovery plan'));
+      await tester.ensureVisible(saveButton);
+      await tester.pumpAndSettle();
+      await tester.tap(saveButton);
+      await tester.pump();
       expect(saves, 1);
     },
   );

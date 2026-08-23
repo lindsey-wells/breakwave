@@ -165,14 +165,17 @@ void main() {
 
       await pumpPersonalPlan(tester);
 
-      await scrollToPlanText(tester, 'Pray for one minute');
-      expect(
-        find.widgetWithText(
-          FilterChip,
-          'Pray for one minute',
-        ),
-        findsOneWidget,
+      final Finder prayerAction = find.widgetWithText(
+        FilterChip,
+        'Pray for one minute',
       );
+      await tester.scrollUntilVisible(
+        prayerAction,
+        320,
+        scrollable: find.byType(Scrollable).first,
+      );
+      await tester.pumpAndSettle();
+      expect(prayerAction, findsOneWidget);
 
       await scrollToPlanText(tester, 'Faith support');
       expect(find.text('Faith support'), findsOneWidget);

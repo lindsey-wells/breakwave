@@ -26,6 +26,8 @@ class PersonalRecoveryPlanDraftControllers {
   final TextEditingController triggers = TextEditingController();
   final TextEditingController dangerWindows = TextEditingController();
   final TextEditingController redirectActions = TextEditingController();
+  final TextEditingController preferredPreparationAction =
+      TextEditingController();
   final TextEditingController trustedSupport = TextEditingController();
   final TextEditingController phoneBoundary = TextEditingController();
   final TextEditingController bedtimeStrategy = TextEditingController();
@@ -41,6 +43,7 @@ class PersonalRecoveryPlanDraftControllers {
         triggers,
         dangerWindows,
         redirectActions,
+        preferredPreparationAction,
         trustedSupport,
         phoneBoundary,
         bedtimeStrategy,
@@ -64,6 +67,8 @@ class PersonalRecoveryPlanDraftControllers {
       _writeLines(triggers, plan.triggers);
       _writeLines(dangerWindows, plan.dangerWindows);
       _writeLines(redirectActions, plan.redirectActions);
+      preferredPreparationAction.text =
+          plan.preferredPreparationAction;
       trustedSupport.text = plan.trustedSupportName;
       phoneBoundary.text = plan.phoneBoundary;
       bedtimeStrategy.text = plan.bedtimeStrategy;
@@ -85,12 +90,21 @@ class PersonalRecoveryPlanDraftControllers {
       triggers: _parseLines(triggers.text),
       dangerWindows: _parseLines(dangerWindows.text),
       redirectActions: _parseLines(redirectActions.text),
+      preferredPreparationAction:
+          preferredPreparationAction.text.trim(),
       trustedSupportName: trustedSupport.text.trim(),
       phoneBoundary: phoneBoundary.text.trim(),
       bedtimeStrategy: bedtimeStrategy.text.trim(),
       afterSlipReset: afterSlipReset.text.trim(),
       faithSupport: faithSupport.text.trim(),
     );
+  }
+
+  List<String> get redirectActionChoices =>
+      _parseLines(redirectActions.text);
+
+  void setPreferredPreparationAction(String value) {
+    preferredPreparationAction.text = value.trim();
   }
 
   void toggleSuggestion(
