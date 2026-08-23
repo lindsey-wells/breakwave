@@ -32,6 +32,7 @@ import 'widgets/pattern_picture_card.dart';
 import 'widgets/pattern_prepare_card.dart';
 import 'widgets/recovery_cycle_preview_card.dart';
 import 'widgets/recovery_snapshot_card.dart';
+import 'widgets/what_helped_before_card.dart';
 
 class HomeScreen extends StatefulWidget {
   final VoidCallback onOpenRescue;
@@ -94,6 +95,8 @@ class _HomeScreenState extends State<HomeScreen> {
     int slipCount = 0;
     int victoryCount = 0;
     int reflectionCount = 0;
+    final List<String> helpfulActions = <String>[];
+    final Set<String> seenHelpfulActions = <String>{};
 
     for (final LogEntry entry in entries) {
       switch (entry.entryType) {
@@ -110,6 +113,13 @@ class _HomeScreenState extends State<HomeScreen> {
           reflectionCount += 1;
           break;
       }
+
+      if (entry.entryType == 'Victory' && helpfulActions.length < 3) {
+        final String action = entry.replacementAction.trim();
+        if (action.isNotEmpty && seenHelpfulActions.add(action)) {
+          helpfulActions.add(action);
+        }
+      }
     }
 
     return _HomeSummaryData(
@@ -119,6 +129,7 @@ class _HomeScreenState extends State<HomeScreen> {
       victoryCount: victoryCount,
       reflectionCount: reflectionCount,
       latestEntry: entries.isEmpty ? null : entries.first,
+      helpfulActions: helpfulActions,
       privacy: privacy,
     );
   }
@@ -254,6 +265,13 @@ class _HomeScreenState extends State<HomeScreen> {
                           reflectionCount: summary.reflectionCount,
                           onOpenLog: widget.onOpenLog,
                         ),
+                        if (!summary.privacy.hideHomeInsights &&
+                            summary.helpfulActions.isNotEmpty) ...<Widget>[
+                          const SizedBox(height: 16),
+                          WhatHelpedBeforeCard(
+                            actions: summary.helpfulActions,
+                          ),
+                        ],
                         if (!summary.privacy.hideLatestLoggedMoment) ...<Widget>[
                           const SizedBox(height: 16),
                           LatestLoggedMomentCard(
@@ -296,6 +314,7 @@ class _HomeSummaryData {
   final int victoryCount;
   final int reflectionCount;
   final LogEntry? latestEntry;
+  final List<String> helpfulActions;
   final PrivacySettings privacy;
 
   const _HomeSummaryData({
@@ -305,6 +324,7 @@ class _HomeSummaryData {
     required this.victoryCount,
     required this.reflectionCount,
     required this.latestEntry,
+    required this.helpfulActions,
     required this.privacy,
   });
 
@@ -315,5 +335,6 @@ class _HomeSummaryData {
         victoryCount = 0,
         reflectionCount = 0,
         latestEntry = null,
+        helpfulActions = const <String>[],
         privacy = PrivacySettings.defaults;
 }
