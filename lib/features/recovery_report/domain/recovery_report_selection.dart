@@ -44,6 +44,7 @@ enum RecoveryReportRange {
 
 enum RecoveryReportSection {
   summary,
+  weeklyReview,
   triggers,
   timingPatterns,
   completedRoutines,
@@ -200,6 +201,7 @@ class RecoveryReportSelection {
   const RecoveryReportSelection({
     this.range =
         RecoveryReportRange.last30Days,
+    this.includeWeeklyReview = false,
     this.includeTriggers = false,
     this.includeTimingPatterns = false,
     this.includeCompletedRoutines = false,
@@ -225,6 +227,7 @@ class RecoveryReportSelection {
   final RecoveryReportRange range;
 
   // All optional sections default to false.
+  final bool includeWeeklyReview;
   final bool includeTriggers;
   final bool includeTimingPatterns;
   final bool includeCompletedRoutines;
@@ -245,6 +248,12 @@ class RecoveryReportSelection {
         <RecoveryReportSection>{
       RecoveryReportSection.summary,
     };
+
+    if (includeWeeklyReview) {
+      sections.add(
+        RecoveryReportSection.weeklyReview,
+      );
+    }
 
     if (includeTriggers) {
       sections.add(
@@ -288,6 +297,7 @@ class RecoveryReportSelection {
   Map<String, dynamic> toMap() {
     return <String, dynamic>{
       'range': range.name,
+      'includeWeeklyReview': includeWeeklyReview,
       'includeTriggers': includeTriggers,
       'includeTimingPatterns':
           includeTimingPatterns,
@@ -306,6 +316,8 @@ class RecoveryReportSelection {
       range: RecoveryReportRange.fromStorage(
         map['range'],
       ),
+      includeWeeklyReview:
+          map['includeWeeklyReview'] == true,
       includeTriggers:
           map['includeTriggers'] == true,
       includeTimingPatterns:

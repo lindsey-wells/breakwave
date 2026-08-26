@@ -15,6 +15,7 @@ void main() {
       );
 
       expect(selection.includeSummary, isTrue);
+      expect(selection.includeWeeklyReview, isFalse);
       expect(selection.includeTriggers, isFalse);
 
       expect(
@@ -53,6 +54,7 @@ void main() {
       const RecoveryReportSelection selection =
           RecoveryReportSelection(
         range: RecoveryReportRange.last90Days,
+        includeWeeklyReview: true,
         includeTriggers: true,
         includeTimingPatterns: true,
         includeCompletedRoutines: true,
@@ -61,7 +63,13 @@ void main() {
       );
 
       expect(selection.range.days, 90);
-      expect(selection.selectedSectionCount, 5);
+      expect(selection.selectedSectionCount, 6);
+      expect(
+        selection.selectedSections.contains(
+          RecoveryReportSection.weeklyReview,
+        ),
+        isTrue,
+      );
 
       expect(
         selection.selectedSections.contains(
@@ -119,6 +127,7 @@ void main() {
       const RecoveryReportSelection original =
           RecoveryReportSelection(
         range: RecoveryReportRange.last90Days,
+        includeWeeklyReview: true,
         includeTriggers: true,
         includeCompletedRoutines: true,
         personalPlan:
@@ -138,6 +147,7 @@ void main() {
         RecoveryReportRange.last90Days,
       );
 
+      expect(restored.includeWeeklyReview, isTrue);
       expect(restored.includeTriggers, isTrue);
 
       expect(
@@ -166,6 +176,7 @@ void main() {
           RecoveryReportSelection.fromMap(
         <String, dynamic>{
           'range': 'unknown',
+          'includeWeeklyReview': 'true',
           'includeTriggers': 'true',
           'includeTimingPatterns': 1,
           'personalPlan': 'invalid',
@@ -177,6 +188,7 @@ void main() {
         RecoveryReportRange.last30Days,
       );
 
+      expect(restored.includeWeeklyReview, isFalse);
       expect(restored.includeTriggers, isFalse);
 
       expect(

@@ -60,6 +60,7 @@ class _RecoveryReportBuilderScreenState
   RecoveryReportRange _range =
       RecoveryReportRange.last30Days;
 
+  bool _includeWeeklyReview = false;
   bool _includeTriggers = false;
   bool _includeTimingPatterns = false;
   bool _includeCompletedRoutines = false;
@@ -94,6 +95,7 @@ class _RecoveryReportBuilderScreenState
   RecoveryReportSelection get _selection =>
       RecoveryReportSelection(
         range: _range,
+        includeWeeklyReview: _includeWeeklyReview,
         includeTriggers: _includeTriggers,
         includeTimingPatterns:
             _includeTimingPatterns,
@@ -491,6 +493,20 @@ class _RecoveryReportBuilderScreenState
                   'Logged moments, urges, victories, '
                   'slips, and average intensity.',
                 ),
+              ),
+              _selectionTile(
+                title: '7-day recovery review',
+                subtitle:
+                    'Compare the last 7 days with the previous '
+                    '7 days using aggregate counts only. This '
+                    'fixed weekly comparison does not change '
+                    'the 30/90-day report period.',
+                value: _includeWeeklyReview,
+                onChanged: (bool value) {
+                  _changeSelection(() {
+                    _includeWeeklyReview = value;
+                  });
+                },
               ),
               _selectionTile(
                 title: 'Top recorded triggers',

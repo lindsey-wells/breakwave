@@ -63,12 +63,44 @@ class RecoveryReportTimingPatterns {
   }
 }
 
+class RecoveryReportWeeklyReview {
+  const RecoveryReportWeeklyReview({
+    required this.current,
+    required this.previous,
+  });
+
+  final RecoveryPeriodSummary current;
+  final RecoveryPeriodSummary previous;
+
+  Map<String, dynamic> toMap() {
+    return <String, dynamic>{
+      'last7Days': _summaryMap(current),
+      'previous7Days': _summaryMap(previous),
+    };
+  }
+
+  static Map<String, dynamic> _summaryMap(
+    RecoveryPeriodSummary summary,
+  ) {
+    return <String, dynamic>{
+      'days': summary.days,
+      'total': summary.total,
+      'urges': summary.urges,
+      'slips': summary.slips,
+      'victories': summary.victories,
+      'averageIntensity': summary.averageIntensity,
+      'hasEntries': summary.hasEntries,
+    };
+  }
+}
+
 class RecoveryReportSnapshot {
   const RecoveryReportSnapshot({
     required this.generatedAtIso,
     required this.range,
     required this.selectedSections,
     required this.summary,
+    required this.weeklyReview,
     required this.triggers,
     required this.timingPatterns,
     required this.completedRoutines,
@@ -77,12 +109,13 @@ class RecoveryReportSnapshot {
     required this.personalPlanFields,
   });
 
-  static const int reportVersion = 1;
+  static const int reportVersion = 2;
 
   final String generatedAtIso;
   final RecoveryReportRange range;
   final List<RecoveryReportSection> selectedSections;
   final RecoveryPeriodSummary summary;
+  final RecoveryReportWeeklyReview? weeklyReview;
   final List<TriggerInsight> triggers;
   final RecoveryReportTimingPatterns? timingPatterns;
   final List<RecoveryReportNamedCount> completedRoutines;
@@ -151,6 +184,12 @@ class RecoveryReportSnapshot {
       'excludedByDesign':
           RecoveryReportSelection.excludedByDesign,
     };
+
+    if (included.contains(
+      RecoveryReportSection.weeklyReview,
+    )) {
+      map['weeklyReview'] = weeklyReview?.toMap();
+    }
 
     if (included.contains(
       RecoveryReportSection.triggers,

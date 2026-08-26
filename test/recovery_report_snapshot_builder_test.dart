@@ -114,6 +114,7 @@ void main() {
 
       expect(snapshot.summary.total, 1);
       expect(snapshot.summary.urges, 1);
+      expect(snapshot.weeklyReview, isNull);
       expect(snapshot.triggers, isEmpty);
       expect(snapshot.timingPatterns, isNull);
       expect(snapshot.personalPlanFields, isEmpty);
@@ -210,6 +211,73 @@ void main() {
       expect(
         snapshot.toMap().toString(),
         isNot(contains('Rescue Completion')),
+      );
+    },
+  );
+
+  test(
+    'weekly review reuses adjacent A12B windows only when selected',
+    () {
+      final DateTime now =
+          DateTime(2026, 7, 15, 12);
+
+      final snapshot = builder.build(
+        selection:
+            const RecoveryReportSelection(
+          includeWeeklyReview: true,
+        ),
+        entries: <LogEntry>[
+          entry(
+            id: 'current',
+            occurredAt:
+                now.subtract(const Duration(days: 1)),
+            type: 'Urge',
+            intensity: 4,
+          ),
+          entry(
+            id: 'previous',
+            occurredAt:
+                now.subtract(const Duration(days: 8)),
+            type: 'Victory',
+            intensity: 2,
+          ),
+          entry(
+            id: 'outside-weekly',
+            occurredAt:
+                now.subtract(const Duration(days: 20)),
+            type: 'Slip',
+            intensity: 3,
+          ),
+        ],
+        routineProgress:
+            <String, RecoveryRoutineProgress>{},
+        christianJourneyProgress:
+            <String, ChristianJourneyProgress>{},
+        personalPlan: null,
+        recoveryMode: RecoveryMode.secular,
+        now: now,
+      );
+
+      expect(snapshot.summary.total, 3);
+      expect(snapshot.weeklyReview, isNotNull);
+      expect(snapshot.weeklyReview!.current.total, 1);
+      expect(snapshot.weeklyReview!.current.urges, 1);
+      expect(snapshot.weeklyReview!.previous.total, 1);
+      expect(snapshot.weeklyReview!.previous.victories, 1);
+
+      final String exported =
+          snapshot.toMap().toString();
+
+      expect(exported, contains('weeklyReview'));
+      expect(exported, contains('last7Days'));
+      expect(exported, contains('previous7Days'));
+      expect(
+        exported,
+        isNot(contains('PRIVATE THOUGHT')),
+      );
+      expect(
+        exported,
+        isNot(contains('PRIVATE NOTES')),
       );
     },
   );

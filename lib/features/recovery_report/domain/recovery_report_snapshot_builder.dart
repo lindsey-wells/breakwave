@@ -87,6 +87,12 @@ class RecoveryReportSnapshotBuilder {
         selectedSections,
       ),
       summary: summary,
+      weeklyReview: selection.includeWeeklyReview
+          ? RecoveryReportWeeklyReview(
+              current: insights.last7Days,
+              previous: insights.previous7Days,
+            )
+          : null,
       triggers: selection.includeTriggers
           ? _topTriggers(periodEntries)
           : const <TriggerInsight>[],

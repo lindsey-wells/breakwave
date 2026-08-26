@@ -13,6 +13,7 @@ RecoveryReportSnapshot buildSnapshot({
   List<TriggerInsight> triggers =
       const <TriggerInsight>[],
   RecoveryReportTimingPatterns? timingPatterns,
+  RecoveryReportWeeklyReview? weeklyReview,
   List<RecoveryReportNamedCount> routines =
       const <RecoveryReportNamedCount>[],
   List<RecoveryReportNamedCount> journeys =
@@ -34,6 +35,7 @@ RecoveryReportSnapshot buildSnapshot({
       victories: 1,
       averageIntensity: 3.25,
     ),
+    weeklyReview: weeklyReview,
     triggers: triggers,
     timingPatterns: timingPatterns,
     completedRoutines: routines,
@@ -78,6 +80,59 @@ void main() {
         text,
         isNot(contains('PRIVATE NOTES')),
       );
+    },
+  );
+
+  test(
+    'weekly review renders adjacent raw windows without judgment',
+    () {
+      final RecoveryReportSnapshot snapshot =
+          buildSnapshot(
+        sections: const <RecoveryReportSection>[
+          RecoveryReportSection.summary,
+          RecoveryReportSection.weeklyReview,
+        ],
+        weeklyReview:
+            const RecoveryReportWeeklyReview(
+          current: RecoveryPeriodSummary(
+            days: 7,
+            total: 5,
+            urges: 1,
+            slips: 1,
+            victories: 3,
+            averageIntensity: 2.2,
+          ),
+          previous: RecoveryPeriodSummary(
+            days: 7,
+            total: 3,
+            urges: 1,
+            slips: 0,
+            victories: 2,
+            averageIntensity: 2.0,
+          ),
+        ),
+      );
+
+      final String text =
+          RecoveryReportFormatter.buildText(snapshot);
+
+      expect(text, contains('7-DAY RECOVERY REVIEW'));
+      expect(text, contains('Last 7 days'));
+      expect(text, contains('Previous 7 days'));
+      expect(
+        text,
+        contains('do not by themselves mean recovery is improving'),
+      );
+      expect(text.toLowerCase(), isNot(contains('better week')));
+      expect(text.toLowerCase(), isNot(contains('worse week')));
+
+      final String json =
+          RecoveryReportFormatter.buildJson(snapshot);
+
+      expect(json, contains('"reportVersion": 2'));
+      expect(json, contains('"weeklyReview"'));
+      expect(json, contains('"last7Days"'));
+      expect(json, contains('"previous7Days"'));
     },
   );
 
@@ -251,7 +306,7 @@ void main() {
         ),
       );
 
-      expect(json, contains('"reportVersion": 1'));
+      expect(json, contains('"reportVersion": 2'));
       expect(json, contains('"summary"'));
       expect(json, contains('"Stress"'));
 

@@ -50,6 +50,50 @@ class RecoveryReportFormatter {
         snapshot.selectedSections.toSet();
 
     if (sections.contains(
+      RecoveryReportSection.weeklyReview,
+    )) {
+      final RecoveryReportWeeklyReview? weekly =
+          snapshot.weeklyReview;
+
+      lines.addAll(<String>[
+        '',
+        '7-DAY RECOVERY REVIEW',
+      ]);
+
+      if (weekly == null) {
+        lines.add(
+          'No weekly review data was available.',
+        );
+      } else {
+        lines.addAll(<String>[
+          'Last 7 days',
+          'Recorded moments: ${weekly.current.total}',
+          'Urges: ${weekly.current.urges}',
+          'Victories: ${weekly.current.victories}',
+          'Slips: ${weekly.current.slips}',
+          weekly.current.hasEntries
+              ? 'Average recorded intensity: '
+                  '${weekly.current.averageIntensity.toStringAsFixed(1)} / 5'
+              : 'Average recorded intensity: No recorded data',
+          '',
+          'Previous 7 days',
+          'Recorded moments: ${weekly.previous.total}',
+          'Urges: ${weekly.previous.urges}',
+          'Victories: ${weekly.previous.victories}',
+          'Slips: ${weekly.previous.slips}',
+          weekly.previous.hasEntries
+              ? 'Average recorded intensity: '
+                  '${weekly.previous.averageIntensity.toStringAsFixed(1)} / 5'
+              : 'Average recorded intensity: No recorded data',
+          '',
+          'These are two adjacent 7-day windows. More or fewer logged '
+              'moments do not by themselves mean recovery is improving '
+              'or worsening.',
+        ]);
+      }
+    }
+
+    if (sections.contains(
       RecoveryReportSection.triggers,
     )) {
       lines.addAll(<String>[
