@@ -25,6 +25,7 @@ import '../domain/recovery_report_formatter.dart';
 import '../domain/recovery_report_selection.dart';
 import '../domain/recovery_report_snapshot.dart';
 import '../domain/recovery_report_snapshot_builder.dart';
+import 'widgets/accountability_check_in_card.dart';
 
 class RecoveryReportBuilderScreen extends StatefulWidget {
   const RecoveryReportBuilderScreen({
@@ -837,6 +838,8 @@ class _RecoveryReportBuilderScreenState
             ],
           ),
         ),
+        const SizedBox(height: 16),
+        const AccountabilityCheckInCard(),
       ],
     );
   }
