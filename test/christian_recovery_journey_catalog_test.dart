@@ -56,10 +56,6 @@ void main() {
     expect(journey!.title, 'Rebuild trust with honesty');
     expect(journey.hasRequiredFlow, isTrue);
 
-    final String combined = journey.steps
-        .map((ChristianJourneyStep step) => step.body)
-        .join(' ');
-
     final ChristianJourneyStep contextStep = journey.steps.firstWhere(
       (ChristianJourneyStep step) =>
           step.kind == ChristianJourneyStepKind.context,
