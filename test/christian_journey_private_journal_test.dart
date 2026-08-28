@@ -67,9 +67,12 @@ void main() {
         ),
         'Remember to listen first.',
       );
-      await tester.tap(
-        find.byKey(const Key('christian-journal-save')),
+      final Finder saveButton = find.byKey(
+        const Key('christian-journal-save'),
       );
+      await tester.ensureVisible(saveButton);
+      await tester.pumpAndSettle();
+      await tester.tap(saveButton);
       await tester.pumpAndSettle();
 
       final ChristianJourneyProgress? saved =

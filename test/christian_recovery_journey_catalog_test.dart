@@ -60,9 +60,17 @@ void main() {
         .map((ChristianJourneyStep step) => step.body)
         .join(' ');
 
-    expect(combined, contains('Trust cannot be demanded'));
-    expect(combined, contains('controls their response'));
-    expect(combined, contains('professional or pastoral guidance'));
+    final ChristianJourneyStep contextStep = journey.steps.firstWhere(
+      (ChristianJourneyStep step) =>
+          step.kind == ChristianJourneyStepKind.context,
+    );
+
+    expect(contextStep.title, 'Trust cannot be demanded');
+    expect(contextStep.body, contains('controls their response'));
+    expect(
+      contextStep.body,
+      contains('professional or pastoral guidance'),
+    );
   });
 
   test('journey and step identifiers are unique', () {
