@@ -46,6 +46,7 @@ expected_phrases = [
     "isolation or secrecy makes the habit feel easier to protect.",
     "you feel lonely, rejected, bored, or disconnected.",
     "you feel pressure to fix everything at once or prove yourself through perfection.",
+    "secrecy, broken promises, or a slip has affected trust in an important relationship.",
     "before bedtime, late-night scrolling, travel, or another predictable risk window.",
 ]
 
@@ -62,9 +63,9 @@ when_values = re.findall(
     catalog,
 )
 
-if len(when_values) != 6:
+if len(when_values) != 7:
     print(
-        "FAIL BW-87B5B2P expected 6 "
+        "FAIL BW-87B5B2P expected 7 "
         f"whenToUse values, found {len(when_values)}"
     )
     sys.exit(1)

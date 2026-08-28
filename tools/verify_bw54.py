@@ -18,10 +18,13 @@ checks = [
         "No charge can occur from this screen.",
     ]),
     ("launch/breakwave_plus_value_wall.md", [
-        "Beta status:",
-        "product concept",
-        "BreakWave Plus — Value Wall and Feature Map",
-        "Do not charge for BreakWave Plus until the paid section contains enough real value",
+        "Current pre-billing status:",
+        "BreakWave Plus — Current Value Map",
+        "Current delivered Plus value",
+        "Rebuild trust with honesty",
+        "optional private journal note",
+        "Major recovery-feature development should remain frozen after BW-89A12F",
+        "This product-value decision does **not** authorize charging users.",
         "breakwave_plus_paid_launch_gate.md",
     ]),
     ("launch/breakwave_plus_paid_launch_gate.md", [

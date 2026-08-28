@@ -229,6 +229,74 @@ void main() {
   );
 
   test(
+    'private journal note is backward compatible and survives restart',
+    () {
+      final ChristianJourneyProgress legacy =
+          ChristianJourneyProgress.fromMap(
+        <String, dynamic>{
+          'journeyId': 'grace-after-a-slip',
+          'currentStepIndex': 2,
+          'completedStepIds': <String>['scripture', 'context'],
+          'startedAtIso': '2026-08-27T10:00:00.000',
+          'updatedAtIso': '2026-08-27T10:05:00.000',
+          'currentRunCompletedAtIso': '',
+          'completionHistoryIso': <String>[],
+        },
+      );
+
+      expect(legacy.journalNote, isEmpty);
+
+      final ChristianJourneyProgress withNote =
+          legacy.withJournalNote(
+        note: '  I want to remember this.  ',
+        now: DateTime(2026, 8, 27, 10, 6),
+      );
+
+      expect(
+        withNote.journalNote,
+        'I want to remember this.',
+      );
+
+      final ChristianJourneyProgress restarted =
+          withNote.restart(
+        DateTime(2026, 8, 28, 9),
+      );
+
+      expect(
+        restarted.journalNote,
+        'I want to remember this.',
+      );
+    },
+  );
+
+  test(
+    'store saves and restores the private journey note',
+    () async {
+      final ChristianJourneyProgress progress =
+          ChristianJourneyProgress.emptyFor(
+        'rebuild-trust-with-honesty',
+      ).withJournalNote(
+        note: 'Practice listening without defending.',
+        now: DateTime(2026, 8, 27, 11),
+      );
+
+      await ChristianJourneyProgressStore
+          .saveProgress(progress);
+
+      final ChristianJourneyProgress? loaded =
+          await ChristianJourneyProgressStore.loadFor(
+        'rebuild-trust-with-honesty',
+      );
+
+      expect(loaded, isNotNull);
+      expect(
+        loaded!.journalNote,
+        'Practice listening without defending.',
+      );
+    },
+  );
+
+  test(
     'store rejects corrupt journey data safely',
     () async {
       SharedPreferences.setMockInitialValues(

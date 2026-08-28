@@ -23,14 +23,14 @@ journey_ids = re.findall(
     catalog,
 )
 
-if len(journey_ids) != 6:
+if len(journey_ids) != 7:
     print(
-        "FAIL BW-87B5A2 expected 6 journeys, "
+        "FAIL BW-87B5A2 expected 7 journeys, "
         f"found {len(journey_ids)}"
     )
     sys.exit(1)
 
-if len(set(journey_ids)) != 6:
+if len(set(journey_ids)) != 7:
     print("FAIL BW-87B5A2 journey IDs are not unique")
     sys.exit(1)
 
@@ -41,6 +41,7 @@ required_journeys = [
     "answer-loneliness-with-presence",
     "practice-small-integrity",
     "guard-the-night",
+    "rebuild-trust-with-honesty",
 ]
 
 for journey_id in required_journeys:
@@ -58,6 +59,7 @@ for reference in [
     "Psalm 34:18",
     "Luke 16:10",
     "Matthew 26:41",
+    "James 1:19",
 ]:
     if reference not in catalog:
         print(
@@ -88,7 +90,7 @@ for needle in [
         sys.exit(1)
 
 for needle in [
-    "catalog contains six complete Christian journeys",
+    "catalog contains seven complete Christian journeys",
     "journey and step identifiers are unique",
     "catalog prepares Rescue and personal plan actions",
     "catalog lookup returns the requested journey",
@@ -118,6 +120,6 @@ for forbidden in [
         sys.exit(1)
 
 print(
-    "PASS: BW-87B5A2 six complete Christian "
+    "PASS: BW-87B5A2 seven complete Christian "
     "recovery journeys and action targets verified."
 )

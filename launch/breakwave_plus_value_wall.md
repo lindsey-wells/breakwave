@@ -1,127 +1,98 @@
-> **Beta status:** This document is a product concept, not a list of currently delivered paid features. Paid launch is blocked until the requirements in `breakwave_plus_paid_launch_gate.md` are met.
+# BreakWave Plus — Current Value Map
 
-# BreakWave Plus — Value Wall and Feature Map
+> **Current pre-billing status:** This document describes the Plus recovery value delivered in the current app baseline. It is not a promise that subscriptions or purchases are live. Paid launch remains blocked by `breakwave_plus_paid_launch_gate.md` and the approved billing-readiness sequence.
 
 ## Product line
 
 Free = help me right now.
 
-BreakWave Plus = help me understand the pattern, build a plan, and keep changing.
+BreakWave Plus = help me understand the pattern, build a plan, practice recovery, involve accountability, and review progress over time.
 
-## Free core
+## Protected Free core
 
-BreakWave should keep immediate support free:
+Immediate recovery support remains free, including Rescue, basic logging, recent history/basic insights, recovery-mode choice, Personal Why basics, privacy basics, support resources, and trusted-contact basics.
 
-- Rescue
-- basic logging
-- recent history
-- basic insights
-- recovery mode choice
-- custom why basics
-- privacy basics
-- support resources
-- optional email capture
-- trusted contact basics
+## Current delivered Plus value
 
-## BreakWave Plus promise
+### 1. Deeper recovery insights
 
-BreakWave Plus is the deeper transformation layer.
+- real 30-day and 90-day recovery history from saved local logs
+- recorded trigger-frequency and timing observations
+- adjacent 7-day recovery review using aggregate counts
+- urge, victory, slip, and recorded-intensity summaries
+- helpful-actions-over-time counts from recorded victories
+- descriptive guardrails that do not predict relapse or claim causation
 
-It should help users:
+### 2. Saved personal recovery plan
 
-- see their patterns
-- prepare before danger windows
-- build a custom rescue plan
-- reflect without shame
-- involve accountability
-- use deeper Christian support if selected
-- export or review progress over time
+Users can create, save, review, update, and safely refresh a plan containing:
 
-## Launch pricing direction
-
-- BreakWave Plus Annual: $59.99/year
-- BreakWave Plus Monthly: $8.99/month
-- Annual shown first
-- Monthly secondary
-- No weekly plan at launch
-- No lifetime plan at launch
-
-## Plus pillars
-
-### 1. Deep Insights
-
-- longer recovery history
-- trigger trends
-- risky-time patterns
-- weekly summaries
-- slip/urge/victory breakdowns
-- what usually happens before a slip
-- what helps recovery happen fastest
-
-### 2. Custom Rescue Plan
-
-- top triggers
-- danger times
-- personal why
+- reasons for change and primary reason
+- primary triggers
+- danger windows
 - redirect actions
-- trusted person
-- faith anchor if Christian mode is selected
-- after-slip reset plan
+- trusted support
+- phone boundary
+- bedtime strategy
+- after-slip reset
+- optional faith support
 
-### 3. Guided Recovery Routines
+### 3. Guided recovery routines
 
-- morning reset
-- bedtime protection
-- after-slip recovery
-- loneliness plan
-- stress plan
-- secrecy breaker
-- phone boundary routine
-- weekend risk plan
+Six repeatable routines are delivered with saved progress, resume, completion history, and restart:
 
-### 4. Accountability Tools
+- Morning reset
+- Stress interruption
+- Loneliness response
+- Phone-boundary reset
+- Bedtime protection
+- Getting back on track (after-slip recovery)
 
-- trusted-person check-in templates
-- “I need help now” messages
-- after-slip honesty template
-- victory report template
-- weekly share summary
-- accountability export
+### 4. Accountability tools
 
-### 5. Premium Christian Depth
+- editable Weekly check-in template
+- editable After-slip honesty template
+- editable Victory update template
+- existing immediate support messages remain available in Free support
+- optional weekly aggregate section in Recovery Reports
+- deliberate preview and confirmation before report sharing
+- no automatic sending or automatic injection of private recovery logs into check-in messages
 
-- 7-Day Grace Reset
-- Shame Recovery Path
-- Secrecy Breaker Path
-- Loneliness Response Path
-- Rebuilding Integrity Path
-- Night Watch / Bedtime Temptation Path
-- prayers by trigger
-- accountability prompts
+### 5. Christian depth
 
-### 6. Advanced Privacy and Exports
+When Christian mode is selected, BreakWave includes seven repeatable multi-step journeys with Scripture references, context, reflection, practical action, prayer, saved progress, and links to Rescue or the personal recovery plan where appropriate:
 
-- longer export range
-- advanced export bundle
-- deeper privacy settings
-- future privacy hardening tools
+- Grace after a slip
+- Renew the next thought
+- Step into the light
+- Answer loneliness with presence
+- Practice small integrity
+- Rebuild trust with honesty
+- Guard the night
+
+Each journey also offers an optional private journal note during its Reflection step. The note is saved locally with that journey and is not included in Recovery Reports or exports.
+
+### 6. Privacy-controlled recovery reports and exports
+
+Users can deliberately build a private 30-day or 90-day Recovery Report from selected information, including applicable recovery summaries, trigger/timing observations, routine and Christian-journey completions, selected personal-plan details, and the optional adjacent 7-day review.
+
+Individual raw logs, private notes, Christian journey journal notes, and other excluded-by-design fields remain outside the report unless a future separately approved privacy contract says otherwise.
+
+## Product-value decision
+
+The Plus recovery system now satisfies the product-value closeout target for the MVP. Major recovery-feature development should remain frozen after BW-89A12F except for defects, safety/privacy fixes, or an explicitly approved post-MVP roadmap.
+
+This product-value decision does **not** authorize charging users.
 
 ## Billing status
 
-Before the Google Play Developer account exists, BreakWave Plus should be treated as a preview/value wall.
+Subscriptions and purchases are not live merely because the recovery value exists. Production billing still requires the approved Google Play/backend entitlement work, lifecycle handling, restore behavior, testing evidence, commercial configuration, and paid-release approval.
 
-Do not claim that real purchases are live until Play Billing, product IDs, subscriptions, and entitlement validation are connected.
+Do not hardcode or advertise a launch price, trial, billing period, or purchase availability from this document. Current commercial details must come from approved Google Play configuration when billing is actually enabled.
 
-## Launch rule
+## Paid launch rule
 
-Do not charge for BreakWave Plus until the paid section contains enough real value to justify the price.
+Do not charge for BreakWave Plus until both conditions are true:
 
-Minimum paid launch target:
-
-- clear Plus screen
-- real feature list
-- faith depth pack
-- guided routine content
-- at least one deeper insight surface
-- at least one accountability template/tool
-- exports or longer history
+1. the recovery-value requirements in `breakwave_plus_paid_launch_gate.md` are satisfied; and
+2. the full billing, entitlement, lifecycle, privacy, testing, and owner-approval gates are satisfied.

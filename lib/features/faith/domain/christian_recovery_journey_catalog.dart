@@ -268,6 +268,56 @@ class ChristianRecoveryJourneyCatalog {
       ],
     ),
     ChristianRecoveryJourney(
+      id: 'rebuild-trust-with-honesty',
+      title: 'Rebuild trust with honesty',
+      summary:
+          'Own what is yours, listen without demanding a quick repair, and practice one trustworthy action at a time.',
+      whenToUse:
+          'secrecy, broken promises, or a slip has affected trust in an important relationship.',
+      estimatedMinutes: 11,
+      steps: <ChristianJourneyStep>[
+        ChristianJourneyStep(
+          id: 'repair-scripture',
+          kind: ChristianJourneyStepKind.scripture,
+          title: 'Listen before defending',
+          scriptureReference: 'James 1:19',
+          body:
+              'Read the passage and notice the call to be quick to listen, slow to speak, and slow to anger. Repair begins with humility, not control.',
+        ),
+        ChristianJourneyStep(
+          id: 'repair-context',
+          kind: ChristianJourneyStepKind.context,
+          title: 'Trust cannot be demanded',
+          body:
+              'You can own your choices, tell the truth appropriately, listen, and change your behavior. The other person still controls their response, boundaries, timing, and forgiveness. If disclosure could be unsafe or harmful, seek appropriate professional or pastoral guidance before acting.',
+        ),
+        ChristianJourneyStep(
+          id: 'repair-reflection',
+          kind: ChristianJourneyStepKind.reflection,
+          title: 'Name what is yours to repair',
+          body:
+              'What broken promise, secrecy, defensiveness, or repeated behavior is yours to acknowledge without excuses? What would respectful listening look like if the other person is hurt or cautious?',
+        ),
+        ChristianJourneyStep(
+          id: 'repair-action',
+          kind: ChristianJourneyStepKind.action,
+          title: 'Choose one trustworthy action',
+          body:
+              'Choose one repair you control: a truthful apology, respecting requested space, keeping a boundary, making practical restitution, or repeating a trustworthy behavior. Open your recovery plan and make that action concrete.',
+          actionTarget:
+              ChristianJourneyActionTarget.personalPlan,
+          actionLabel: 'Open personal recovery plan',
+        ),
+        ChristianJourneyStep(
+          id: 'repair-prayer',
+          kind: ChristianJourneyStepKind.prayer,
+          title: 'Pray for humility and patience',
+          body:
+              'God, help me tell the truth without defending myself, listen without controlling the outcome, respect healthy boundaries, and rebuild trust through patient, consistent integrity.',
+        ),
+      ],
+    ),
+    ChristianRecoveryJourney(
       id: 'guard-the-night',
       title: 'Guard the night',
       summary:

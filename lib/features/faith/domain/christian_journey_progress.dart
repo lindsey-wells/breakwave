@@ -15,6 +15,7 @@ class ChristianJourneyProgress {
     required this.updatedAtIso,
     required this.currentRunCompletedAtIso,
     required this.completionHistoryIso,
+    this.journalNote = '',
   });
 
   final String journeyId;
@@ -26,6 +27,9 @@ class ChristianJourneyProgress {
   final String currentRunCompletedAtIso;
 
   final List<String> completionHistoryIso;
+
+  // Optional private note for this journey only.
+  final String journalNote;
 
   static ChristianJourneyProgress emptyFor(
     String journeyId,
@@ -88,6 +92,7 @@ class ChristianJourneyProgress {
       currentRunCompletedAtIso: '',
       completionHistoryIso:
           completionHistoryIso,
+      journalNote: journalNote,
     );
   }
 
@@ -159,6 +164,27 @@ class ChristianJourneyProgress {
           List<String>.unmodifiable(
         history,
       ),
+      journalNote: journalNote,
+    );
+  }
+
+  ChristianJourneyProgress withJournalNote({
+    required String note,
+    required DateTime now,
+  }) {
+    return ChristianJourneyProgress(
+      journeyId: journeyId,
+      currentStepIndex: currentStepIndex,
+      completedStepIds: completedStepIds,
+      startedAtIso: startedAtIso,
+      updatedAtIso: now.toIso8601String(),
+      currentRunCompletedAtIso:
+          currentRunCompletedAtIso,
+      completionHistoryIso:
+          List<String>.unmodifiable(
+        completionHistoryIso,
+      ),
+      journalNote: note.trim(),
     );
   }
 
@@ -180,6 +206,7 @@ class ChristianJourneyProgress {
           List<String>.unmodifiable(
         completionHistoryIso,
       ),
+      journalNote: journalNote,
     );
   }
 
@@ -196,6 +223,7 @@ class ChristianJourneyProgress {
           currentRunCompletedAtIso,
       'completionHistoryIso':
           completionHistoryIso,
+      'journalNote': journalNote,
     };
   }
 
@@ -232,6 +260,10 @@ class ChristianJourneyProgress {
           _normalizedList(
         map['completionHistoryIso'],
       ),
+      journalNote:
+          (map['journalNote'] ?? '')
+              .toString()
+              .trim(),
     );
   }
 

@@ -6,11 +6,11 @@ import 'package:breakwave/features/faith/domain/christian_recovery_journey_catal
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
-  test('catalog contains six complete Christian journeys', () {
+  test('catalog contains seven complete Christian journeys', () {
     final List<ChristianRecoveryJourney> journeys =
         ChristianRecoveryJourneyCatalog.journeys;
 
-    expect(journeys.length, 6);
+    expect(journeys.length, 7);
 
     for (final ChristianRecoveryJourney journey
         in journeys) {
@@ -44,6 +44,25 @@ void main() {
         isTrue,
       );
     }
+  });
+
+  test('relationship repair journey protects agency and safety', () {
+    final ChristianRecoveryJourney? journey =
+        ChristianRecoveryJourneyCatalog.findById(
+      'rebuild-trust-with-honesty',
+    );
+
+    expect(journey, isNotNull);
+    expect(journey!.title, 'Rebuild trust with honesty');
+    expect(journey.hasRequiredFlow, isTrue);
+
+    final String combined = journey.steps
+        .map((ChristianJourneyStep step) => step.body)
+        .join(' ');
+
+    expect(combined, contains('Trust cannot be demanded'));
+    expect(combined, contains('controls their response'));
+    expect(combined, contains('professional or pastoral guidance'));
   });
 
   test('journey and step identifiers are unique', () {

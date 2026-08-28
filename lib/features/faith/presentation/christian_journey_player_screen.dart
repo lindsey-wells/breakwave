@@ -37,6 +37,9 @@ class _ChristianJourneyPlayerScreenState
     extends State<ChristianJourneyPlayerScreen> {
   ChristianJourneyProgress? _progress;
 
+  final TextEditingController _journalController =
+      TextEditingController();
+
   bool _loading = true;
   bool _saving = false;
 
@@ -49,6 +52,12 @@ class _ChristianJourneyPlayerScreenState
     _loadProgress();
   }
 
+  @override
+  void dispose() {
+    _journalController.dispose();
+    super.dispose();
+  }
+
   Future<void> _loadProgress() async {
     try {
       final ChristianJourneyProgress? saved =
@@ -59,11 +68,16 @@ class _ChristianJourneyPlayerScreenState
 
       if (!mounted) return;
 
+      final ChristianJourneyProgress loaded =
+          saved ??
+              ChristianJourneyProgress.emptyFor(
+                widget.journey.id,
+              );
+
+      _journalController.text = loaded.journalNote;
+
       setState(() {
-        _progress = saved ??
-            ChristianJourneyProgress.emptyFor(
-              widget.journey.id,
-            );
+        _progress = loaded;
 
         _loading = false;
         _errorMessage = null;
@@ -152,12 +166,22 @@ class _ChristianJourneyPlayerScreenState
     });
 
     try {
+      final DateTime now = DateTime.now();
+
+      final ChristianJourneyProgress baseProgress =
+          step.kind == ChristianJourneyStepKind.reflection
+              ? progress.withJournalNote(
+                  note: _journalController.text,
+                  now: now,
+                )
+              : progress;
+
       final ChristianJourneyProgress updated =
-          progress.completeCurrentStep(
+          baseProgress.completeCurrentStep(
         stepId: step.id,
         totalSteps:
             widget.journey.steps.length,
-        now: DateTime.now(),
+        now: now,
       );
 
       await ChristianJourneyProgressStore
@@ -183,6 +207,87 @@ class _ChristianJourneyPlayerScreenState
             'The journey remains open.';
       });
     }
+  }
+
+  Future<void> _saveJournalNote() async {
+    if (_saving) return;
+
+    final ChristianJourneyProgress progress =
+        _progress ??
+            ChristianJourneyProgress.emptyFor(
+              widget.journey.id,
+            );
+
+    setState(() {
+      _saving = true;
+      _statusMessage = null;
+    });
+
+    try {
+      final ChristianJourneyProgress updated =
+          progress.withJournalNote(
+        note: _journalController.text,
+        now: DateTime.now(),
+      );
+
+      await ChristianJourneyProgressStore
+          .saveProgress(updated);
+
+      if (!mounted) return;
+
+      _journalController.text = updated.journalNote;
+
+      setState(() {
+        _progress = updated;
+        _saving = false;
+        _statusMessage = updated.journalNote.isEmpty
+            ? 'Private journal note cleared.'
+            : 'Private journal note saved on this device.';
+      });
+    } catch (_) {
+      if (!mounted) return;
+
+      setState(() {
+        _saving = false;
+        _statusMessage =
+            'BreakWave could not save this private note.';
+      });
+    }
+  }
+
+  Future<void> _clearJournalNote() async {
+    if (_saving) return;
+
+    final bool? clear = await showDialog<bool>(
+      context: context,
+      builder: (BuildContext dialogContext) {
+        return AlertDialog(
+          title: const Text('Clear private journal note?'),
+          content: const Text(
+            'This removes the note saved with this journey. '
+            'Journey progress and completion history stay intact.',
+          ),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () =>
+                  Navigator.of(dialogContext).pop(false),
+              child: const Text('Cancel'),
+            ),
+            FilledButton(
+              key: const Key('christian-journal-confirm-clear'),
+              onPressed: () =>
+                  Navigator.of(dialogContext).pop(true),
+              child: const Text('Clear note'),
+            ),
+          ],
+        );
+      },
+    );
+
+    if (clear != true || !mounted) return;
+
+    _journalController.clear();
+    await _saveJournalNote();
   }
 
   Future<void> _restartJourney() async {
@@ -633,6 +738,11 @@ class _ChristianJourneyPlayerScreenState
                     .textTheme
                     .bodyLarge,
               ),
+              if (currentStep.kind ==
+                  ChristianJourneyStepKind.reflection) ...<Widget>[
+                const SizedBox(height: 18),
+                _buildPrivateJournal(context),
+              ],
               if (currentStep.hasAction &&
                   widget.onActionRequested !=
                       null) ...<Widget>[
@@ -733,6 +843,81 @@ class _ChristianJourneyPlayerScreenState
           ),
         ),
       ],
+    );
+  }
+
+  Widget _buildPrivateJournal(
+    BuildContext context,
+  ) {
+    return Container(
+      key: const Key('christian-journey-private-journal'),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Theme.of(context)
+            .colorScheme
+            .surface,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: Theme.of(context)
+              .colorScheme
+              .outlineVariant,
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          Text(
+            'Private journal note (optional)',
+            style: Theme.of(context)
+                .textTheme
+                .titleMedium
+                ?.copyWith(
+                  fontWeight: FontWeight.w800,
+                ),
+          ),
+          const SizedBox(height: 6),
+          const Text(
+            'Saved only on this device with this journey. '
+            'It is not included in Recovery Reports or exports.',
+          ),
+          const SizedBox(height: 12),
+          TextField(
+            key: const Key('christian-journey-journal-note'),
+            controller: _journalController,
+            minLines: 3,
+            maxLines: 7,
+            decoration: const InputDecoration(
+              labelText: 'What do you want to remember?',
+              hintText:
+                  'Write as much or as little as is useful. You can leave this blank.',
+            ),
+          ),
+          const SizedBox(height: 10),
+          const Text(
+            'Save the note now, or it will save when you complete this Reflection step.',
+          ),
+          const SizedBox(height: 12),
+          Row(
+            children: <Widget>[
+              Expanded(
+                child: FilledButton.tonal(
+                  key: const Key('christian-journal-save'),
+                  onPressed:
+                      _saving ? null : _saveJournalNote,
+                  child: const Text('Save note'),
+                ),
+              ),
+              const SizedBox(width: 10),
+              TextButton(
+                key: const Key('christian-journal-clear'),
+                onPressed:
+                    _saving ? null : _clearJournalNote,
+                child: const Text('Clear'),
+              ),
+            ],
+          ),
+        ],
+      ),
     );
   }
 
