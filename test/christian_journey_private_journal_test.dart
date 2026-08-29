@@ -75,6 +75,18 @@ void main() {
       await tester.tap(saveButton);
       await tester.pumpAndSettle();
 
+      expect(find.text('✓ Saved'), findsOneWidget);
+      expect(
+        find.byKey(
+          const Key('christian-journal-saved-confirmation'),
+        ),
+        findsOneWidget,
+      );
+      expect(
+        find.text('Private note saved on this device.'),
+        findsOneWidget,
+      );
+
       final ChristianJourneyProgress? saved =
           await ChristianJourneyProgressStore.loadFor(
         reflectionJourney.id,
@@ -82,6 +94,22 @@ void main() {
 
       expect(saved, isNotNull);
       expect(saved!.journalNote, 'Remember to listen first.');
+
+      await tester.enterText(
+        find.byKey(
+          const Key('christian-journey-journal-note'),
+        ),
+        'Remember to listen first and slow down.',
+      );
+      await tester.pump();
+
+      expect(find.text('Save note'), findsOneWidget);
+      expect(
+        find.byKey(
+          const Key('christian-journal-saved-confirmation'),
+        ),
+        findsNothing,
+      );
     },
   );
 

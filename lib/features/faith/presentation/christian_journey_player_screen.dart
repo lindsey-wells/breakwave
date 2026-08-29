@@ -42,6 +42,7 @@ class _ChristianJourneyPlayerScreenState
 
   bool _loading = true;
   bool _saving = false;
+  bool _journalSaved = false;
 
   String? _errorMessage;
   String? _statusMessage;
@@ -78,6 +79,7 @@ class _ChristianJourneyPlayerScreenState
 
       setState(() {
         _progress = loaded;
+        _journalSaved = loaded.journalNote.isNotEmpty;
 
         _loading = false;
         _errorMessage = null;
@@ -240,6 +242,7 @@ class _ChristianJourneyPlayerScreenState
       setState(() {
         _progress = updated;
         _saving = false;
+        _journalSaved = updated.journalNote.isNotEmpty;
         _statusMessage = updated.journalNote.isEmpty
             ? 'Private journal note cleared.'
             : 'Private journal note saved on this device.';
@@ -884,6 +887,13 @@ class _ChristianJourneyPlayerScreenState
           TextField(
             key: const Key('christian-journey-journal-note'),
             controller: _journalController,
+            onChanged: (_) {
+              if (_journalSaved) {
+                setState(() {
+                  _journalSaved = false;
+                });
+              }
+            },
             minLines: 3,
             maxLines: 7,
             decoration: const InputDecoration(
@@ -904,7 +914,13 @@ class _ChristianJourneyPlayerScreenState
                   key: const Key('christian-journal-save'),
                   onPressed:
                       _saving ? null : _saveJournalNote,
-                  child: const Text('Save note'),
+                  child: Text(
+                    _saving
+                        ? 'Saving...'
+                        : _journalSaved
+                            ? '✓ Saved'
+                            : 'Save note',
+                  ),
                 ),
               ),
               const SizedBox(width: 10),
@@ -916,6 +932,21 @@ class _ChristianJourneyPlayerScreenState
               ),
             ],
           ),
+          if (_journalSaved) ...<Widget>[
+            const SizedBox(height: 8),
+            Text(
+              'Private note saved on this device.',
+              key: const Key(
+                'christian-journal-saved-confirmation',
+              ),
+              style: Theme.of(context)
+                  .textTheme
+                  .bodySmall
+                  ?.copyWith(
+                    fontWeight: FontWeight.w700,
+                  ),
+            ),
+          ],
         ],
       ),
     );
