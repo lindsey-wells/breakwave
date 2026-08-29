@@ -10,6 +10,7 @@ import 'package:flutter/foundation.dart';
 import 'package:purchases_flutter/purchases_flutter.dart';
 
 import '../access/breakwave_entitlement_source.dart';
+import 'revenuecat_catalog_contract.dart';
 import 'revenuecat_entitlement_policy.dart';
 import 'revenuecat_trusted_state_store.dart';
 
@@ -111,6 +112,8 @@ class RevenueCatEntitlementSource
     return RevenueCatEntitlementSource(
       entitlementId: const String.fromEnvironment(
         'BREAKWAVE_REVENUECAT_PLUS_ENTITLEMENT_ID',
+        defaultValue:
+            RevenueCatCatalogContract.plusEntitlementId,
       ),
       observationProvider:
           const RevenueCatSdkEntitlementObservationProvider(),
