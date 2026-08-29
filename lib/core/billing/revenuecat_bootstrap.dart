@@ -39,6 +39,9 @@ class RevenueCatBootstrap {
       final PurchasesConfiguration configuration =
           PurchasesConfiguration(_androidPublicSdkKey);
 
+      configuration.entitlementVerificationMode =
+          EntitlementVerificationMode.informational;
+
       await Purchases.configure(configuration);
     } catch (_) {
       // RevenueCat initialization is optional at app launch.
