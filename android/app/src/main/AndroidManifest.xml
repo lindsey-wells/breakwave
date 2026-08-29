@@ -4,12 +4,12 @@
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
     <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM"/>
     <application
-        android:label="BreakWave"
+        android:label="${breakWaveAppLabel}"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher"
         android:roundIcon="@mipmap/ic_launcher_round">
         <activity
-            android:name=".MainActivity"
+            android:name="com.cube23.breakwave.MainActivity"
             android:exported="true"
             android:launchMode="singleTop"
             android:taskAffinity=""
@@ -39,7 +39,7 @@
         <meta-data
             android:name="flutterEmbedding"
             android:value="2" />
-    
+
         <receiver
             android:exported="false"
             android:name="com.dexterous.flutterlocalnotifications.ScheduledNotificationReceiver" />
@@ -54,9 +54,8 @@
             </intent-filter>
         </receiver>
 
-    
         <receiver
-            android:name=".BreakWaveHomeWidgetProvider"
+            android:name="com.cube23.breakwave.BreakWaveHomeWidgetProvider"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />

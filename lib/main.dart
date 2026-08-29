@@ -11,6 +11,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 
 import 'app/breakwave_app.dart';
+import 'core/billing/breakwave_billing_qa_config.dart';
 import 'core/billing/revenuecat_bootstrap.dart';
 import 'core/privacy/privacy_settings.dart';
 import 'core/privacy/privacy_settings_store.dart';
@@ -35,6 +36,16 @@ Future<void> main() async {
     // Screen privacy is a best-effort shield. Never let it block app launch.
   }
 
+  // WP-03V-T2 Test Store QA is an explicit build-only lane. Await
+  // RevenueCat there so the Billing QA console opens against a configured
+  // SDK. Production keeps the existing non-blocking bootstrap behavior.
+  if (BreakWaveBillingQaConfig.enabled) {
+    await RevenueCatBootstrap.initialize();
+  }
+
   runApp(const BreakWaveApp());
-  unawaited(RevenueCatBootstrap.initialize());
+
+  if (!BreakWaveBillingQaConfig.enabled) {
+    unawaited(RevenueCatBootstrap.initialize());
+  }
 }

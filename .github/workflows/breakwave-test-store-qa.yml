@@ -1,0 +1,238 @@
+name: BreakWave Test Store QA
+
+run-name: ${{ inputs.run_label || format('BreakWave Test Store QA — {0}', github.ref_name) }}
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+  BREAKWAVE_FLUTTER_VERSION: '3.44.9'
+
+on:
+  workflow_dispatch:
+    inputs:
+      run_label:
+        description: 'Optional QA mission label shown in Actions'
+        required: false
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: breakwave-test-store-qa-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  test-store-qa:
+    name: Verify + Build Test Store APK
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout exact QA commit
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Java
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          flutter-version: ${{ env.BREAKWAVE_FLUTTER_VERSION }}
+          cache: true
+
+      - name: Verify pinned Flutter version
+        shell: bash
+        run: |
+          set -euo pipefail
+          flutter --version | tee /tmp/breakwave_flutter_version.txt
+          grep -F "Flutter ${BREAKWAVE_FLUTTER_VERSION}" /tmp/breakwave_flutter_version.txt
+
+      - name: Require Test Store public SDK key
+        shell: bash
+        env:
+          TEST_STORE_PUBLIC_SDK_KEY: ${{ secrets.BREAKWAVE_REVENUECAT_TEST_STORE_PUBLIC_SDK_KEY }}
+        run: |
+          set -euo pipefail
+          if [ -z "$TEST_STORE_PUBLIC_SDK_KEY" ]; then
+            echo "::error::BREAKWAVE_REVENUECAT_TEST_STORE_PUBLIC_SDK_KEY is not configured."
+            exit 1
+          fi
+          echo "Test Store public SDK key is configured (value intentionally not printed)."
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Verify T2 static isolation contract
+        run: |
+          set -euo pipefail
+          python3 tools/verify_bw_wp03v.py
+          python3 tools/verify_bw_wp03vt1.py
+          python3 tools/verify_bw_wp03vt2.py
+
+      - name: Analyze
+        run: flutter analyze --no-fatal-infos
+
+      - name: Test
+        run: flutter test
+
+      - name: Build isolated Test Store QA APK
+        shell: bash
+        env:
+          TEST_STORE_PUBLIC_SDK_KEY: ${{ secrets.BREAKWAVE_REVENUECAT_TEST_STORE_PUBLIC_SDK_KEY }}
+          ORG_GRADLE_PROJECT_breakwaveTestStoreQa: 'true'
+        run: |
+          set -euo pipefail
+
+          DEFINE_FILE="$RUNNER_TEMP/breakwave-test-store-defines.json"
+          cleanup() {
+            rm -f -- "$DEFINE_FILE"
+          }
+          trap cleanup EXIT
+
+          python3 - "$DEFINE_FILE" <<'PY'
+          import json
+          import os
+          import sys
+          from pathlib import Path
+
+          key = os.environ.get("TEST_STORE_PUBLIC_SDK_KEY", "")
+          if not key:
+              raise SystemExit("Test Store public SDK key missing.")
+
+          Path(sys.argv[1]).write_text(
+              json.dumps(
+                  {
+                      "BREAKWAVE_REVENUECAT_TEST_STORE_QA": "true",
+                      "BREAKWAVE_REVENUECAT_ANDROID_PUBLIC_SDK_KEY": key,
+                  }
+              ),
+              encoding="utf-8",
+          )
+          os.chmod(sys.argv[1], 0o600)
+          PY
+
+          flutter build apk \
+            --release \
+            --dart-define-from-file="$DEFINE_FILE"
+
+          cleanup
+          trap - EXIT
+
+      - name: Verify isolated APK identity
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          APK="build/app/outputs/flutter-apk/app-release.apk"
+          test -s "$APK"
+
+          AAPT="$(
+            find "$ANDROID_SDK_ROOT/build-tools" \
+              -type f -name aapt -perm -111 |
+            sort -V |
+            tail -n 1
+          )"
+          test -x "$AAPT"
+
+          mkdir -p test_store_qa_evidence
+          "$AAPT" dump badging "$APK" > test_store_qa_evidence/aapt_badging.txt
+
+          grep -F "package: name='com.cube23.breakwave.teststoreqa'" \
+            test_store_qa_evidence/aapt_badging.txt
+
+          grep -F "application-label:'BreakWave Test Store'" \
+            test_store_qa_evidence/aapt_badging.txt
+
+          if grep -F "package: name='com.cube23.breakwave'" \
+              test_store_qa_evidence/aapt_badging.txt; then
+            echo "::error::QA artifact resolved to the production package ID."
+            exit 1
+          fi
+
+          sha256sum "$APK" > test_store_qa_evidence/apk.sha256
+
+      - name: Verify Test Store key never entered tracked source
+        shell: bash
+        env:
+          TEST_STORE_PUBLIC_SDK_KEY: ${{ secrets.BREAKWAVE_REVENUECAT_TEST_STORE_PUBLIC_SDK_KEY }}
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import os
+          import subprocess
+          from pathlib import Path
+
+          secret = os.environ["TEST_STORE_PUBLIC_SDK_KEY"].encode("utf-8")
+          tracked = subprocess.check_output(["git", "ls-files", "-z"]).split(b"\0")
+
+          for raw in tracked:
+              if not raw:
+                  continue
+              path = Path(raw.decode("utf-8", "surrogateescape"))
+              try:
+                  data = path.read_bytes()
+              except OSError:
+                  continue
+              if secret and secret in data:
+                  raise SystemExit(
+                      "Test Store public SDK key value found in tracked repository source."
+                  )
+
+          print("PASS: Test Store public SDK key value is absent from tracked source.")
+          PY
+
+      - name: Write QA evidence metadata
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p test_store_qa_evidence
+
+          python3 - <<'PY'
+          import json
+          import os
+          import subprocess
+          from pathlib import Path
+
+          payload = {
+              "branch": os.environ.get("GITHUB_REF_NAME", ""),
+              "commit": subprocess.check_output(
+                  ["git", "rev-parse", "HEAD"], text=True
+              ).strip(),
+              "qa_flag": True,
+              "application_id": "com.cube23.breakwave.teststoreqa",
+              "application_label": "BreakWave Test Store",
+              "test_store_key_present": True,
+              "test_store_key_value_recorded": False,
+              "production_application_id": "com.cube23.breakwave",
+              "production_signing_secrets_used": False,
+              "aab_built": False,
+              "artifact_purpose": "RevenueCat Test Store device QA only",
+          }
+
+          Path("test_store_qa_evidence/summary.json").write_text(
+              json.dumps(payload, indent=2, sort_keys=True) + "\n",
+              encoding="utf-8",
+          )
+          PY
+
+      - name: Upload Test Store QA evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: breakwave-test-store-qa-evidence
+          path: test_store_qa_evidence/**
+          if-no-files-found: error
+          retention-days: 14
+
+      - name: Upload isolated Test Store QA APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: breakwave-test-store-qa-apk
+          path: build/app/outputs/flutter-apk/app-release.apk
+          if-no-files-found: error
+          retention-days: 7
