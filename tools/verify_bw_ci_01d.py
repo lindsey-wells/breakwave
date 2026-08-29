@@ -15,6 +15,7 @@ source = RUNNER.read_text(encoding="utf-8")
 
 required = (
     "PHASE_VERIFIER_REFS",
+    '"tools/verify_bw87b6p2.py": "bw87b6p2-green"',
     '"tools/verify_bw88rc1e.py": "bw-88rc1k-green"',
     '"tools/verify_bw88rc1k.py": "bw-88rc1k-green"',
     '"tools/verify_bw_wp03r.py": "02136802599b5a286cf42d98217da7b4f696e50b"',
