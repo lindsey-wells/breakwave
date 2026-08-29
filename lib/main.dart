@@ -6,9 +6,12 @@
 // Notes: Initializes local notifications for BW-22 and hardens launch for BW-34.
 // ------------------------------------------------------------
 
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 
 import 'app/breakwave_app.dart';
+import 'core/billing/revenuecat_bootstrap.dart';
 import 'core/privacy/privacy_settings.dart';
 import 'core/privacy/privacy_settings_store.dart';
 import 'core/privacy/screen_privacy_service.dart';
@@ -33,4 +36,5 @@ Future<void> main() async {
   }
 
   runApp(const BreakWaveApp());
+  unawaited(RevenueCatBootstrap.initialize());
 }
