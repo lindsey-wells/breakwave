@@ -9,9 +9,11 @@
 
 import 'package:flutter/material.dart';
 
+import '../../../core/billing/breakwave_billing_qa_config.dart';
 import '../../../core/privacy_lock/privacy_lock_mode.dart';
 import '../../../core/privacy_lock/privacy_lock_settings.dart';
 import '../../../core/privacy_lock/privacy_lock_store.dart';
+import '../../billing_qa/presentation/billing_qa_screen.dart';
 import '../../guided_routines/domain/recovery_routine.dart';
 import '../../home/presentation/home_screen.dart';
 import '../../log/presentation/log_screen.dart';
@@ -223,6 +225,8 @@ class _BreakWaveShellState extends State<BreakWaveShell>
         onRoutineActionRequested:
             _handleRoutineActionRequested,
       ),
+      if (BreakWaveBillingQaConfig.enabled)
+        const BillingQaScreen(),
     ];
 
     return Scaffold(
@@ -261,6 +265,12 @@ class _BreakWaveShellState extends State<BreakWaveShell>
             selectedIcon: Icon(Icons.support),
             label: 'Support',
           ),
+          if (BreakWaveBillingQaConfig.enabled)
+            NavigationDestination(
+              icon: Icon(Icons.science_outlined),
+              selectedIcon: Icon(Icons.science),
+              label: 'Billing QA',
+            ),
         ],
       ),
     );
