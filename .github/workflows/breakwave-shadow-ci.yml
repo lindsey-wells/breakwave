@@ -102,6 +102,15 @@ jobs:
       - name: Run complete Shadow verification
         run: python3 .github/scripts/run_breakwave_shadow_ci.py
 
+      - name: Capture resolved dependency lock
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -s pubspec.lock
+          mkdir -p shadow_evidence
+          cp pubspec.lock shadow_evidence/pubspec.lock.resolved
+          sha256sum pubspec.lock > shadow_evidence/pubspec.lock.resolved.sha256
+
       - name: Upload Shadow evidence
         if: always()
         uses: actions/upload-artifact@v4

@@ -17,8 +17,27 @@ class RevenueCatCatalogContract {
 
   static const String defaultOfferingId = 'default';
 
+  static const String monthlyPackageIdentifier =
+      r'$rc_monthly';
+
+  static const String annualPackageIdentifier =
+      r'$rc_annual';
+
+  static const String testStoreMonthlyProductIdentifier =
+      'monthly';
+
+  static const String testStoreAnnualProductIdentifier =
+      'yearly';
+
   static const String googlePlayProductPrefix =
       '$googlePlaySubscriptionId:';
+
+  static bool isSupportedPurchasePackage(
+    String identifier,
+  ) {
+    return identifier == monthlyPackageIdentifier ||
+        identifier == annualPackageIdentifier;
+  }
 
   static bool isBreakWavePlusGoogleProduct(
     String identifier,
