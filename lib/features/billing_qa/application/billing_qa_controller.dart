@@ -9,6 +9,7 @@ import '../../../core/access/breakwave_entitlement_source.dart';
 import '../../../core/billing/breakwave_billing_composition.dart';
 import '../../../core/billing/revenuecat_catalog_contract.dart';
 import '../../../core/billing/revenuecat_catalog_service.dart';
+import '../../../core/billing/revenuecat_entitlement_source.dart';
 import '../../../core/billing/revenuecat_purchase_lifecycle.dart';
 
 enum BreakWaveBillingQaAction {
@@ -25,6 +26,7 @@ class BreakWaveBillingQaSnapshot {
     required this.packages,
     required this.catalogIssues,
     required this.trustedPlusUnlocked,
+    required this.entitlementDiagnostic,
     this.errorMessage,
   });
 
@@ -34,6 +36,8 @@ class BreakWaveBillingQaSnapshot {
   final List<RevenueCatCatalogPackageRecord> packages;
   final List<String> catalogIssues;
   final bool trustedPlusUnlocked;
+  final RevenueCatEntitlementDiagnosticSnapshot?
+      entitlementDiagnostic;
   final String? errorMessage;
 
   bool get catalogReady => catalogIssues.isEmpty;
@@ -57,10 +61,14 @@ class BreakWaveBillingQaController {
     required RevenueCatCatalogProvider catalogProvider,
     required RevenueCatPurchaseLifecycleService purchaseLifecycle,
     required BreakWaveEntitlementSource entitlementSource,
+    RevenueCatEntitlementDiagnosticsProvider?
+        entitlementDiagnosticsProvider,
   })  : _runtimeStatusProvider = runtimeStatusProvider,
         _catalogProvider = catalogProvider,
         _purchaseLifecycle = purchaseLifecycle,
-        _entitlementSource = entitlementSource;
+        _entitlementSource = entitlementSource,
+        _entitlementDiagnosticsProvider =
+            entitlementDiagnosticsProvider;
 
   factory BreakWaveBillingQaController.fromComposition(
     BreakWaveBillingComposition composition,
@@ -70,6 +78,8 @@ class BreakWaveBillingQaController {
       catalogProvider: composition.catalogProvider,
       purchaseLifecycle: composition.purchaseLifecycle,
       entitlementSource: composition.entitlementSource,
+      entitlementDiagnosticsProvider:
+          composition.entitlementDiagnosticsProvider,
     );
   }
 
@@ -77,6 +87,8 @@ class BreakWaveBillingQaController {
   final RevenueCatCatalogProvider _catalogProvider;
   final RevenueCatPurchaseLifecycleService _purchaseLifecycle;
   final BreakWaveEntitlementSource _entitlementSource;
+  final RevenueCatEntitlementDiagnosticsProvider?
+      _entitlementDiagnosticsProvider;
 
   Future<BreakWaveBillingQaSnapshot> refresh() {
     return _loadSnapshot();
@@ -176,6 +188,10 @@ class BreakWaveBillingQaController {
       }
     }
 
+    final RevenueCatEntitlementDiagnosticSnapshot?
+        entitlementDiagnostic =
+        _entitlementDiagnosticsProvider?.lastDiagnostic;
+
     final List<RevenueCatCatalogPackageRecord> packages =
         List<RevenueCatCatalogPackageRecord>.of(
       catalogSnapshot.packages,
@@ -204,6 +220,7 @@ class BreakWaveBillingQaController {
       ),
       catalogIssues: List<String>.unmodifiable(issues),
       trustedPlusUnlocked: trustedPlusUnlocked,
+      entitlementDiagnostic: entitlementDiagnostic,
       errorMessage: errorMessage,
     );
   }

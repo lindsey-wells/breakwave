@@ -37,6 +37,8 @@ class BreakWaveBillingComposition {
     required RevenueCatPurchaseExecutor purchaseExecutor,
     required RevenueCatCatalogProvider catalogProvider,
     required RevenueCatRuntimeStatusProvider runtimeStatusProvider,
+    RevenueCatEntitlementDiagnosticsProvider?
+        entitlementDiagnosticsProvider,
     void Function()? disposeEntitlementSource,
   })  : entitlementSource = entitlementSource,
         accessService = BreakWaveAccessService(
@@ -48,6 +50,8 @@ class BreakWaveBillingComposition {
         ),
         catalogProvider = catalogProvider,
         runtimeStatusProvider = runtimeStatusProvider,
+        entitlementDiagnosticsProvider =
+            entitlementDiagnosticsProvider,
         _disposeEntitlementSource = disposeEntitlementSource;
 
   factory BreakWaveBillingComposition.production() {
@@ -60,6 +64,7 @@ class BreakWaveBillingComposition {
       catalogProvider: const RevenueCatSdkCatalogProvider(),
       runtimeStatusProvider:
           const RevenueCatSdkRuntimeStatusProvider(),
+      entitlementDiagnosticsProvider: entitlementSource,
       disposeEntitlementSource: entitlementSource.dispose,
     );
   }
@@ -69,6 +74,8 @@ class BreakWaveBillingComposition {
   final RevenueCatPurchaseLifecycleService purchaseLifecycle;
   final RevenueCatCatalogProvider catalogProvider;
   final RevenueCatRuntimeStatusProvider runtimeStatusProvider;
+  final RevenueCatEntitlementDiagnosticsProvider?
+      entitlementDiagnosticsProvider;
 
   final void Function()? _disposeEntitlementSource;
   bool _disposed = false;

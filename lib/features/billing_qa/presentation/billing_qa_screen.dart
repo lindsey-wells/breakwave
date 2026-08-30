@@ -10,6 +10,8 @@ import 'package:flutter/material.dart';
 
 import '../../../core/billing/breakwave_billing_scope.dart';
 import '../../../core/billing/revenuecat_catalog_service.dart';
+import '../../../core/billing/revenuecat_entitlement_policy.dart';
+import '../../../core/billing/revenuecat_entitlement_source.dart';
 import '../../../core/billing/revenuecat_purchase_lifecycle.dart';
 import '../application/billing_qa_controller.dart';
 
@@ -152,6 +154,8 @@ class _BillingQaScreenState extends State<BillingQaScreen> {
             const SizedBox(height: 16),
           ],
           _StatusCard(snapshot: snapshot),
+          const SizedBox(height: 16),
+          _EntitlementDiagnosticCard(snapshot: snapshot),
           const SizedBox(height: 16),
           Text(
             'Catalog',
@@ -319,6 +323,88 @@ class _StatusRow extends StatelessWidget {
         ],
       ),
     );
+  }
+}
+
+
+class _EntitlementDiagnosticCard extends StatelessWidget {
+  const _EntitlementDiagnosticCard({required this.snapshot});
+
+  final BreakWaveBillingQaSnapshot? snapshot;
+
+  @override
+  Widget build(BuildContext context) {
+    final RevenueCatEntitlementDiagnosticSnapshot? diagnostic =
+        snapshot?.entitlementDiagnostic;
+
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            Text('Entitlement diagnostics',
+                style: Theme.of(context).textTheme.titleMedium),
+            const SizedBox(height: 8),
+            _StatusRow(
+              label: 'Raw entitlement active',
+              value: diagnostic?.isActive == null
+                  ? 'UNKNOWN'
+                  : diagnostic!.isActive! ? 'YES' : 'NO',
+            ),
+            _StatusRow(
+              label: 'Verification',
+              value: _verificationLabel(diagnostic?.verification),
+            ),
+            _StatusRow(
+              label: 'Policy decision',
+              value: _decisionLabel(diagnostic?.decisionReason),
+            ),
+            _StatusRow(
+              label: 'Policy would unlock',
+              value: diagnostic == null
+                  ? 'UNKNOWN'
+                  : diagnostic.policyWouldUnlock ? 'YES' : 'NO',
+            ),
+            _StatusRow(
+              label: 'Trusted result',
+              value: snapshot == null
+                  ? 'UNKNOWN'
+                  : snapshot!.trustedPlusUnlocked ? 'PLUS' : 'FREE',
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  String _verificationLabel(RevenueCatVerificationState? verification) {
+    return switch (verification) {
+      null => 'UNKNOWN',
+      RevenueCatVerificationState.verified => 'VERIFIED',
+      RevenueCatVerificationState.verifiedOnDevice => 'VERIFIED_ON_DEVICE',
+      RevenueCatVerificationState.notRequested => 'NOT_REQUESTED',
+      RevenueCatVerificationState.failed => 'FAILED',
+    };
+  }
+
+  String _decisionLabel(RevenueCatEntitlementDecisionReason? reason) {
+    return switch (reason) {
+      null => 'UNKNOWN',
+      RevenueCatEntitlementDecisionReason.verifiedActive => 'VERIFIED_ACTIVE',
+      RevenueCatEntitlementDecisionReason.verifiedBillingIssue => 'VERIFIED_BILLING_ISSUE',
+      RevenueCatEntitlementDecisionReason.verifiedInactive => 'VERIFIED_INACTIVE',
+      RevenueCatEntitlementDecisionReason.verifiedInvalidExpiration => 'VERIFIED_INVALID_EXPIRATION',
+      RevenueCatEntitlementDecisionReason.verifiedOnDeviceUsingPriorTrustedState => 'VERIFIED_ON_DEVICE_USING_PRIOR_TRUSTED_STATE',
+      RevenueCatEntitlementDecisionReason.verifiedOnDeviceDenied => 'VERIFIED_ON_DEVICE_DENIED',
+      RevenueCatEntitlementDecisionReason.notRequestedDenied => 'NOT_REQUESTED_DENIED',
+      RevenueCatEntitlementDecisionReason.failedDenied => 'FAILED_DENIED',
+      RevenueCatEntitlementDecisionReason.staleObservationIgnored => 'STALE_OBSERVATION_IGNORED',
+      RevenueCatEntitlementDecisionReason.cachedTrustedState => 'CACHED_TRUSTED_STATE',
+      RevenueCatEntitlementDecisionReason.noTrustedState => 'NO_TRUSTED_STATE',
+      RevenueCatEntitlementDecisionReason.clockRollbackDenied => 'CLOCK_ROLLBACK_DENIED',
+      RevenueCatEntitlementDecisionReason.futureServerTimeDenied => 'FUTURE_SERVER_TIME_DENIED',
+    };
   }
 }
 

@@ -22,6 +22,26 @@ abstract class RevenueCatEntitlementObservationProvider {
   );
 }
 
+class RevenueCatEntitlementDiagnosticSnapshot {
+  const RevenueCatEntitlementDiagnosticSnapshot({
+    required this.verification,
+    required this.isActive,
+    required this.decisionReason,
+    required this.policyWouldUnlock,
+  });
+
+  final RevenueCatVerificationState? verification;
+  final bool? isActive;
+  final RevenueCatEntitlementDecisionReason decisionReason;
+  final bool policyWouldUnlock;
+}
+
+abstract class RevenueCatEntitlementDiagnosticsProvider {
+  const RevenueCatEntitlementDiagnosticsProvider();
+
+  RevenueCatEntitlementDiagnosticSnapshot? get lastDiagnostic;
+}
+
 class RevenueCatSdkEntitlementObservationProvider
     extends RevenueCatEntitlementObservationProvider {
   const RevenueCatSdkEntitlementObservationProvider();
@@ -94,7 +114,8 @@ class RevenueCatSdkEntitlementObservationProvider
 }
 
 class RevenueCatEntitlementSource
-    extends BreakWaveEntitlementSource {
+    extends BreakWaveEntitlementSource
+    implements RevenueCatEntitlementDiagnosticsProvider {
   RevenueCatEntitlementSource({
     required this.entitlementId,
     required RevenueCatEntitlementObservationProvider
@@ -129,6 +150,12 @@ class RevenueCatEntitlementSource
   final RevenueCatEntitlementPolicy _policy;
   final DateTime Function() _nowUtc;
 
+  RevenueCatEntitlementDiagnosticSnapshot? _lastDiagnostic;
+
+  @override
+  RevenueCatEntitlementDiagnosticSnapshot? get lastDiagnostic =>
+      _lastDiagnostic;
+
   final ValueNotifier<int> _changes =
       ValueNotifier<int>(0);
 
@@ -139,6 +166,9 @@ class RevenueCatEntitlementSource
 
   @override
   Future<bool> isPlusUnlocked() async {
+    // Passive QA record of this same authority read. No second SDK read.
+    _lastDiagnostic = null;
+
     if (entitlementId.trim().isEmpty) {
       return _publish(false);
     }
@@ -167,6 +197,13 @@ class RevenueCatEntitlementSource
       previous: previous,
       nowUtc: nowUtc,
       observation: observation,
+    );
+
+    _lastDiagnostic = RevenueCatEntitlementDiagnosticSnapshot(
+      verification: observation?.verification,
+      isActive: observation?.isActive,
+      decisionReason: decision.reason,
+      policyWouldUnlock: decision.isPlusUnlocked,
     );
 
     try {

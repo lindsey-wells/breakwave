@@ -5,6 +5,8 @@ import 'package:breakwave/core/access/breakwave_entitlement_source.dart';
 import 'package:breakwave/core/billing/breakwave_billing_composition.dart';
 import 'package:breakwave/core/billing/revenuecat_catalog_contract.dart';
 import 'package:breakwave/core/billing/revenuecat_catalog_service.dart';
+import 'package:breakwave/core/billing/revenuecat_entitlement_policy.dart';
+import 'package:breakwave/core/billing/revenuecat_entitlement_source.dart';
 import 'package:breakwave/core/billing/revenuecat_purchase_executor.dart';
 import 'package:breakwave/core/billing/revenuecat_purchase_lifecycle.dart';
 import 'package:breakwave/features/billing_qa/application/billing_qa_controller.dart';
@@ -29,6 +31,37 @@ void main() {
     expect(snapshot.catalogIssues, isEmpty);
     expect(snapshot.trustedPlusUnlocked, isFalse);
   });
+
+
+  test(
+    'QA snapshot surfaces entitlement diagnostics without creating access',
+    () async {
+      final _FakeEntitlementSource entitlement = _FakeEntitlementSource(
+        unlocked: false,
+        diagnostic: const RevenueCatEntitlementDiagnosticSnapshot(
+          verification: RevenueCatVerificationState.verifiedOnDevice,
+          isActive: true,
+          decisionReason: RevenueCatEntitlementDecisionReason.verifiedOnDeviceDenied,
+          policyWouldUnlock: false,
+        ),
+      );
+      addTearDown(entitlement.dispose);
+
+      final BreakWaveBillingQaSnapshot snapshot = await _controller(
+        entitlement: entitlement,
+        catalog: _validCatalog(),
+      ).refresh();
+
+      expect(snapshot.trustedPlusUnlocked, isFalse);
+      expect(snapshot.entitlementDiagnostic, isNotNull);
+      expect(snapshot.entitlementDiagnostic!.verification,
+          RevenueCatVerificationState.verifiedOnDevice);
+      expect(snapshot.entitlementDiagnostic!.decisionReason,
+          RevenueCatEntitlementDecisionReason.verifiedOnDeviceDenied);
+      expect(snapshot.entitlementDiagnostic!.policyWouldUnlock, isFalse);
+      expect(entitlement.readCount, 1);
+    },
+  );
 
   test('missing annual Test Store package is not ready', () async {
     final _FakeEntitlementSource entitlement =
@@ -254,6 +287,7 @@ BreakWaveBillingQaController _controller({
       entitlementSource: entitlement,
     ),
     entitlementSource: entitlement,
+    entitlementDiagnosticsProvider: entitlement,
   );
 }
 
@@ -298,12 +332,15 @@ RevenueCatCatalogPackageRecord _annualPackage() {
 }
 
 class _FakeEntitlementSource
-    extends BreakWaveEntitlementSource {
+    extends BreakWaveEntitlementSource
+    implements RevenueCatEntitlementDiagnosticsProvider {
   _FakeEntitlementSource({
     required this.unlocked,
+    this.diagnostic,
   });
 
   final bool unlocked;
+  final RevenueCatEntitlementDiagnosticSnapshot? diagnostic;
   int readCount = 0;
 
   final ValueNotifier<int> _changes =
@@ -311,6 +348,9 @@ class _FakeEntitlementSource
 
   @override
   ValueListenable<int> get changes => _changes;
+
+  @override
+  RevenueCatEntitlementDiagnosticSnapshot? get lastDiagnostic => diagnostic;
 
   @override
   Future<bool> isPlusUnlocked() async {

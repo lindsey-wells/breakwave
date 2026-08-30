@@ -12,6 +12,9 @@ MANIFEST = ROOT / "android/app/src/main/AndroidManifest.xml"
 MAIN = ROOT / "lib/main.dart"
 QA_CONFIG = ROOT / "lib/core/billing/breakwave_billing_qa_config.dart"
 QA_SCREEN = ROOT / "lib/features/billing_qa/presentation/billing_qa_screen.dart"
+QA_CONTROLLER = ROOT / "lib/features/billing_qa/application/billing_qa_controller.dart"
+ENTITLEMENT_SOURCE = ROOT / "lib/core/billing/revenuecat_entitlement_source.dart"
+COMPOSITION = ROOT / "lib/core/billing/breakwave_billing_composition.dart"
 QA_WORKFLOW = ROOT / ".github/workflows/breakwave-test-store-qa.yml"
 SHADOW_WORKFLOW = ROOT / ".github/workflows/breakwave-shadow-ci.yml"
 DOC = ROOT / "docs/BW_WP03VT2_TEST_STORE_QA_APK.md"
@@ -38,6 +41,9 @@ manifest = text(MANIFEST)
 main = text(MAIN)
 qa_config = text(QA_CONFIG)
 qa_screen = text(QA_SCREEN)
+qa_controller = text(QA_CONTROLLER)
+entitlement_source = text(ENTITLEMENT_SOURCE)
+composition = text(COMPOSITION)
 qa_workflow = text(QA_WORKFLOW)
 shadow_workflow = text(SHADOW_WORKFLOW)
 doc = text(DOC)
@@ -98,9 +104,39 @@ for marker in (
     "Buy Annual",
     "Restore Purchases",
     "Refresh Trusted Entitlement",
+    "Entitlement diagnostics",
+    "Raw entitlement active",
+    "Verification",
+    "Policy decision",
+    "Policy would unlock",
+    "Trusted result",
 ):
     if marker not in qa_screen:
-        fail(f"T1 Billing QA surface missing: {marker}")
+        fail(f"T1/T2 Billing QA surface missing: {marker}")
+
+for marker in (
+    "RevenueCatEntitlementDiagnosticSnapshot",
+    "RevenueCatEntitlementDiagnosticsProvider",
+    "_lastDiagnostic = RevenueCatEntitlementDiagnosticSnapshot(",
+    "verification: observation?.verification",
+    "decisionReason: decision.reason",
+    "policyWouldUnlock: decision.isPlusUnlocked",
+):
+    if marker not in entitlement_source:
+        fail(f"entitlement diagnostic source marker missing: {marker}")
+
+for marker in (
+    "_entitlementDiagnosticsProvider?.lastDiagnostic",
+    "entitlementDiagnostic: entitlementDiagnostic",
+):
+    if marker not in qa_controller:
+        fail(f"QA diagnostic controller marker missing: {marker}")
+
+if "entitlementDiagnosticsProvider: entitlementSource" not in composition:
+    fail("production composition must expose shared entitlement source diagnostics")
+
+if "Purchases.getCustomerInfo" in qa_screen or "Purchases.getCustomerInfo" in qa_controller:
+    fail("QA diagnostics UI/controller must not perform direct RevenueCat CustomerInfo reads")
 
 for marker in (
     "name: BreakWave Test Store QA",
@@ -201,4 +237,7 @@ print("QA release build: no")
 print("QA AAB build: no")
 print("Customer paywall introduced: no")
 print("Plus shell icon introduced: no")
+print("QA entitlement diagnostics: passive same-read observation")
+print("QA diagnostics direct RevenueCat read: no")
+print("Trusted entitlement policy weakened: no")
 print("Next gates: standard Shadow CI + dedicated Test Store QA CI")

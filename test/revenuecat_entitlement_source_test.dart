@@ -73,6 +73,44 @@ void main() {
     },
   );
 
+
+  test(
+    'verified-on-device diagnostics reuse the same authority read',
+    () async {
+      final RevenueCatEntitlementObservation observation =
+          RevenueCatEntitlementObservation(
+        requestDateUtc: t0,
+        verification: RevenueCatVerificationState.verifiedOnDevice,
+        isActive: true,
+        expirationDateUtc: t0.add(const Duration(days: 30)),
+      );
+      final _FakeProvider provider = _FakeProvider(observation: observation);
+      final _MemoryStore store = _MemoryStore();
+
+      final RevenueCatEntitlementSource source = RevenueCatEntitlementSource(
+        entitlementId: 'test-entitlement',
+        observationProvider: provider,
+        stateStore: store,
+        nowUtc: () => t0,
+      );
+      addTearDown(source.dispose);
+
+      expect(await source.isPlusUnlocked(), isFalse);
+      final RevenueCatEntitlementDiagnosticSnapshot? diagnostic =
+          source.lastDiagnostic;
+
+      expect(provider.readCount, 1);
+      expect(diagnostic, isNotNull);
+      expect(diagnostic!.verification,
+          RevenueCatVerificationState.verifiedOnDevice);
+      expect(diagnostic.isActive, isTrue);
+      expect(diagnostic.decisionReason,
+          RevenueCatEntitlementDecisionReason.verifiedOnDeviceDenied);
+      expect(diagnostic.policyWouldUnlock, isFalse);
+      expect(store.state.authoritativePlus, isFalse);
+    },
+  );
+
   test(
     'Rescue bypasses RevenueCat entirely',
     () async {
