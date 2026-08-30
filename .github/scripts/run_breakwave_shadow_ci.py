@@ -21,7 +21,30 @@ TOOLS = ROOT / "tools"
 # Historical billing verifiers are phase contracts, not permanent assertions
 # about every later repository state. Run them against the locked state where
 # those contracts were closed instead of weakening or suppressing them.
+# WP-03W intentionally replaces the historical Plus placeholder/preview UI.
+# Verifiers that assert that superseded UI remain valuable historical contracts,
+# but they belong to the last fully-green state immediately before WP-03W.
+PRE_WP03W_REF = "b7ef61ed24a9aae1e683c2d8e790e70802f754c4"
+
 PHASE_VERIFIER_REFS = {
+    "tools/verify_bw25.py": PRE_WP03W_REF,
+    "tools/verify_bw31.py": PRE_WP03W_REF,
+    "tools/verify_bw36.py": PRE_WP03W_REF,
+    "tools/verify_bw54.py": PRE_WP03W_REF,
+    "tools/verify_bw87a1.py": PRE_WP03W_REF,
+    "tools/verify_bw87a1b.py": PRE_WP03W_REF,
+    "tools/verify_bw87b1.py": PRE_WP03W_REF,
+    "tools/verify_bw87b2b.py": PRE_WP03W_REF,
+    "tools/verify_bw87b3b.py": PRE_WP03W_REF,
+    "tools/verify_bw87b4b.py": PRE_WP03W_REF,
+    "tools/verify_bw87b5b2.py": PRE_WP03W_REF,
+    "tools/verify_bw87b6b1.py": PRE_WP03W_REF,
+    "tools/verify_bw87b6p3b2b.py": PRE_WP03W_REF,
+    "tools/verify_bw89a12a.py": PRE_WP03W_REF,
+    "tools/verify_bw89a12b.py": PRE_WP03W_REF,
+    "tools/verify_bw89a12c.py": PRE_WP03W_REF,
+    "tools/verify_bw89a12d.py": PRE_WP03W_REF,
+    "tools/verify_bw89a12f.py": PRE_WP03W_REF,
     "tools/verify_bw69.py": "bw69-green",
     "tools/verify_bw74.py": "bw74-green",
     "tools/verify_bw87b6p2.py": "bw87b6p2-green",
@@ -217,6 +240,24 @@ def run_phase_aware_verifiers(name: str, verifier_paths: list[str]) -> dict:
 
 def phase_routing_selftest() -> None:
     expected = {
+        "tools/verify_bw25.py": PRE_WP03W_REF,
+        "tools/verify_bw31.py": PRE_WP03W_REF,
+        "tools/verify_bw36.py": PRE_WP03W_REF,
+        "tools/verify_bw54.py": PRE_WP03W_REF,
+        "tools/verify_bw87a1.py": PRE_WP03W_REF,
+        "tools/verify_bw87a1b.py": PRE_WP03W_REF,
+        "tools/verify_bw87b1.py": PRE_WP03W_REF,
+        "tools/verify_bw87b2b.py": PRE_WP03W_REF,
+        "tools/verify_bw87b3b.py": PRE_WP03W_REF,
+        "tools/verify_bw87b4b.py": PRE_WP03W_REF,
+        "tools/verify_bw87b5b2.py": PRE_WP03W_REF,
+        "tools/verify_bw87b6b1.py": PRE_WP03W_REF,
+        "tools/verify_bw87b6p3b2b.py": PRE_WP03W_REF,
+        "tools/verify_bw89a12a.py": PRE_WP03W_REF,
+        "tools/verify_bw89a12b.py": PRE_WP03W_REF,
+        "tools/verify_bw89a12c.py": PRE_WP03W_REF,
+        "tools/verify_bw89a12d.py": PRE_WP03W_REF,
+        "tools/verify_bw89a12f.py": PRE_WP03W_REF,
         "tools/verify_bw69.py": "bw69-green",
         "tools/verify_bw74.py": "bw74-green",
         "tools/verify_bw87b6p2.py": "bw87b6p2-green",
@@ -224,6 +265,8 @@ def phase_routing_selftest() -> None:
         "tools/verify_bw88rc1k.py": "bw-88rc1k-green",
         "tools/verify_bw_wp03r.py": "02136802599b5a286cf42d98217da7b4f696e50b",
         "tools/verify_bw_wp03s.py": "HEAD",
+        "tools/verify_bw_wp03w.py": "HEAD",
+        "tools/verify_bw_ci_01d.py": "HEAD",
         "tools/verify_bw01.py": "HEAD",
     }
     for rel, ref in expected.items():
@@ -236,18 +279,39 @@ def phase_routing_selftest() -> None:
     result = run_phase_aware_verifiers(
         "phase_routing_selftest",
         [
+            "tools/verify_bw25.py",
+            "tools/verify_bw31.py",
+            "tools/verify_bw36.py",
+            "tools/verify_bw54.py",
+            "tools/verify_bw87a1.py",
+            "tools/verify_bw87a1b.py",
+            "tools/verify_bw87b1.py",
+            "tools/verify_bw87b2b.py",
+            "tools/verify_bw87b3b.py",
+            "tools/verify_bw87b4b.py",
+            "tools/verify_bw87b5b2.py",
+            "tools/verify_bw87b6b1.py",
+            "tools/verify_bw87b6p3b2b.py",
+            "tools/verify_bw89a12a.py",
+            "tools/verify_bw89a12b.py",
+            "tools/verify_bw89a12c.py",
+            "tools/verify_bw89a12d.py",
+            "tools/verify_bw89a12f.py",
             "tools/verify_bw69.py",
             "tools/verify_bw74.py",
             "tools/verify_bw87b6p2.py",
             "tools/verify_bw88rc1k.py",
             "tools/verify_bw_wp03r.py",
             "tools/verify_bw_wp03s.py",
+            "tools/verify_bw_wp03w.py",
         ],
     )
     if not result["passed"]:
         raise RuntimeError("phase-aware verifier execution selftest failed")
 
     print("PASS: Shadow phase-aware billing verifier routing selftest.")
+    print("PASS: superseded Plus-era contracts run at PRE_WP03W_REF.")
+    print("PASS: current WP-03W verifier remains on HEAD.")
 
 
 def ensure_origin_main() -> None:
