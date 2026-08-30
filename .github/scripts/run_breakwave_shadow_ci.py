@@ -22,6 +22,8 @@ TOOLS = ROOT / "tools"
 # about every later repository state. Run them against the locked state where
 # those contracts were closed instead of weakening or suppressing them.
 PHASE_VERIFIER_REFS = {
+    "tools/verify_bw69.py": "bw69-green",
+    "tools/verify_bw74.py": "bw74-green",
     "tools/verify_bw87b6p2.py": "bw87b6p2-green",
     "tools/verify_bw88rc1e.py": "bw-88rc1k-green",
     "tools/verify_bw88rc1f.py": "bw-88rc1k-green",
@@ -215,6 +217,8 @@ def run_phase_aware_verifiers(name: str, verifier_paths: list[str]) -> dict:
 
 def phase_routing_selftest() -> None:
     expected = {
+        "tools/verify_bw69.py": "bw69-green",
+        "tools/verify_bw74.py": "bw74-green",
         "tools/verify_bw87b6p2.py": "bw87b6p2-green",
         "tools/verify_bw88rc1e.py": "bw-88rc1k-green",
         "tools/verify_bw88rc1k.py": "bw-88rc1k-green",
@@ -232,6 +236,8 @@ def phase_routing_selftest() -> None:
     result = run_phase_aware_verifiers(
         "phase_routing_selftest",
         [
+            "tools/verify_bw69.py",
+            "tools/verify_bw74.py",
             "tools/verify_bw87b6p2.py",
             "tools/verify_bw88rc1k.py",
             "tools/verify_bw_wp03r.py",
