@@ -18,6 +18,8 @@ import '../../guided_routines/domain/recovery_routine.dart';
 import '../../home/presentation/home_screen.dart';
 import '../../log/presentation/log_screen.dart';
 import '../../personal_plan/presentation/personal_recovery_plan_screen.dart';
+import '../../premium/presentation/breakwave_plus_access_button.dart';
+import '../../premium/presentation/breakwave_plus_screen.dart';
 import '../../privacy_lock/presentation/privacy_unlock_screen.dart';
 import '../../rescue/presentation/rescue_screen.dart';
 import '../../support/presentation/support_screen.dart';
@@ -197,6 +199,17 @@ class _BreakWaveShellState extends State<BreakWaveShell>
   }
 
 
+  void _openBreakWavePlus() {
+    Navigator.of(context).push<void>(
+      MaterialPageRoute<void>(
+        builder: (_) => BreakWavePlusScreen(
+          onRoutineActionRequested:
+              _handleRoutineActionRequested,
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final List<Widget> screens = <Widget>[
@@ -229,18 +242,41 @@ class _BreakWaveShellState extends State<BreakWaveShell>
         const BillingQaScreen(),
     ];
 
+    final bool showLockScreen = _shouldShowLockScreen();
+    final bool showCustomerPlusAccess =
+        !_lockLoading &&
+        !showLockScreen &&
+        _selectedIndex != 1 &&
+        _selectedIndex < 4;
+
+    final Widget shellBody = _lockLoading
+        ? const Center(child: CircularProgressIndicator())
+        : showLockScreen
+            ? PrivacyUnlockScreen(
+                settings: _lockSettings,
+                onUnlocked: _handleUnlocked,
+              )
+            : IndexedStack(
+                index: _selectedIndex,
+                children: screens,
+              );
+
     return Scaffold(
-      body: _lockLoading
-          ? const Center(child: CircularProgressIndicator())
-          : _shouldShowLockScreen()
-              ? PrivacyUnlockScreen(
-                  settings: _lockSettings,
-                  onUnlocked: _handleUnlocked,
-                )
-              : IndexedStack(
-                  index: _selectedIndex,
-                  children: screens,
+      body: Stack(
+        children: <Widget>[
+          Positioned.fill(child: shellBody),
+          if (showCustomerPlusAccess)
+            Positioned(
+              top: 10,
+              right: 12,
+              child: SafeArea(
+                child: BreakWavePlusAccessButton(
+                  onPressed: _openBreakWavePlus,
                 ),
+              ),
+            ),
+        ],
+      ),
       bottomNavigationBar: NavigationBar(
         selectedIndex: _selectedIndex,
         onDestinationSelected: _onDestinationSelected,

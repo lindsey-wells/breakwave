@@ -38,8 +38,8 @@ class OnboardingAccessStepDetails extends StatelessWidget {
         ),
         const SizedBox(height: 8),
         Text(
-          'Continue Free always remains available. Reviewing Plus only '
-          'opens an information screen after setup.',
+          'Continue Free always remains available. Reviewing Plus opens '
+          'the customer Plus screen after setup; it never grants access by itself.',
           style: theme.textTheme.bodyMedium,
         ),
         const SizedBox(height: 18),
@@ -66,7 +66,7 @@ class OnboardingAccessStepDetails extends StatelessWidget {
           key: const Key('onboarding-access-review-plus'),
           title: 'Review BreakWave Plus',
           subtitle:
-              'Finish setup, then open the honest Plus information screen.',
+              'Finish setup, then review current Plus access and any store plans available on this build.',
           selected: draft.accessChoice ==
               OnboardingAccessChoice.reviewPlus,
           enabled: enabled,
@@ -93,9 +93,10 @@ class OnboardingAccessStepDetails extends StatelessWidget {
                 .withOpacity(0.36),
           ),
           child: const Text(
-            'Plus purchasing is not available yet. There is no price, '
-            'trial, checkout, purchase, restore, or subscription action '
-            'on this screen. Choosing Review Plus does not unlock Plus.',
+            'This setup screen never charges or unlocks Plus. Store prices '
+            'and purchase or restore actions appear only on the Plus screen '
+            'when the connected catalog is available. Choosing Review Plus '
+            'still does not unlock Plus.',
           ),
         ),
         const SizedBox(height: 12),

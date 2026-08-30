@@ -10,6 +10,7 @@ on:
   push:
     branches:
       - billing/wp-03vt2-test-store-qa-apk
+      - billing/wp-03w-customer-plus
   workflow_dispatch:
     inputs:
       run_label:
@@ -76,6 +77,9 @@ jobs:
           python3 tools/verify_bw_wp03v.py
           python3 tools/verify_bw_wp03vt1.py
           python3 tools/verify_bw_wp03vt2.py
+          if [ -f tools/verify_bw_wp03w.py ]; then
+            python3 tools/verify_bw_wp03w.py
+          fi
 
       - name: Analyze
         run: flutter analyze --no-fatal-infos
