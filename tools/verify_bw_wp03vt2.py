@@ -104,6 +104,9 @@ for marker in (
 
 for marker in (
     "name: BreakWave Test Store QA",
+    "push:",
+    "branches:",
+    "- billing/wp-03vt2-test-store-qa-apk",
     "workflow_dispatch:",
     SECRET_NAME,
     "ORG_GRADLE_PROJECT_breakwaveTestStoreQa: 'true'",
@@ -179,7 +182,7 @@ print(f"Production application ID: {PRODUCTION_ID}")
 print(f"Test Store QA application ID: {QA_ID}")
 print(f"Test Store QA application label: {QA_LABEL}")
 print("Billing QA default in normal builds: OFF")
-print("QA workflow: manual-only")
+print("QA workflow: manual + branch-scoped pre-merge push bootstrap")
 print("Test Store key in tracked source: no")
 print("Test Store key in evidence by design: no")
 print("Production signing secrets in QA workflow: no")

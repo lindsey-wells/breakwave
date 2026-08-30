@@ -7,6 +7,9 @@ env:
   BREAKWAVE_FLUTTER_VERSION: '3.44.9'
 
 on:
+  push:
+    branches:
+      - billing/wp-03vt2-test-store-qa-apk
   workflow_dispatch:
     inputs:
       run_label:

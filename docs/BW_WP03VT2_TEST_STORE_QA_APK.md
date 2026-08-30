@@ -54,7 +54,17 @@ QA console a deterministic configured SDK at first use.
 
 ## Dedicated workflow
 
-`.github/workflows/breakwave-test-store-qa.yml` is manual-only.
+`.github/workflows/breakwave-test-store-qa.yml` uses two triggers:
+
+- `workflow_dispatch` for normal manual QA once the workflow exists on the
+  repository default branch;
+- a pre-merge `push` bootstrap scoped only to
+  `billing/wp-03vt2-test-store-qa-apk`, because GitHub does not allow
+  `workflow_dispatch` to address a workflow that is absent from the default
+  branch.
+
+The branch-scoped bootstrap does not run from `main` and exists only to prove
+the dedicated Test Store QA lane before T2 is merged.
 
 It:
 
