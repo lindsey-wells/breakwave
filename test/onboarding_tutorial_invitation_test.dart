@@ -11,6 +11,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'support/breakwave_billing_test_harness.dart';
+
 void _prepareFinalStep(OnboardingAccessChoice choice) {
   SharedPreferences.setMockInitialValues(<String, Object>{
     OnboardingStateStore.storageKey: jsonEncode(<String, dynamic>{
@@ -37,8 +39,8 @@ void _prepareFinalStep(OnboardingAccessChoice choice) {
 }
 
 Widget _buildGate() {
-  return const MaterialApp(
-    home: OnboardingLaunchGate(
+  return buildBreakWaveBillingTestApp(
+    home: const OnboardingLaunchGate(
       child: Scaffold(
         body: Center(child: Text('APP CHILD')),
       ),

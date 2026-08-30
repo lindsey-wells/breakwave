@@ -14,13 +14,15 @@ import 'package:breakwave/core/triggers/triggers_store.dart';
 import 'package:breakwave/features/onboarding/presentation/onboarding_flow_screen.dart';
 import 'package:breakwave/features/premium/presentation/breakwave_plus_screen.dart';
 
+import 'support/breakwave_billing_test_harness.dart';
+
 void main() {
   Widget buildFlow({
     required int initialStep,
     ValueChanged<OnboardingStatus>? onFinished,
     VoidCallback? onReviewPlusRequested,
   }) {
-    return MaterialApp(
+    return buildBreakWaveBillingTestApp(
       home: OnboardingFlowScreen(
         initialStep: initialStep,
         onFinished: onFinished ?? (_) {},
@@ -484,8 +486,8 @@ void main() {
       );
 
       await tester.pumpWidget(
-        const MaterialApp(
-          home: OnboardingLaunchGate(
+        buildBreakWaveBillingTestApp(
+          home: const OnboardingLaunchGate(
             child: Scaffold(
               body: Center(child: Text('APP CHILD')),
             ),
@@ -527,7 +529,10 @@ void main() {
 
       expect(find.byType(BreakWavePlusScreen), findsOneWidget);
       expect(
-        find.text('BreakWave Plus is in development.'),
+        find.descendant(
+          of: find.byType(AppBar),
+          matching: find.text('BreakWave Plus'),
+        ),
         findsOneWidget,
       );
 
