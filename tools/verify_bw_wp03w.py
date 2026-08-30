@@ -21,6 +21,8 @@ def forbid(haystack: str, marker: str, label: str) -> None:
         raise SystemExit(f"FAIL WP-03W {label}: {marker}")
 
 
+app = text("lib/app/breakwave_app.dart")
+app_scope_test = text("test/breakwave_app_billing_scope_test.dart")
 controller = text("lib/features/premium/application/breakwave_plus_controller.dart")
 screen = text("lib/features/premium/presentation/breakwave_plus_screen.dart")
 button = text("lib/features/premium/presentation/breakwave_plus_access_button.dart")
@@ -30,6 +32,38 @@ access_policy = text("lib/core/access/breakwave_access_policy.dart")
 catalog_service = text("lib/core/billing/revenuecat_catalog_service.dart")
 workflow = text(".github/workflows/breakwave-test-store-qa.yml")
 onboarding = text("lib/features/onboarding/presentation/onboarding_access_step_details.dart")
+
+# BreakWaveBillingScope must wrap MaterialApp itself. MaterialApp owns the
+# Navigator, so a scope limited to home does not cover pushed routes.
+scope_index = app.find("return BreakWaveBillingScope(")
+material_index = app.find("child: MaterialApp(")
+if scope_index < 0 or material_index < 0 or scope_index > material_index:
+    raise SystemExit(
+        "FAIL WP-03W billing scope must wrap MaterialApp/Navigator"
+    )
+
+require(
+    app,
+    "composition: _billingComposition",
+    "shared app-root billing composition missing",
+)
+forbid(
+    app,
+    "home: BreakWaveBillingScope(",
+    "billing scope is incorrectly limited to MaterialApp.home",
+)
+
+for marker in (
+    "pushed Navigator route inherits the one shared billing composition",
+    "tester.state<NavigatorState>",
+    "BreakWaveBillingScope.of(routeContext)",
+    "same(composition)",
+):
+    require(
+        app_scope_test,
+        marker,
+        "app-root Navigator billing-scope regression test missing",
+    )
 
 for marker in (
     "BreakWavePlusController.fromComposition",
@@ -161,5 +195,7 @@ print("Red/slash state: no")
 print("Plus feature entry points: yes")
 print("Rescue billing dependency: no")
 print("Billing QA remains compile-time gated: yes")
+print("Billing scope wraps MaterialApp/Navigator: yes")
+print("Pushed-route billing-scope regression test: yes")
 print("Local Flutter executed: no")
 print("CI required: yes")

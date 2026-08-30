@@ -54,15 +54,15 @@ class _BreakWaveAppState extends State<BreakWaveApp> {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'BreakWave',
-      debugShowCheckedModeBanner: false,
-      theme: BreakWaveTheme.dark(),
-      darkTheme: BreakWaveTheme.dark(),
-      themeMode: ThemeMode.dark,
-      home: BreakWaveBillingScope(
-        composition: _billingComposition,
-        child: const OnboardingLaunchGate(
+    return BreakWaveBillingScope(
+      composition: _billingComposition,
+      child: MaterialApp(
+        title: 'BreakWave',
+        debugShowCheckedModeBanner: false,
+        theme: BreakWaveTheme.dark(),
+        darkTheme: BreakWaveTheme.dark(),
+        themeMode: ThemeMode.dark,
+        home: const OnboardingLaunchGate(
           child: RecoveryModeGate(
             child: BreakWaveShell(),
           ),
