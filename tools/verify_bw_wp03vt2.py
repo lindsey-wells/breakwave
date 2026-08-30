@@ -114,6 +114,10 @@ for marker in (
     '"BREAKWAVE_REVENUECAT_ANDROID_PUBLIC_SDK_KEY": key',
     '--dart-define-from-file="$DEFINE_FILE"',
     "flutter build apk",
+    "--debug",
+    "build/app/outputs/flutter-apk/app-debug.apk",
+    '"build_mode": "debug"',
+    '"release_build": False',
     f"package: name='{QA_ID}'",
     f"application-label:'{QA_LABEL}'",
     "breakwave-test-store-qa-evidence",
@@ -125,6 +129,12 @@ for marker in (
 
 if "flutter build appbundle" in qa_workflow:
     fail("Test Store QA workflow must not build an AAB")
+
+if "--release" in qa_workflow:
+    fail("RevenueCat Test Store QA must not use a release-mode Flutter build")
+
+if "app-release.apk" in qa_workflow:
+    fail("RevenueCat Test Store QA must not consume a release APK path")
 
 for forbidden in (
     "ANDROID_KEYSTORE_BASE64",
@@ -186,6 +196,8 @@ print("QA workflow: manual + branch-scoped pre-merge push bootstrap")
 print("Test Store key in tracked source: no")
 print("Test Store key in evidence by design: no")
 print("Production signing secrets in QA workflow: no")
+print("QA build mode: debug")
+print("QA release build: no")
 print("QA AAB build: no")
 print("Customer paywall introduced: no")
 print("Plus shell icon introduced: no")

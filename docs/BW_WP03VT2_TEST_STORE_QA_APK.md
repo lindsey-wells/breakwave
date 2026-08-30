@@ -43,6 +43,12 @@ the key is necessarily present in the compiled QA client that uses it; this
 artifact is Test Store QA only and must never be distributed as the production
 Play build.
 
+RevenueCat deliberately rejects a Test Store `test_...` key in a Flutter
+**release** build. Therefore this isolated Test Store artifact is intentionally
+built with `flutter build apk --debug`. The production/Shadow lane remains a
+release build and continues to use the production application identity with the
+QA flag disabled.
+
 ## Startup behavior
 
 Production remains non-blocking: the normal build starts BreakWave and
@@ -73,7 +79,7 @@ It:
 3. runs WP-03V, T1, and T2 static verifiers;
 4. runs Flutter analyze;
 5. runs the full Flutter test suite;
-6. builds only a release APK with QA identity and QA Dart defines;
+6. builds only a **debug APK** with QA identity and QA Dart defines;
 7. uses no production signing secrets;
 8. validates the APK package ID and label with Android `aapt`;
 9. proves the key value did not enter tracked source;

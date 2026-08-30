@@ -120,7 +120,7 @@ jobs:
           PY
 
           flutter build apk \
-            --release \
+            --debug \
             --dart-define-from-file="$DEFINE_FILE"
 
           cleanup
@@ -131,7 +131,7 @@ jobs:
         run: |
           set -euo pipefail
 
-          APK="build/app/outputs/flutter-apk/app-release.apk"
+          APK="build/app/outputs/flutter-apk/app-debug.apk"
           test -s "$APK"
 
           AAPT="$(
@@ -213,6 +213,8 @@ jobs:
               "test_store_key_value_recorded": False,
               "production_application_id": "com.cube23.breakwave",
               "production_signing_secrets_used": False,
+              "build_mode": "debug",
+              "release_build": False,
               "aab_built": False,
               "artifact_purpose": "RevenueCat Test Store device QA only",
           }
@@ -236,6 +238,6 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: breakwave-test-store-qa-apk
-          path: build/app/outputs/flutter-apk/app-release.apk
+          path: build/app/outputs/flutter-apk/app-debug.apk
           if-no-files-found: error
           retention-days: 7
