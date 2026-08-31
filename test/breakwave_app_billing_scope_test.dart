@@ -37,14 +37,14 @@ void main() {
         find.byType(Navigator).first,
       );
       BreakWaveBillingComposition? resolved;
+      bool routeBuilt = false;
 
       navigator.push<void>(
         MaterialPageRoute<void>(
           builder: (BuildContext routeContext) {
+            routeBuilt = true;
             resolved = BreakWaveBillingScope.of(routeContext);
-            return const Scaffold(
-              body: Text('billing-scope-route-probe'),
-            );
+            return const SizedBox.shrink();
           },
         ),
       );
@@ -58,8 +58,14 @@ void main() {
             'A route pushed by the real BreakWave Navigator must remain '
             'under BreakWaveBillingScope.',
       );
+      expect(
+        routeBuilt,
+        isTrue,
+        reason:
+            'The pushed Navigator route must build before its billing '
+            'scope inheritance can be evaluated.',
+      );
       expect(resolved, same(composition));
-      expect(find.text('billing-scope-route-probe'), findsOneWidget);
     },
   );
 }
