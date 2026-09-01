@@ -26,7 +26,18 @@ TOOLS = ROOT / "tools"
 # but they belong to the last fully-green state immediately before WP-03W.
 PRE_WP03W_REF = "b7ef61ed24a9aae1e683c2d8e790e70802f754c4"
 
+# PERF-02A changes retained Home/Log state. Historical contracts that
+# freeze the prior implementation execute at the direct parent state.
+PRE_PERF02A_REF = "aad47817f602a716e4094bcd8857dc6a1f48dfd4"
+
 PHASE_VERIFIER_REFS = {
+    "tools/verify_bw13b.py": PRE_PERF02A_REF,
+    "tools/verify_bw89a8b.py": PRE_PERF02A_REF,
+    "tools/verify_bw89a9.py": PRE_PERF02A_REF,
+    "tools/verify_bw89a10b.py": PRE_PERF02A_REF,
+    "tools/verify_bw89a11.py": PRE_PERF02A_REF,
+    "tools/verify_bw89a11b.py": PRE_PERF02A_REF,
+    "tools/verify_bw89a11c.py": PRE_PERF02A_REF,
     "tools/verify_bw25.py": PRE_WP03W_REF,
     "tools/verify_bw31.py": PRE_WP03W_REF,
     "tools/verify_bw36.py": PRE_WP03W_REF,
@@ -240,6 +251,13 @@ def run_phase_aware_verifiers(name: str, verifier_paths: list[str]) -> dict:
 
 def phase_routing_selftest() -> None:
     expected = {
+        "tools/verify_bw13b.py": PRE_PERF02A_REF,
+        "tools/verify_bw89a8b.py": PRE_PERF02A_REF,
+        "tools/verify_bw89a9.py": PRE_PERF02A_REF,
+        "tools/verify_bw89a10b.py": PRE_PERF02A_REF,
+        "tools/verify_bw89a11.py": PRE_PERF02A_REF,
+        "tools/verify_bw89a11b.py": PRE_PERF02A_REF,
+        "tools/verify_bw89a11c.py": PRE_PERF02A_REF,
         "tools/verify_bw25.py": PRE_WP03W_REF,
         "tools/verify_bw31.py": PRE_WP03W_REF,
         "tools/verify_bw36.py": PRE_WP03W_REF,
@@ -279,6 +297,13 @@ def phase_routing_selftest() -> None:
     result = run_phase_aware_verifiers(
         "phase_routing_selftest",
         [
+            "tools/verify_bw13b.py",
+            "tools/verify_bw89a8b.py",
+            "tools/verify_bw89a9.py",
+            "tools/verify_bw89a10b.py",
+            "tools/verify_bw89a11.py",
+            "tools/verify_bw89a11b.py",
+            "tools/verify_bw89a11c.py",
             "tools/verify_bw25.py",
             "tools/verify_bw31.py",
             "tools/verify_bw36.py",
