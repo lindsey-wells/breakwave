@@ -36,12 +36,14 @@ import 'widgets/recovery_snapshot_card.dart';
 import 'widgets/what_helped_before_card.dart';
 
 class HomeScreen extends StatefulWidget {
+  final int refreshTick;
   final VoidCallback onOpenRescue;
   final VoidCallback onOpenLog;
   final VoidCallback onOpenPersonalPlan;
 
   const HomeScreen({
     super.key,
+    this.refreshTick = 0,
     required this.onOpenRescue,
     required this.onOpenLog,
     required this.onOpenPersonalPlan,
@@ -53,6 +55,7 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   late final ValueNotifier<int> _privacyNotifier;
+  late Future<_HomeSummaryData> _summaryFuture;
   final GlobalKey _checkInSectionKey = GlobalKey();
 
   @override
@@ -60,7 +63,17 @@ class _HomeScreenState extends State<HomeScreen> {
     super.initState();
     _privacyNotifier = PrivacySettingsStore.changes;
     _privacyNotifier.addListener(_handlePrivacyChanged);
+    _summaryFuture = _loadSummary();
     BreakWaveHomeWidgetSync.sync();
+  }
+
+  @override
+  void didUpdateWidget(covariant HomeScreen oldWidget) {
+    super.didUpdateWidget(oldWidget);
+
+    if (oldWidget.refreshTick != widget.refreshTick) {
+      _summaryFuture = _loadSummary();
+    }
   }
 
   @override
@@ -71,7 +84,9 @@ class _HomeScreenState extends State<HomeScreen> {
 
   void _handlePrivacyChanged() {
     if (!mounted) return;
-    setState(() {});
+    setState(() {
+      _summaryFuture = _loadSummary();
+    });
   }
 
 
@@ -148,7 +163,7 @@ class _HomeScreenState extends State<HomeScreen> {
       appBar: const BreakWaveAppBar(sectionTitle: 'Home'),
       body: SafeArea(
         child: FutureBuilder<_HomeSummaryData>(
-          future: _loadSummary(),
+          future: _summaryFuture,
           builder:
               (BuildContext context, AsyncSnapshot<_HomeSummaryData> snapshot) {
             final _HomeSummaryData summary =

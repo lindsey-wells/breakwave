@@ -33,12 +33,14 @@ import 'widgets/recent_log_entries_card.dart';
 import 'widgets/pattern_observation_card.dart';
 
 class LogScreen extends StatefulWidget {
+  final int refreshTick;
   final VoidCallback onReturnHome;
   final VoidCallback onOpenRescue;
   final VoidCallback onOpenSupport;
 
   const LogScreen({
     super.key,
+    this.refreshTick = 0,
     required this.onReturnHome,
     required this.onOpenRescue,
     required this.onOpenSupport,
@@ -123,6 +125,15 @@ class _LogScreenState extends State<LogScreen> {
     _betterPlanController = TextEditingController();
     _notesController = TextEditingController();
     _refreshFromStorage();
+  }
+
+  @override
+  void didUpdateWidget(covariant LogScreen oldWidget) {
+    super.didUpdateWidget(oldWidget);
+
+    if (oldWidget.refreshTick != widget.refreshTick) {
+      _refreshFromStorage();
+    }
   }
 
   @override

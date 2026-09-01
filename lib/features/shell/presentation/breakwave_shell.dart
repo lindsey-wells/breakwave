@@ -244,7 +244,7 @@ class _BreakWaveShellState extends State<BreakWaveShell>
   Widget build(BuildContext context) {
     final List<Widget> screens = <Widget>[
       HomeScreen(
-        key: ValueKey<int>(_homeRefreshTick),
+        refreshTick: _homeRefreshTick,
         onOpenRescue: () => _onDestinationSelected(1),
         onOpenLog: () => _onDestinationSelected(2),
         onOpenPersonalPlan: () => Navigator.of(context).push<void>(
@@ -259,7 +259,7 @@ class _BreakWaveShellState extends State<BreakWaveShell>
         onOpenLog: () => _onDestinationSelected(2),
       ),
       LogScreen(
-        key: ValueKey<int>(_logRefreshTick),
+        refreshTick: _logRefreshTick,
         onReturnHome: _returnHome,
         onOpenRescue: () => _onDestinationSelected(1),
         onOpenSupport: () => _onDestinationSelected(3),

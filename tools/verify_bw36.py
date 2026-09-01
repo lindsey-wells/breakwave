@@ -28,8 +28,8 @@ checks = [
     ("lib/features/shell/presentation/breakwave_shell.dart", [
         "_homeRefreshTick",
         "_logRefreshTick",
-        "ValueKey<int>(_homeRefreshTick)",
-        "ValueKey<int>(_logRefreshTick)",
+        "refreshTick: _homeRefreshTick",
+        "refreshTick: _logRefreshTick",
     ]),
     ("lib/core/reminders/breakwave_notifications.dart", [
         "safeInitialize()",
@@ -42,8 +42,8 @@ checks = [
     ]),
     ("lib/features/premium/presentation/breakwave_plus_screen.dart", [
         "BreakWave Plus",
-        "BreakWave Plus is in development.",
-        "Subscriptions and purchases are not enabled.",
+        "Restore purchases",
+        "Purchases are not available on this build yet.",
     ]),
 ]
 
