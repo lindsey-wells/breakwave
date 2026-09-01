@@ -339,6 +339,20 @@ def phase_routing_selftest() -> None:
     print("PASS: current WP-03W verifier remains on HEAD.")
 
 
+
+def run_all_phase_verifiers_cli() -> None:
+    verifier_paths = [
+        str(path.relative_to(ROOT))
+        for path in sorted((ROOT / "tools").glob("verify_bw*.py"))
+    ]
+    result = run_phase_aware_verifiers(
+        "all_phase_verifiers",
+        verifier_paths,
+    )
+    if not result["passed"]:
+        raise SystemExit(1)
+    print("PASS: all BreakWave verifiers passed with phase-aware routing.")
+
 def ensure_origin_main() -> None:
     if git("rev-parse", "--verify", "origin/main", check=False):
         return
@@ -566,5 +580,7 @@ def main() -> None:
 if __name__ == "__main__":
     if sys.argv[1:] == ["--phase-selftest"]:
         phase_routing_selftest()
+    elif sys.argv[1:] == ["--phase-all"]:
+        run_all_phase_verifiers_cli()
     else:
         main()
