@@ -9,6 +9,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../core/billing/breakwave_billing_scope.dart';
+import '../../../core/performance/breakwave_performance_probe.dart';
 import '../../../core/billing/revenuecat_catalog_service.dart';
 import '../../../core/billing/revenuecat_entitlement_policy.dart';
 import '../../../core/billing/revenuecat_entitlement_source.dart';
@@ -62,12 +63,25 @@ class _BillingQaScreenState extends State<BillingQaScreen> {
       return;
     }
 
+    final Stopwatch? performanceTimer =
+        BreakWavePerformanceProbe.enabled
+            ? BreakWavePerformanceProbe.startTimer()
+            : null;
+
     setState(() {
       _busy = true;
     });
 
     final BreakWaveBillingQaSnapshot snapshot =
         await controller.refresh();
+
+    if (performanceTimer != null) {
+      BreakWavePerformanceProbe.recordElapsed(
+        category: 'billing',
+        name: 'billing_qa_refresh',
+        stopwatch: performanceTimer,
+      );
+    }
 
     if (!mounted) {
       return;
@@ -156,6 +170,15 @@ class _BillingQaScreenState extends State<BillingQaScreen> {
           _StatusCard(snapshot: snapshot),
           const SizedBox(height: 16),
           _EntitlementDiagnosticCard(snapshot: snapshot),
+          const SizedBox(height: 16),
+          _PerformanceDiagnosticsCard(
+            snapshot: BreakWavePerformanceProbe.snapshot(),
+            onRefresh: _busy
+                ? null
+                : () {
+                    setState(() {});
+                  },
+          ),
           const SizedBox(height: 16),
           Text(
             'Catalog',
@@ -406,6 +429,120 @@ class _EntitlementDiagnosticCard extends StatelessWidget {
       RevenueCatEntitlementDecisionReason.futureServerTimeDenied => 'FUTURE_SERVER_TIME_DENIED',
     };
   }
+}
+
+
+class _PerformanceDiagnosticsCard extends StatelessWidget {
+  const _PerformanceDiagnosticsCard({
+    required this.snapshot,
+    required this.onRefresh,
+  });
+
+  final BreakWavePerformanceSnapshot snapshot;
+  final VoidCallback? onRefresh;
+
+  @override
+  Widget build(BuildContext context) {
+    final List<BreakWavePerformanceSample> startup = snapshot.samples
+        .where((BreakWavePerformanceSample sample) =>
+            sample.category == 'startup')
+        .toList();
+    final List<BreakWavePerformanceSample> tabs = snapshot.samples.reversed
+        .where((BreakWavePerformanceSample sample) =>
+            sample.category == 'tab')
+        .take(10)
+        .toList();
+    final List<BreakWavePerformanceSample> billingSamples =
+        snapshot.samples.reversed
+            .where((BreakWavePerformanceSample sample) =>
+                sample.category == 'billing')
+            .take(1)
+            .toList();
+    final BreakWavePerformanceSample? billingRefresh =
+        billingSamples.isEmpty ? null : billingSamples.first;
+
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            Text(
+              'Performance diagnostics',
+              style: Theme.of(context).textTheme.titleMedium,
+            ),
+            const SizedBox(height: 6),
+            const Text(
+              'Debug Test Store timings are diagnostic. Use them to '
+              'compare where time is spent; do not treat them as '
+              'production benchmark numbers.',
+            ),
+            const SizedBox(height: 12),
+            _StatusRow(
+              label: 'Current Dart RSS',
+              value: _mib(snapshot.currentRssBytes),
+            ),
+            _StatusRow(label: 'Frames observed', value: '${snapshot.frameCount}'),
+            _StatusRow(label: 'Frames >16.7 ms', value: '${snapshot.framesOver16Ms}'),
+            _StatusRow(label: 'Frames >33.3 ms', value: '${snapshot.framesOver33Ms}'),
+            _StatusRow(label: 'Max frame', value: _ms(snapshot.maxFrameMicroseconds.toDouble())),
+            _StatusRow(label: 'Average build', value: _ms(snapshot.averageBuildMicroseconds)),
+            _StatusRow(label: 'Average raster', value: _ms(snapshot.averageRasterMicroseconds)),
+            if (startup.isNotEmpty) ...<Widget>[
+              const SizedBox(height: 12),
+              Text('Startup timings', style: Theme.of(context).textTheme.titleSmall),
+              const SizedBox(height: 6),
+              for (final BreakWavePerformanceSample sample in startup)
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 4),
+                  child: Text(
+                    '${sample.name}: '
+                    '${sample.durationMilliseconds.toStringAsFixed(1)} ms '
+                    '· ${_mib(sample.rssBytes)}',
+                  ),
+                ),
+            ],
+            if (billingRefresh != null) ...<Widget>[
+              const SizedBox(height: 12),
+              Text(
+                'Latest Billing QA refresh: '
+                '${billingRefresh.durationMilliseconds.toStringAsFixed(1)} ms '
+                '· ${_mib(billingRefresh.rssBytes)}',
+              ),
+            ],
+            const SizedBox(height: 12),
+            Text('Recent tab transitions', style: Theme.of(context).textTheme.titleSmall),
+            const SizedBox(height: 6),
+            if (tabs.isEmpty)
+              const Text('Switch tabs, then refresh this view.')
+            else
+              for (final BreakWavePerformanceSample sample in tabs)
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 4),
+                  child: Text(
+                    '${sample.name}: '
+                    '${sample.durationMilliseconds.toStringAsFixed(1)} ms '
+                    '· ${_mib(sample.rssBytes)}',
+                  ),
+                ),
+            const SizedBox(height: 12),
+            OutlinedButton(
+              onPressed: onRefresh,
+              child: const Text('Refresh performance view'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  String _mib(int bytes) {
+    if (bytes <= 0) return 'unavailable';
+    return '${(bytes / (1024 * 1024)).toStringAsFixed(1)} MiB';
+  }
+
+  String _ms(double microseconds) =>
+      '${(microseconds / 1000.0).toStringAsFixed(1)} ms';
 }
 
 class _PackageCard extends StatelessWidget {

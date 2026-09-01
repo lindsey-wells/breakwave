@@ -80,6 +80,7 @@ jobs:
           if [ -f tools/verify_bw_wp03w.py ]; then
             python3 tools/verify_bw_wp03w.py
           fi
+          python3 tools/verify_bw_perf01.py
 
       - name: Analyze
         run: flutter analyze --no-fatal-infos

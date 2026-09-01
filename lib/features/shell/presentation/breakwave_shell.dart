@@ -10,6 +10,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../core/billing/breakwave_billing_qa_config.dart';
+import '../../../core/performance/breakwave_performance_probe.dart';
 import '../../../core/privacy_lock/privacy_lock_mode.dart';
 import '../../../core/privacy_lock/privacy_lock_settings.dart';
 import '../../../core/privacy_lock/privacy_lock_store.dart';
@@ -138,8 +139,25 @@ class _BreakWaveShellState extends State<BreakWaveShell>
     });
   }
 
+  String _destinationPerformanceLabel(int index) {
+    return switch (index) {
+      0 => 'home',
+      1 => 'rescue',
+      2 => 'log',
+      3 => 'support',
+      4 => 'billing_qa',
+      _ => 'unknown_$index',
+    };
+  }
+
   void _onDestinationSelected(int index) {
     if (_selectedIndex == index && index != 0 && index != 2) return;
+
+    final int previousIndex = _selectedIndex;
+    final Stopwatch? transitionTimer =
+        BreakWavePerformanceProbe.enabled
+            ? BreakWavePerformanceProbe.startTimer()
+            : null;
 
     setState(() {
       if (index == 0) {
@@ -150,6 +168,18 @@ class _BreakWaveShellState extends State<BreakWaveShell>
       }
       _selectedIndex = index;
     });
+
+    if (transitionTimer != null) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        BreakWavePerformanceProbe.recordElapsed(
+          category: 'tab',
+          name:
+              'tab_${_destinationPerformanceLabel(previousIndex)}'
+              '_to_${_destinationPerformanceLabel(index)}',
+          stopwatch: transitionTimer,
+        );
+      });
+    }
   }
 
   void _returnHome() {
