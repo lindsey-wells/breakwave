@@ -47,7 +47,7 @@ for path in Path("lib").rglob("*.dart"):
             failed = True
 
     lower = text.lower()
-    if "todo" in lower or "fixme" in lower:
+    if re.search(r"\b(?:todo|fixme)\b", text, re.IGNORECASE):
         print(f"FAIL unfinished TODO/FIXME marker in {path}")
         failed = True
 
