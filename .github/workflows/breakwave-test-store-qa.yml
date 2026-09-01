@@ -11,6 +11,7 @@ on:
     branches:
       - billing/wp-03vt2-test-store-qa-apk
       - billing/wp-03w-customer-plus
+      - perf/qa-readonly-instrumentation
   workflow_dispatch:
     inputs:
       run_label:
