@@ -12,6 +12,7 @@ on:
       - billing/wp-03vt2-test-store-qa-apk
       - billing/wp-03w-customer-plus
       - perf/qa-readonly-instrumentation
+      - perf/perf02b-notification-startup
   workflow_dispatch:
     inputs:
       run_label:
