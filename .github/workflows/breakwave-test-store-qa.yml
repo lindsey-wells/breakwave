@@ -13,6 +13,7 @@ on:
       - billing/wp-03w-customer-plus
       - perf/qa-readonly-instrumentation
       - perf/perf02b-notification-startup
+      - perf/perf02c-privacy-startup
   workflow_dispatch:
     inputs:
       run_label:
@@ -83,6 +84,7 @@ jobs:
             python3 tools/verify_bw_wp03w.py
           fi
           python3 tools/verify_bw_perf01.py
+          python3 tools/verify_bw_perf02c.py
 
       - name: Analyze
         run: flutter analyze --no-fatal-infos

@@ -58,10 +58,33 @@ Future<void> main() async {
           : null;
 
   try {
+    final Stopwatch? privacySettingsTimer =
+        BreakWavePerformanceProbe.enabled
+            ? BreakWavePerformanceProbe.startTimer()
+            : null;
     final PrivacySettings privacy = await PrivacySettingsStore.load();
+    if (privacySettingsTimer != null) {
+      BreakWavePerformanceProbe.recordElapsed(
+        category: 'startup',
+        name: 'privacy_settings_load',
+        stopwatch: privacySettingsTimer,
+      );
+    }
+
+    final Stopwatch? privacyShieldTimer =
+        BreakWavePerformanceProbe.enabled
+            ? BreakWavePerformanceProbe.startTimer()
+            : null;
     await ScreenPrivacyService.setScreenPrivacyEnabled(
       privacy.blockScreenshotsAndScreenRecording,
     );
+    if (privacyShieldTimer != null) {
+      BreakWavePerformanceProbe.recordElapsed(
+        category: 'startup',
+        name: 'privacy_screen_shield_apply',
+        stopwatch: privacyShieldTimer,
+      );
+    }
   } catch (_) {
     // Screen privacy is a best-effort shield. Never let it block app launch.
   } finally {
