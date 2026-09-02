@@ -34,28 +34,47 @@ class BreakWaveNotifications {
   static const String fallbackNotificationIconName = '@mipmap/ic_launcher';
 
   static bool _initialized = false;
+  static Future<void>? _initializationFuture;
   static bool _timeZoneReady = false;
   static String? _timeZoneIdentifier;
 
-  static Future<void> initialize() async {
-    if (_initialized) return;
+  static Future<void> initialize() {
+    if (_initialized) {
+      return Future<void>.value();
+    }
 
-    tz.initializeTimeZones();
-    await _configureLocalTimeZone();
+    final Future<void>? pendingInitialization =
+        _initializationFuture;
+    if (pendingInitialization != null) {
+      return pendingInitialization;
+    }
 
-    final AndroidInitializationSettings androidSettings =
-        AndroidInitializationSettings(
-      fallbackNotificationIconName,
-    );
+    final Future<void> initialization = _initializeOnce();
+    _initializationFuture = initialization;
+    return initialization;
+  }
 
-    final InitializationSettings initializationSettings =
-        InitializationSettings(android: androidSettings);
+  static Future<void> _initializeOnce() async {
+    try {
+      tz.initializeTimeZones();
+      await _configureLocalTimeZone();
 
-    await _plugin.initialize(
-      settings: initializationSettings,
-    );
+      final AndroidInitializationSettings androidSettings =
+          AndroidInitializationSettings(
+        fallbackNotificationIconName,
+      );
 
-    _initialized = true;
+      final InitializationSettings initializationSettings =
+          InitializationSettings(android: androidSettings);
+
+      await _plugin.initialize(
+        settings: initializationSettings,
+      );
+
+      _initialized = true;
+    } finally {
+      _initializationFuture = null;
+    }
   }
 
   static Future<void> _configureLocalTimeZone() async {

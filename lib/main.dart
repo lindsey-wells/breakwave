@@ -19,18 +19,7 @@ import 'core/privacy/privacy_settings_store.dart';
 import 'core/privacy/screen_privacy_service.dart';
 import 'core/reminders/breakwave_notifications.dart';
 
-Future<void> main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-
-  final Stopwatch? qaStartupTimer =
-      BreakWavePerformanceProbe.enabled
-          ? BreakWavePerformanceProbe.startTimer()
-          : null;
-
-  if (BreakWavePerformanceProbe.enabled) {
-    BreakWavePerformanceProbe.installFrameTimingObserver();
-  }
-
+Future<void> _warmNotificationsAfterFirstFrame() async {
   final Stopwatch? notificationTimer =
       BreakWavePerformanceProbe.enabled
           ? BreakWavePerformanceProbe.startTimer()
@@ -48,6 +37,19 @@ Future<void> main() async {
         stopwatch: notificationTimer,
       );
     }
+  }
+}
+
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  final Stopwatch? qaStartupTimer =
+      BreakWavePerformanceProbe.enabled
+          ? BreakWavePerformanceProbe.startTimer()
+          : null;
+
+  if (BreakWavePerformanceProbe.enabled) {
+    BreakWavePerformanceProbe.installFrameTimingObserver();
   }
 
   final Stopwatch? privacyTimer =
@@ -93,8 +95,8 @@ Future<void> main() async {
 
   runApp(const BreakWaveApp());
 
-  if (firstFrameTimer != null && qaStartupTimer != null) {
-    WidgetsBinding.instance.addPostFrameCallback((_) {
+  WidgetsBinding.instance.addPostFrameCallback((_) {
+    if (firstFrameTimer != null && qaStartupTimer != null) {
       BreakWavePerformanceProbe.recordElapsed(
         category: 'startup',
         name: 'runApp_to_first_frame',
@@ -105,8 +107,10 @@ Future<void> main() async {
         name: 'qa_entry_to_first_frame',
         stopwatch: qaStartupTimer,
       );
-    });
-  }
+    }
+
+    unawaited(_warmNotificationsAfterFirstFrame());
+  });
 
   if (!BreakWaveBillingQaConfig.enabled) {
     unawaited(RevenueCatBootstrap.initialize());

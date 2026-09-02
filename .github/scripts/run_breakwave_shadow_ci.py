@@ -30,7 +30,12 @@ PRE_WP03W_REF = "b7ef61ed24a9aae1e683c2d8e790e70802f754c4"
 # freeze the prior implementation execute at the direct parent state.
 PRE_PERF02A_REF = "aad47817f602a716e4094bcd8857dc6a1f48dfd4"
 
+# PERF-02B moves notification initialization after first frame.
+# BW-34 freezes the prior awaited startup implementation.
+PRE_PERF02B_REF = "97e17cc2eb7ad6a2db99fddfdb638ce22df326b0"
+
 PHASE_VERIFIER_REFS = {
+    "tools/verify_bw34.py": PRE_PERF02B_REF,
     "tools/verify_bw13b.py": PRE_PERF02A_REF,
     "tools/verify_bw89a8b.py": PRE_PERF02A_REF,
     "tools/verify_bw89a9.py": PRE_PERF02A_REF,
@@ -251,6 +256,8 @@ def run_phase_aware_verifiers(name: str, verifier_paths: list[str]) -> dict:
 
 def phase_routing_selftest() -> None:
     expected = {
+        "tools/verify_bw34.py": PRE_PERF02B_REF,
+        "tools/verify_bw_perf02b.py": "HEAD",
         "tools/verify_bw13b.py": PRE_PERF02A_REF,
         "tools/verify_bw89a8b.py": PRE_PERF02A_REF,
         "tools/verify_bw89a9.py": PRE_PERF02A_REF,
@@ -297,6 +304,8 @@ def phase_routing_selftest() -> None:
     result = run_phase_aware_verifiers(
         "phase_routing_selftest",
         [
+            "tools/verify_bw34.py",
+            "tools/verify_bw_perf02b.py",
             "tools/verify_bw13b.py",
             "tools/verify_bw89a8b.py",
             "tools/verify_bw89a9.py",
@@ -337,6 +346,8 @@ def phase_routing_selftest() -> None:
     print("PASS: Shadow phase-aware billing verifier routing selftest.")
     print("PASS: superseded Plus-era contracts run at PRE_WP03W_REF.")
     print("PASS: current WP-03W verifier remains on HEAD.")
+    print("PASS: PERF-02B historical BW-34 contract runs at PRE_PERF02B_REF.")
+    print("PASS: current PERF-02B verifier remains on HEAD.")
 
 
 
