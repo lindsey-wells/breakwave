@@ -3,13 +3,20 @@ package com.cube23.breakwave
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
+import android.os.Bundle
 import android.provider.Settings
 import android.view.WindowManager
 import io.flutter.embedding.android.FlutterActivity
 import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.plugin.common.MethodChannel
+import org.json.JSONObject
 
 class MainActivity : FlutterActivity() {
+    override fun onCreate(savedInstanceState: Bundle?) {
+        applyScreenPrivacyLaunchGuard()
+        super.onCreate(savedInstanceState)
+    }
+
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
         super.configureFlutterEngine(flutterEngine)
 
@@ -74,6 +81,36 @@ class MainActivity : FlutterActivity() {
                 }
                 else -> result.notImplemented()
             }
+        }
+    }
+
+    private fun applyScreenPrivacyLaunchGuard() {
+        setScreenPrivacyEnabled(readStoredScreenPrivacyEnabled())
+    }
+
+    private fun readStoredScreenPrivacyEnabled(): Boolean {
+        return try {
+            val preferences = getSharedPreferences(
+                FLUTTER_SHARED_PREFERENCES,
+                MODE_PRIVATE
+            )
+            val raw = preferences.getString(
+                FLUTTER_PRIVACY_SETTINGS_KEY,
+                null
+            )
+
+            // A missing/corrupt startup state is intentionally fail-secure.
+            // Flutter reconciles its actual saved/default setting asynchronously.
+            if (raw.isNullOrBlank()) {
+                true
+            } else {
+                JSONObject(raw).optBoolean(
+                    SCREEN_PRIVACY_JSON_KEY,
+                    false
+                )
+            }
+        } catch (_: Exception) {
+            true
         }
     }
 
@@ -165,6 +202,9 @@ class MainActivity : FlutterActivity() {
 
     companion object {
         private const val SCREEN_PRIVACY_CHANNEL = "breakwave/screen_privacy"
+        private const val FLUTTER_SHARED_PREFERENCES = "FlutterSharedPreferences"
+        private const val FLUTTER_PRIVACY_SETTINGS_KEY = "flutter.bw_privacy_settings_v1"
+        private const val SCREEN_PRIVACY_JSON_KEY = "blockScreenshotsAndScreenRecording"
         private const val SOCIAL_LINKS_CHANNEL = "breakwave/social_links"
         private const val NOTIFICATION_SETTINGS_CHANNEL = "breakwave/notification_settings"
     }

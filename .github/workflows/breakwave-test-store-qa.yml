@@ -84,7 +84,7 @@ jobs:
             python3 tools/verify_bw_wp03w.py
           fi
           python3 tools/verify_bw_perf01.py
-          python3 tools/verify_bw_perf02c.py
+          python3 tools/verify_bw_perf02c_native.py
 
       - name: Analyze
         run: flutter analyze --no-fatal-infos

@@ -19,6 +19,29 @@ import 'core/privacy/privacy_settings_store.dart';
 import 'core/privacy/screen_privacy_service.dart';
 import 'core/reminders/breakwave_notifications.dart';
 
+Future<void> _reconcileScreenPrivacyAfterNativeLaunch(
+  bool enabled,
+) async {
+  final Stopwatch? privacyShieldTimer =
+      BreakWavePerformanceProbe.enabled
+          ? BreakWavePerformanceProbe.startTimer()
+          : null;
+
+  try {
+    await ScreenPrivacyService.setScreenPrivacyEnabled(enabled);
+  } catch (_) {
+    // Android already applied the launch guard. Reconciliation is best effort.
+  } finally {
+    if (privacyShieldTimer != null) {
+      BreakWavePerformanceProbe.recordElapsed(
+        category: 'startup',
+        name: 'privacy_screen_shield_reconcile',
+        stopwatch: privacyShieldTimer,
+      );
+    }
+  }
+}
+
 Future<void> _warmNotificationsAfterFirstFrame() async {
   final Stopwatch? notificationTimer =
       BreakWavePerformanceProbe.enabled
@@ -71,20 +94,13 @@ Future<void> main() async {
       );
     }
 
-    final Stopwatch? privacyShieldTimer =
-        BreakWavePerformanceProbe.enabled
-            ? BreakWavePerformanceProbe.startTimer()
-            : null;
-    await ScreenPrivacyService.setScreenPrivacyEnabled(
-      privacy.blockScreenshotsAndScreenRecording,
+    // Android applies the launch guard before FlutterActivity.onCreate.
+    // Reconcile the actual Flutter preference without holding the first frame.
+    unawaited(
+      _reconcileScreenPrivacyAfterNativeLaunch(
+        privacy.blockScreenshotsAndScreenRecording,
+      ),
     );
-    if (privacyShieldTimer != null) {
-      BreakWavePerformanceProbe.recordElapsed(
-        category: 'startup',
-        name: 'privacy_screen_shield_apply',
-        stopwatch: privacyShieldTimer,
-      );
-    }
   } catch (_) {
     // Screen privacy is a best-effort shield. Never let it block app launch.
   } finally {
