@@ -79,7 +79,7 @@ def verify_static() -> list[str]:
         failures,
         "pubspec.yaml",
         [
-            "version: 1.0.1+2",
+            "version: 1.0.1+3",
             "assets:",
             (
                 "- assets/branding/"
