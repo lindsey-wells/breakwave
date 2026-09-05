@@ -19,6 +19,7 @@ import '../../insights/presentation/recovery_insights_screen.dart';
 import '../../personal_plan/presentation/personal_recovery_plan_screen.dart';
 import '../../recovery_report/presentation/recovery_report_builder_screen.dart';
 import '../application/breakwave_plus_controller.dart';
+import 'breakwave_plus_badge.dart';
 
 class BreakWavePlusScreen extends StatefulWidget {
   const BreakWavePlusScreen({
@@ -301,24 +302,15 @@ class _AccessStatusCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final bool active = snapshot.isPlusUnlocked;
-    final Color statusColor =
-        active ? Colors.blue : Colors.grey.shade600;
-
     return _PlusCard(
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
-          Container(
-            width: 52,
-            height: 52,
-            decoration: BoxDecoration(
-              color: statusColor,
-              shape: BoxShape.circle,
-            ),
-            child: const Icon(
-              Icons.workspace_premium_rounded,
-              color: Colors.white,
-            ),
+          BreakWavePlusBadge(
+            active: active,
+            statusColor:
+                active ? Colors.blue : Colors.grey.shade600,
+            size: 58,
           ),
           const SizedBox(width: 14),
           Expanded(

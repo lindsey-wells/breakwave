@@ -10,6 +10,7 @@ import 'package:flutter/material.dart';
 
 import '../../../core/billing/breakwave_billing_composition.dart';
 import '../../../core/billing/breakwave_billing_scope.dart';
+import 'breakwave_plus_badge.dart';
 
 class BreakWavePlusAccessButton extends StatefulWidget {
   const BreakWavePlusAccessButton({
@@ -89,27 +90,22 @@ class _BreakWavePlusAccessButtonState
     return Semantics(
       button: true,
       label: tooltip,
-      child: Material(
-        color: background,
-        shape: const CircleBorder(),
-        elevation: 3,
-        child: IconButton(
-          key: const Key('breakwave-plus-access-button'),
-          onPressed: widget.onPressed,
-          tooltip: tooltip,
-          icon: _loading
-              ? const SizedBox(
-                  width: 21,
-                  height: 21,
-                  child: CircularProgressIndicator(
-                    strokeWidth: 2,
-                    color: Colors.white,
-                  ),
-                )
-              : const Icon(
-                  Icons.add_rounded,
-                  color: Colors.white,
-                ),
+      child: Tooltip(
+        message: tooltip,
+        child: Material(
+          color: Colors.transparent,
+          shape: const CircleBorder(),
+          child: InkWell(
+            key: const Key('breakwave-plus-access-button'),
+            customBorder: const CircleBorder(),
+            onTap: widget.onPressed,
+            child: BreakWavePlusBadge(
+              active: _active,
+              statusColor: background,
+              size: 62,
+              loading: _loading,
+            ),
+          ),
         ),
       ),
     );

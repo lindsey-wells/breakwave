@@ -276,7 +276,6 @@ class _BreakWaveShellState extends State<BreakWaveShell>
     final bool showCustomerPlusAccess =
         !_lockLoading &&
         !showLockScreen &&
-        _selectedIndex != 1 &&
         _selectedIndex < 4;
 
     final Widget shellBody = _lockLoading

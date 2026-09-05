@@ -112,7 +112,7 @@ for marker in (
 
 for marker in (
     "BreakWavePlusAccessButton",
-    "_selectedIndex != 1",
+    "_selectedIndex < 4",
     "BreakWavePlusScreen(",
 ):
     require(shell, marker, "shell Plus access invariant missing")

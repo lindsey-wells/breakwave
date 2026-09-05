@@ -166,7 +166,7 @@ class SupportScreen extends StatelessWidget {
                     title: 'Explore BreakWave Plus',
                     subtitle:
                         'Preview longer-term planning, insight, and guided recovery tools.',
-                    icon: Icons.workspace_premium_outlined,
+                    icon: Icons.add_rounded,
                     initiallyExpanded: false,
                     children: <Widget>[
                       _BreakWavePlusPreviewCard(
