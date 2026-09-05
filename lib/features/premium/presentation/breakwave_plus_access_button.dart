@@ -107,7 +107,7 @@ class _BreakWavePlusAccessButtonState
                   ),
                 )
               : const Icon(
-                  Icons.workspace_premium_rounded,
+                  Icons.add_rounded,
                   color: Colors.white,
                 ),
         ),

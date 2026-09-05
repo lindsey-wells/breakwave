@@ -12,6 +12,7 @@
 // Notes: BW-NOTIFY-01A adds test delivery and reminder-readiness feedback.
 // ------------------------------------------------------------
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import '../../../../core/reminders/android_notification_settings.dart';
@@ -580,6 +581,7 @@ class _ReminderSettingsCardState extends State<ReminderSettingsCard> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
+          if (!kReleaseMode) ...<Widget>[
           Text(
             'Notification readiness',
             style: theme.textTheme.titleSmall?.copyWith(
@@ -696,6 +698,7 @@ class _ReminderSettingsCardState extends State<ReminderSettingsCard> {
           const SizedBox(height: 18),
           Divider(color: colorScheme.outlineVariant),
           const SizedBox(height: 14),
+          ],
           Text(
             'Precise reminder timing',
             style: theme.textTheme.titleSmall?.copyWith(
@@ -748,6 +751,7 @@ class _ReminderSettingsCardState extends State<ReminderSettingsCard> {
               ),
             ),
           ],
+          if (!kReleaseMode) ...<Widget>[
           Text(
             'Scheduled delivery proof',
             style: theme.textTheme.titleSmall?.copyWith(
@@ -801,6 +805,10 @@ class _ReminderSettingsCardState extends State<ReminderSettingsCard> {
             ),
           ),
           const SizedBox(height: 18),
+          ],
+          const SizedBox(height: 18),
+          Divider(color: colorScheme.outlineVariant),
+          const SizedBox(height: 14),
           Text(
             'Android delivery controls',
             style: theme.textTheme.titleSmall?.copyWith(
