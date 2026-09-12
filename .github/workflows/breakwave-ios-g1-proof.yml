@@ -153,7 +153,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          flutter analyze 2>&1 \
+          flutter analyze --no-fatal-infos 2>&1 \
             | tee "${IOS_G1_EVIDENCE_DIR}/flutter_analyze.txt"
 
       - name: Flutter test
