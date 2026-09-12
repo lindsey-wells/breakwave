@@ -1,0 +1,204 @@
+name: BreakWave iOS G1 Proof
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+  BREAKWAVE_FLUTTER_VERSION: '3.44.9'
+  BREAKWAVE_IOS_G1_BASELINE_SHA: '07406b26dc3a98170c6181ef5cc69dac1f468496'
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  ios-g1-proof:
+    name: macOS 26 unsigned iOS Simulator proof
+    runs-on: macos-26
+    timeout-minutes: 45
+
+    steps:
+      - name: Checkout exact September baseline
+        uses: actions/checkout@v5
+        with:
+          ref: ${{ env.BREAKWAVE_IOS_G1_BASELINE_SHA }}
+          fetch-depth: 1
+
+      - name: Verify exact source SHA
+        shell: bash
+        run: |
+          set -euo pipefail
+          ACTUAL_SHA="$(git rev-parse HEAD)"
+          echo "Expected: ${BREAKWAVE_IOS_G1_BASELINE_SHA}"
+          echo "Actual:   ${ACTUAL_SHA}"
+          test "${ACTUAL_SHA}" = "${BREAKWAVE_IOS_G1_BASELINE_SHA}"
+          test -z "$(git status --porcelain)"
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          flutter-version: ${{ env.BREAKWAVE_FLUTTER_VERSION }}
+          cache: true
+
+      - name: Create evidence directory
+        shell: bash
+        run: mkdir -p ios_g1_evidence
+
+      - name: Capture hosted macOS and Apple toolchain evidence
+        shell: bash
+        run: |
+          set -euo pipefail
+          {
+            echo "=== BREAKWAVE IOS-G1 TOOLCHAIN EVIDENCE ==="
+            echo "SOURCE_SHA=$(git rev-parse HEAD)"
+            echo "GITHUB_RUN_ID=${GITHUB_RUN_ID}"
+            echo "GITHUB_RUN_ATTEMPT=${GITHUB_RUN_ATTEMPT}"
+            echo "RUNNER_OS=${RUNNER_OS}"
+            echo "RUNNER_ARCH=${RUNNER_ARCH}"
+            echo "ImageOS=${ImageOS:-unknown}"
+            echo "ImageVersion=${ImageVersion:-unknown}"
+            echo
+            echo "=== XCODE ==="
+            xcodebuild -version
+            echo "DEVELOPER_DIR=$(xcode-select -p)"
+            echo
+            echo "=== IOS SIMULATOR SDK ==="
+            xcrun --sdk iphonesimulator --show-sdk-version
+            echo
+            echo "=== SWIFT ==="
+            swift --version
+            echo
+            echo "=== COCOAPODS ==="
+            if command -v pod >/dev/null 2>&1; then pod --version; else echo "pod=NOT_PRESENT"; fi
+            echo
+            echo "=== FLUTTER ==="
+            flutter --version
+            echo
+            echo "=== DART ==="
+            dart --version 2>&1
+          } | tee ios_g1_evidence/toolchain.txt
+
+          flutter --version | tee /tmp/breakwave_flutter_version.txt
+          grep -F "Flutter ${BREAKWAVE_FLUTTER_VERSION}" /tmp/breakwave_flutter_version.txt
+
+      - name: Capture Flutter doctor
+        shell: bash
+        run: |
+          set -o pipefail
+          flutter doctor -v 2>&1 | tee ios_g1_evidence/flutter_doctor.txt || true
+
+      - name: Hash dependency inputs before resolution
+        shell: bash
+        run: |
+          set -euo pipefail
+          shasum -a 256 pubspec.yaml pubspec.lock | tee ios_g1_evidence/dependency_hashes_before.txt
+
+      - name: Resolve Flutter dependencies without lock drift
+        shell: bash
+        run: |
+          set -euo pipefail
+          flutter pub get 2>&1 | tee ios_g1_evidence/flutter_pub_get.txt
+          git diff --exit-code -- pubspec.lock
+          shasum -a 256 pubspec.yaml pubspec.lock | tee ios_g1_evidence/dependency_hashes_after.txt
+          if [ -n "$(git status --porcelain)" ]; then
+            git status --short | tee ios_g1_evidence/repository_drift.txt
+            exit 1
+          fi
+
+      - name: BreakWaveVerify engine self-test
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 tools/breakwave_verify.py selftest 2>&1 | tee ios_g1_evidence/breakwave_verify_selftest.txt
+
+      - name: Flutter analyze
+        shell: bash
+        run: |
+          set -euo pipefail
+          flutter analyze 2>&1 | tee ios_g1_evidence/flutter_analyze.txt
+
+      - name: Flutter test
+        shell: bash
+        run: |
+          set -euo pipefail
+          flutter test 2>&1 | tee ios_g1_evidence/flutter_test.txt
+
+      - name: Build unsigned iOS Simulator app
+        shell: bash
+        run: |
+          set -euo pipefail
+          flutter precache --ios
+          flutter build ios --simulator --debug 2>&1 | tee ios_g1_evidence/flutter_build_ios_simulator.txt
+
+          APP_PATH="$(find build/ios -type d -name Runner.app -print -quit)"
+          test -n "${APP_PATH}"
+          test -d "${APP_PATH}"
+
+          echo "${APP_PATH}" | tee ios_g1_evidence/runner_app_path.txt
+          ditto -c -k --sequesterRsrc --keepParent "${APP_PATH}" ios_g1_evidence/BreakWave_iOS_G1_Runner_app.zip
+          shasum -a 256 ios_g1_evidence/BreakWave_iOS_G1_Runner_app.zip | tee ios_g1_evidence/runner_app_sha256.txt
+          shasum -a 256 pubspec.lock | tee ios_g1_evidence/pubspec_lock_sha256.txt
+
+      - name: Capture final repository cleanliness
+        shell: bash
+        run: |
+          set -euo pipefail
+          git status --short | tee ios_g1_evidence/git_status_final.txt
+          test -z "$(git status --porcelain)"
+
+      - name: Write machine-readable G1 evidence
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import hashlib, json, os, pathlib, subprocess
+          root = pathlib.Path(".")
+          evidence = root / "ios_g1_evidence"
+          artifact = evidence / "BreakWave_iOS_G1_Runner_app.zip"
+          lockfile = root / "pubspec.lock"
+
+          def sha256(path):
+              h = hashlib.sha256()
+              with open(path, "rb") as f:
+                  for chunk in iter(lambda: f.read(1024 * 1024), b""):
+                      h.update(chunk)
+              return h.hexdigest()
+
+          def cmd(*args):
+              return subprocess.check_output(args, text=True).strip()
+
+          payload = {
+              "gate": "IOS-G1",
+              "result": "BUILD_COMPLETED",
+              "source_sha": cmd("git", "rev-parse", "HEAD"),
+              "expected_source_sha": os.environ["BREAKWAVE_IOS_G1_BASELINE_SHA"],
+              "github_run_id": os.environ.get("GITHUB_RUN_ID"),
+              "github_run_attempt": os.environ.get("GITHUB_RUN_ATTEMPT"),
+              "runner_os": os.environ.get("RUNNER_OS"),
+              "runner_arch": os.environ.get("RUNNER_ARCH"),
+              "runner_image_os": os.environ.get("ImageOS", "unknown"),
+              "runner_image_version": os.environ.get("ImageVersion", "unknown"),
+              "flutter_pin": os.environ["BREAKWAVE_FLUTTER_VERSION"],
+              "xcode": cmd("xcodebuild", "-version"),
+              "ios_simulator_sdk": cmd("xcrun", "--sdk", "iphonesimulator", "--show-sdk-version"),
+              "pubspec_lock_sha256": sha256(lockfile),
+              "runner_app_zip_sha256": sha256(artifact),
+              "signing_used": False,
+              "apple_credentials_used": False,
+          }
+
+          (evidence / "ios_g1_evidence.json").write_text(
+              json.dumps(payload, indent=2) + "\n", encoding="utf-8"
+          )
+          print(json.dumps(payload, indent=2))
+          PY
+
+      - name: Upload IOS-G1 evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: breakwave-ios-g1-${{ github.run_id }}
+          path: ios_g1_evidence/
+          if-no-files-found: error
+          retention-days: 30
