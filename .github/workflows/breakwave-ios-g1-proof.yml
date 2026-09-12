@@ -1,15 +1,15 @@
 name: BreakWave iOS G1 Proof
 
-env:
-  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
-  BREAKWAVE_FLUTTER_VERSION: '3.44.9'
-  BREAKWAVE_IOS_G1_BASELINE_SHA: '07406b26dc3a98170c6181ef5cc69dac1f468496'
-
-on:
+"on":
   workflow_dispatch:
 
 permissions:
   contents: read
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+  BREAKWAVE_FLUTTER_VERSION: "3.44.9"
+  BREAKWAVE_IOS_G1_BASELINE_SHA: "07406b26dc3a98170c6181ef5cc69dac1f468496"
 
 jobs:
   ios-g1-proof:
@@ -28,11 +28,11 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          ACTUAL_SHA="$(git rev-parse HEAD)"
+          actual="$(git rev-parse HEAD)"
           echo "Expected: ${BREAKWAVE_IOS_G1_BASELINE_SHA}"
-          echo "Actual:   ${ACTUAL_SHA}"
-          test "${ACTUAL_SHA}" = "${BREAKWAVE_IOS_G1_BASELINE_SHA}"
-          test -z "$(git status --porcelain)"
+          echo "Actual:   ${actual}"
+          test "${actual}" = "${BREAKWAVE_IOS_G1_BASELINE_SHA}"
+          test -z "$(git status --porcelain --untracked-files=all)"
 
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
@@ -41,9 +41,13 @@ jobs:
           flutter-version: ${{ env.BREAKWAVE_FLUTTER_VERSION }}
           cache: true
 
-      - name: Create evidence directory
+      - name: Initialize external evidence directory
         shell: bash
-        run: mkdir -p ios_g1_evidence
+        run: |
+          set -euo pipefail
+          evidence="${RUNNER_TEMP}/breakwave_ios_g1_evidence"
+          mkdir -p "${evidence}"
+          echo "IOS_G1_EVIDENCE_DIR=${evidence}" >> "${GITHUB_ENV}"
 
       - name: Capture hosted macOS and Apple toolchain evidence
         shell: bash
@@ -70,54 +74,71 @@ jobs:
             swift --version
             echo
             echo "=== COCOAPODS ==="
-            if command -v pod >/dev/null 2>&1; then pod --version; else echo "pod=NOT_PRESENT"; fi
+            if command -v pod >/dev/null 2>&1; then
+              pod --version
+            else
+              echo "pod=NOT_PRESENT"
+            fi
             echo
             echo "=== FLUTTER ==="
             flutter --version
             echo
             echo "=== DART ==="
             dart --version 2>&1
-          } | tee ios_g1_evidence/toolchain.txt
+          } | tee "${IOS_G1_EVIDENCE_DIR}/toolchain.txt"
 
-          flutter --version | tee /tmp/breakwave_flutter_version.txt
-          grep -F "Flutter ${BREAKWAVE_FLUTTER_VERSION}" /tmp/breakwave_flutter_version.txt
+          flutter --version | tee "${RUNNER_TEMP}/breakwave_flutter_version.txt"
+          grep -F "Flutter ${BREAKWAVE_FLUTTER_VERSION}" "${RUNNER_TEMP}/breakwave_flutter_version.txt"
 
       - name: Capture Flutter doctor
         shell: bash
         run: |
           set -o pipefail
-          flutter doctor -v 2>&1 | tee ios_g1_evidence/flutter_doctor.txt || true
+          flutter doctor -v 2>&1 | tee "${IOS_G1_EVIDENCE_DIR}/flutter_doctor.txt" || true
 
       - name: Hash dependency inputs before resolution
         shell: bash
         run: |
           set -euo pipefail
-          shasum -a 256 pubspec.yaml pubspec.lock | tee ios_g1_evidence/dependency_hashes_before.txt
+          shasum -a 256 pubspec.yaml pubspec.lock \
+            | tee "${IOS_G1_EVIDENCE_DIR}/dependency_hashes_before.txt"
 
-      - name: Resolve Flutter dependencies and classify generated iOS bootstrap
+      - name: Resolve Flutter dependencies and classify iOS bootstrap
         shell: bash
         run: |
           set -euo pipefail
-          flutter pub get 2>&1 | tee ios_g1_evidence/flutter_pub_get.txt
+
+          flutter pub get 2>&1 \
+            | tee "${IOS_G1_EVIDENCE_DIR}/flutter_pub_get.txt"
 
           git diff --exit-code -- pubspec.lock
-          shasum -a 256 pubspec.yaml pubspec.lock | tee ios_g1_evidence/dependency_hashes_after.txt
 
-          git status --porcelain --untracked-files=all             | grep -v '^?? ios_g1_evidence/'             | tee ios_g1_evidence/repository_drift_after_pub_get.txt || true
+          shasum -a 256 pubspec.yaml pubspec.lock \
+            | tee "${IOS_G1_EVIDENCE_DIR}/dependency_hashes_after.txt"
 
-          git diff -- ios/Flutter/Debug.xcconfig ios/Flutter/Release.xcconfig             > ios_g1_evidence/generated_xcconfig.diff || true
+          git status --porcelain --untracked-files=all \
+            | tee "${IOS_G1_EVIDENCE_DIR}/git_status_after_pub_get.txt"
+
+          git diff -- ios/Flutter/Debug.xcconfig ios/Flutter/Release.xcconfig \
+            > "${IOS_G1_EVIDENCE_DIR}/generated_xcconfig.diff" || true
+
           if [ -f ios/Podfile ]; then
-            cp ios/Podfile ios_g1_evidence/generated_Podfile
+            cp ios/Podfile "${IOS_G1_EVIDENCE_DIR}/generated_Podfile"
           fi
 
-          BAD_DRIFT="$(
-            git status --porcelain --untracked-files=all               | grep -v '^?? ios_g1_evidence/'               | grep -Ev '^( M ios/Flutter/(Debug|Release)\.xcconfig|\?\? ios/Podfile)$'               || true
+          unexpected="$(
+            git status --porcelain --untracked-files=all \
+              | awk '
+                  $0 == " M ios/Flutter/Debug.xcconfig" { next }
+                  $0 == " M ios/Flutter/Release.xcconfig" { next }
+                  $0 == "?? ios/Podfile" { next }
+                  { print }
+                '
           )"
 
-          if [ -n "${BAD_DRIFT}" ]; then
+          if [ -n "${unexpected}" ]; then
             echo "::error::IOS-G1 unexpected source drift after flutter pub get:"
-            printf '%s
-' "${BAD_DRIFT}"
+            echo "${unexpected}"
             exit 1
           fi
 
@@ -125,68 +146,95 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          python3 tools/breakwave_verify.py selftest 2>&1 | tee ios_g1_evidence/breakwave_verify_selftest.txt
+          python3 tools/breakwave_verify.py selftest 2>&1 \
+            | tee "${IOS_G1_EVIDENCE_DIR}/breakwave_verify_selftest.txt"
 
       - name: Flutter analyze
         shell: bash
         run: |
           set -euo pipefail
-          flutter analyze 2>&1 | tee ios_g1_evidence/flutter_analyze.txt
+          flutter analyze 2>&1 \
+            | tee "${IOS_G1_EVIDENCE_DIR}/flutter_analyze.txt"
 
       - name: Flutter test
         shell: bash
         run: |
           set -euo pipefail
-          flutter test 2>&1 | tee ios_g1_evidence/flutter_test.txt
+          flutter test 2>&1 \
+            | tee "${IOS_G1_EVIDENCE_DIR}/flutter_test.txt"
 
       - name: Build unsigned iOS Simulator app
         shell: bash
         run: |
           set -euo pipefail
+
           flutter precache --ios
-          flutter build ios --simulator --debug 2>&1 | tee ios_g1_evidence/flutter_build_ios_simulator.txt
 
-          APP_PATH="$(find build/ios -type d -name Runner.app -print -quit)"
-          test -n "${APP_PATH}"
-          test -d "${APP_PATH}"
+          flutter build ios --simulator --debug 2>&1 \
+            | tee "${IOS_G1_EVIDENCE_DIR}/flutter_build_ios_simulator.txt"
 
-          echo "${APP_PATH}" | tee ios_g1_evidence/runner_app_path.txt
-          ditto -c -k --sequesterRsrc --keepParent "${APP_PATH}" ios_g1_evidence/BreakWave_iOS_G1_Runner_app.zip
-          shasum -a 256 ios_g1_evidence/BreakWave_iOS_G1_Runner_app.zip | tee ios_g1_evidence/runner_app_sha256.txt
-          shasum -a 256 pubspec.lock | tee ios_g1_evidence/pubspec_lock_sha256.txt
+          app_path="$(find build/ios -type d -name Runner.app -print -quit)"
+          test -n "${app_path}"
+          test -d "${app_path}"
+
+          echo "${app_path}" \
+            | tee "${IOS_G1_EVIDENCE_DIR}/runner_app_path.txt"
+
+          ditto -c -k --sequesterRsrc --keepParent \
+            "${app_path}" \
+            "${IOS_G1_EVIDENCE_DIR}/BreakWave_iOS_G1_Runner_app.zip"
+
+          shasum -a 256 \
+            "${IOS_G1_EVIDENCE_DIR}/BreakWave_iOS_G1_Runner_app.zip" \
+            | tee "${IOS_G1_EVIDENCE_DIR}/runner_app_sha256.txt"
+
+          shasum -a 256 pubspec.lock \
+            | tee "${IOS_G1_EVIDENCE_DIR}/pubspec_lock_sha256.txt"
 
       - name: Classify final generated iOS build drift
         shell: bash
         run: |
           set -euo pipefail
 
-          git status --porcelain --untracked-files=all             | grep -v '^?? ios_g1_evidence/'             | tee ios_g1_evidence/git_status_final.txt || true
+          git status --porcelain --untracked-files=all \
+            | tee "${IOS_G1_EVIDENCE_DIR}/git_status_final.txt"
 
           if [ -f ios/Podfile.lock ]; then
-            cp ios/Podfile.lock ios_g1_evidence/generated_Podfile.lock
+            cp ios/Podfile.lock "${IOS_G1_EVIDENCE_DIR}/generated_Podfile.lock"
           fi
 
-          BAD_DRIFT="$(
-            git status --porcelain --untracked-files=all               | grep -v '^?? ios_g1_evidence/'               | grep -Ev '^( M ios/Flutter/(Debug|Release)\.xcconfig|\?\? ios/Podfile|\?\? ios/Podfile\.lock)$'               || true
+          unexpected="$(
+            git status --porcelain --untracked-files=all \
+              | awk '
+                  $0 == " M ios/Flutter/Debug.xcconfig" { next }
+                  $0 == " M ios/Flutter/Release.xcconfig" { next }
+                  $0 == "?? ios/Podfile" { next }
+                  $0 == "?? ios/Podfile.lock" { next }
+                  { print }
+                '
           )"
 
-          if [ -n "${BAD_DRIFT}" ]; then
+          if [ -n "${unexpected}" ]; then
             echo "::error::IOS-G1 unexpected source drift after iOS build:"
-            printf '%s
-' "${BAD_DRIFT}"
+            echo "${unexpected}"
             exit 1
           fi
 
-      - name: Write machine-readable G1 evidence
+      - name: Write machine-readable IOS-G1 evidence
         shell: bash
         run: |
           set -euo pipefail
+
           python3 - <<'PY'
-          import hashlib, json, os, pathlib, subprocess
-          root = pathlib.Path(".")
-          evidence = root / "ios_g1_evidence"
+          import hashlib
+          import json
+          import os
+          import pathlib
+          import subprocess
+
+          evidence = pathlib.Path(os.environ["IOS_G1_EVIDENCE_DIR"])
           artifact = evidence / "BreakWave_iOS_G1_Runner_app.zip"
-          lockfile = root / "pubspec.lock"
+          lockfile = pathlib.Path("pubspec.lock")
 
           def sha256(path):
               h = hashlib.sha256()
@@ -195,13 +243,13 @@ jobs:
                       h.update(chunk)
               return h.hexdigest()
 
-          def cmd(*args):
+          def command(*args):
               return subprocess.check_output(args, text=True).strip()
 
           payload = {
               "gate": "IOS-G1",
               "result": "BUILD_COMPLETED",
-              "source_sha": cmd("git", "rev-parse", "HEAD"),
+              "source_sha": command("git", "rev-parse", "HEAD"),
               "expected_source_sha": os.environ["BREAKWAVE_IOS_G1_BASELINE_SHA"],
               "github_run_id": os.environ.get("GITHUB_RUN_ID"),
               "github_run_attempt": os.environ.get("GITHUB_RUN_ATTEMPT"),
@@ -210,16 +258,23 @@ jobs:
               "runner_image_os": os.environ.get("ImageOS", "unknown"),
               "runner_image_version": os.environ.get("ImageVersion", "unknown"),
               "flutter_pin": os.environ["BREAKWAVE_FLUTTER_VERSION"],
-              "xcode": cmd("xcodebuild", "-version"),
-              "ios_simulator_sdk": cmd("xcrun", "--sdk", "iphonesimulator", "--show-sdk-version"),
+              "xcode": command("xcodebuild", "-version"),
+              "ios_simulator_sdk": command(
+                  "xcrun",
+                  "--sdk",
+                  "iphonesimulator",
+                  "--show-sdk-version",
+              ),
               "pubspec_lock_sha256": sha256(lockfile),
               "runner_app_zip_sha256": sha256(artifact),
               "signing_used": False,
               "apple_credentials_used": False,
           }
 
-          (evidence / "ios_g1_evidence.json").write_text(
-              json.dumps(payload, indent=2) + "\n", encoding="utf-8"
+          output = evidence / "ios_g1_evidence.json"
+          output.write_text(
+              json.dumps(payload, indent=2) + "\n",
+              encoding="utf-8",
           )
           print(json.dumps(payload, indent=2))
           PY
@@ -229,6 +284,6 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: breakwave-ios-g1-${{ github.run_id }}
-          path: ios_g1_evidence/
+          path: ${{ runner.temp }}/breakwave_ios_g1_evidence/
           if-no-files-found: error
           retention-days: 30
