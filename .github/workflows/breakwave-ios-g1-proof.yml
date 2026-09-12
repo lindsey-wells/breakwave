@@ -94,15 +94,30 @@ jobs:
           set -euo pipefail
           shasum -a 256 pubspec.yaml pubspec.lock | tee ios_g1_evidence/dependency_hashes_before.txt
 
-      - name: Resolve Flutter dependencies without lock drift
+      - name: Resolve Flutter dependencies and classify generated iOS bootstrap
         shell: bash
         run: |
           set -euo pipefail
           flutter pub get 2>&1 | tee ios_g1_evidence/flutter_pub_get.txt
+
           git diff --exit-code -- pubspec.lock
           shasum -a 256 pubspec.yaml pubspec.lock | tee ios_g1_evidence/dependency_hashes_after.txt
-          if [ -n "$(git status --porcelain)" ]; then
-            git status --short | tee ios_g1_evidence/repository_drift.txt
+
+          git status --porcelain --untracked-files=all             | grep -v '^?? ios_g1_evidence/'             | tee ios_g1_evidence/repository_drift_after_pub_get.txt || true
+
+          git diff -- ios/Flutter/Debug.xcconfig ios/Flutter/Release.xcconfig             > ios_g1_evidence/generated_xcconfig.diff || true
+          if [ -f ios/Podfile ]; then
+            cp ios/Podfile ios_g1_evidence/generated_Podfile
+          fi
+
+          BAD_DRIFT="$(
+            git status --porcelain --untracked-files=all               | grep -v '^?? ios_g1_evidence/'               | grep -Ev '^( M ios/Flutter/(Debug|Release)\.xcconfig|\?\? ios/Podfile)$'               || true
+          )"
+
+          if [ -n "${BAD_DRIFT}" ]; then
+            echo "::error::IOS-G1 unexpected source drift after flutter pub get:"
+            printf '%s
+' "${BAD_DRIFT}"
             exit 1
           fi
 
@@ -140,12 +155,27 @@ jobs:
           shasum -a 256 ios_g1_evidence/BreakWave_iOS_G1_Runner_app.zip | tee ios_g1_evidence/runner_app_sha256.txt
           shasum -a 256 pubspec.lock | tee ios_g1_evidence/pubspec_lock_sha256.txt
 
-      - name: Capture final repository cleanliness
+      - name: Classify final generated iOS build drift
         shell: bash
         run: |
           set -euo pipefail
-          git status --short | tee ios_g1_evidence/git_status_final.txt
-          test -z "$(git status --porcelain)"
+
+          git status --porcelain --untracked-files=all             | grep -v '^?? ios_g1_evidence/'             | tee ios_g1_evidence/git_status_final.txt || true
+
+          if [ -f ios/Podfile.lock ]; then
+            cp ios/Podfile.lock ios_g1_evidence/generated_Podfile.lock
+          fi
+
+          BAD_DRIFT="$(
+            git status --porcelain --untracked-files=all               | grep -v '^?? ios_g1_evidence/'               | grep -Ev '^( M ios/Flutter/(Debug|Release)\.xcconfig|\?\? ios/Podfile|\?\? ios/Podfile\.lock)$'               || true
+          )"
+
+          if [ -n "${BAD_DRIFT}" ]; then
+            echo "::error::IOS-G1 unexpected source drift after iOS build:"
+            printf '%s
+' "${BAD_DRIFT}"
+            exit 1
+          fi
 
       - name: Write machine-readable G1 evidence
         shell: bash
