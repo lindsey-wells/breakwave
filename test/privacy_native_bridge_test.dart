@@ -138,8 +138,8 @@ void main() {
       final IosPrivacyCredentialGateway gateway =
           IosPrivacyCredentialGateway(bridge: bridge);
 
-      await expectLater(
-        gateway.configurePin('12345'),
+      expect(
+        () => gateway.configurePin('12345'),
         throwsArgumentError,
       );
       expect(bridge.configuredPin, isNull);
