@@ -1,5 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 
+import 'package:breakwave/core/privacy_lock/platform/ios_privacy_credential_gateway.dart';
 import 'package:breakwave/core/privacy_lock/platform/legacy_android_privacy_credential_gateway.dart';
 import 'package:breakwave/core/privacy_lock/platform/unsupported_privacy_credential_gateway.dart';
 import 'package:breakwave/core/privacy_lock/privacy_auth_result.dart';
@@ -7,7 +8,7 @@ import 'package:breakwave/core/privacy_lock/privacy_biometric_status.dart';
 import 'package:breakwave/core/privacy_lock/privacy_credential_gateway.dart';
 import 'package:breakwave/core/privacy_lock/privacy_lock_composition.dart';
 
-class _FakeIosGateway implements PrivacyCredentialGateway {
+class _FakeGateway implements PrivacyCredentialGateway {
   @override
   Future<PrivacyAuthResult> authenticateBiometric() async {
     return PrivacyAuthResult.success;
@@ -48,7 +49,7 @@ void main() {
     });
 
     test('Android accepts an injected compatibility gateway', () {
-      final PrivacyCredentialGateway injected = _FakeIosGateway();
+      final PrivacyCredentialGateway injected = _FakeGateway();
 
       final PrivacyCredentialGateway resolved =
           PrivacyLockComposition.credentialGatewayFor(
@@ -59,20 +60,17 @@ void main() {
       expect(identical(resolved, injected), isTrue);
     });
 
-    test('iOS fails closed until IOS-G2D injects the native gateway', () {
+    test('iOS defaults to the native-bound credential gateway', () {
       final PrivacyCredentialGateway gateway =
           PrivacyLockComposition.credentialGatewayFor(
         platform: PrivacyCredentialPlatform.ios,
       );
 
-      expect(
-        gateway,
-        isA<UnsupportedPrivacyCredentialGateway>(),
-      );
+      expect(gateway, isA<IosPrivacyCredentialGateway>());
     });
 
-    test('iOS returns the injected native-bound gateway unchanged', () {
-      final PrivacyCredentialGateway injected = _FakeIosGateway();
+    test('iOS returns an injected credential gateway unchanged', () {
+      final PrivacyCredentialGateway injected = _FakeGateway();
 
       final PrivacyCredentialGateway resolved =
           PrivacyLockComposition.credentialGatewayFor(

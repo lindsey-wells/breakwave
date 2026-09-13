@@ -79,6 +79,7 @@ PHASE_VERIFIER_REFS = {
     "tools/verify_bw88rc1j.py": "bw-88rc1k-green",
     "tools/verify_bw88rc1k.py": "bw-88rc1k-green",
     "tools/verify_bw_wp03r.py": "02136802599b5a286cf42d98217da7b4f696e50b",
+    "tools/verify_bw_ios_g2c.py": "1a718ea0bcbdac31cd12bd2c747d5abe279c9cbc",
 }
 
 
@@ -299,6 +300,7 @@ def phase_routing_selftest() -> None:
         "tools/verify_bw88rc1e.py": "bw-88rc1k-green",
         "tools/verify_bw88rc1k.py": "bw-88rc1k-green",
         "tools/verify_bw_wp03r.py": "02136802599b5a286cf42d98217da7b4f696e50b",
+        "tools/verify_bw_ios_g2c.py": "1a718ea0bcbdac31cd12bd2c747d5abe279c9cbc",
         "tools/verify_bw_wp03s.py": "HEAD",
         "tools/verify_bw_wp03w.py": "HEAD",
         "tools/verify_bw_ci_01d.py": "HEAD",
@@ -349,6 +351,7 @@ def phase_routing_selftest() -> None:
             "tools/verify_bw87b6p2.py",
             "tools/verify_bw88rc1k.py",
             "tools/verify_bw_wp03r.py",
+            "tools/verify_bw_ios_g2c.py",
             "tools/verify_bw_wp03s.py",
             "tools/verify_bw_wp03w.py",
         ],
