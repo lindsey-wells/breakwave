@@ -127,7 +127,7 @@ final class BreakWavePinVerifier {
             CCPseudoRandomAlgorithm(kCCPRFHmacAlgSHA256),
             UInt32(iterations),
             outputAddress,
-            output.count
+            outputBuffer.count
           )
         }
       }
