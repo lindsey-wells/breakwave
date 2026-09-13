@@ -3,10 +3,17 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:breakwave/core/privacy_lock/platform/ios_privacy_credential_gateway.dart';
 import 'package:breakwave/core/privacy_lock/platform/legacy_android_privacy_credential_gateway.dart';
 import 'package:breakwave/core/privacy_lock/platform/unsupported_privacy_credential_gateway.dart';
+import 'package:breakwave/core/privacy_lock/privacy_attempt_state.dart';
+import 'package:breakwave/core/privacy_lock/privacy_attempt_store.dart';
 import 'package:breakwave/core/privacy_lock/privacy_auth_result.dart';
 import 'package:breakwave/core/privacy_lock/privacy_biometric_status.dart';
 import 'package:breakwave/core/privacy_lock/privacy_credential_gateway.dart';
 import 'package:breakwave/core/privacy_lock/privacy_lock_composition.dart';
+import 'package:breakwave/core/privacy_lock/privacy_lock_configuration.dart';
+import 'package:breakwave/core/privacy_lock/privacy_lock_configuration_store.dart';
+import 'package:breakwave/core/privacy_lock/privacy_lock_mode.dart';
+import 'package:breakwave/core/privacy_lock/privacy_session_controller.dart';
+import 'package:breakwave/core/privacy_lock/privacy_session_state.dart';
 
 class _FakeGateway implements PrivacyCredentialGateway {
   @override
@@ -32,6 +39,34 @@ class _FakeGateway implements PrivacyCredentialGateway {
   Future<PrivacyAuthResult> verifyPin(String pin) async {
     return PrivacyAuthResult.success;
   }
+}
+
+class _FakeAttemptStore implements PrivacyAttemptStoreApi {
+  @override
+  Future<void> clear() async {}
+
+  @override
+  Future<PrivacyAttemptState> load() async => PrivacyAttemptState.empty;
+
+  @override
+  Future<void> save(PrivacyAttemptState state) async {}
+}
+
+class _FakeConfigurationStore implements PrivacyLockConfigurationStoreApi {
+  @override
+  Future<void> clear() async {}
+
+  @override
+  Future<PrivacyLockConfiguration> load() async {
+    return const PrivacyLockConfiguration(
+      mode: PrivacyLockMode.fullApp,
+      biometricEnabled: false,
+      credentialConfigured: true,
+    );
+  }
+
+  @override
+  Future<void> save(PrivacyLockConfiguration configuration) async {}
 }
 
 void main() {
@@ -91,6 +126,22 @@ void main() {
         gateway,
         isA<UnsupportedPrivacyCredentialGateway>(),
       );
+    });
+
+    test('session controller composition stays unhooked and injectable', () async {
+      final PrivacySessionController controller =
+          PrivacyLockComposition.sessionControllerFor(
+        platform: PrivacyCredentialPlatform.ios,
+        credentialGateway: _FakeGateway(),
+        configurationStore: _FakeConfigurationStore(),
+        attemptStore: _FakeAttemptStore(),
+        now: () => DateTime.utc(2026, 9, 13, 12),
+      );
+
+      await controller.initialize();
+
+      expect(controller.state, PrivacySessionState.locked);
+      expect(controller.configuration.mode, PrivacyLockMode.fullApp);
     });
   });
 }
