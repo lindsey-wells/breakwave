@@ -48,13 +48,9 @@ final class BreakWavePinVerifier {
     )
   }
 
-  func verify(
-    pin: String,
-    record: BreakWavePinVerificationRecord
-  ) throws -> Bool {
-    guard isValidPin(pin) else {
-      return false
-    }
+  func validateRecord(
+    _ record: BreakWavePinVerificationRecord
+  ) throws {
     guard
       record.schemaVersion == Self.schemaVersion,
       record.kdf == Self.kdfName,
@@ -64,6 +60,16 @@ final class BreakWavePinVerifier {
     else {
       throw VerifierError.invalidRecord
     }
+  }
+
+  func verify(
+    pin: String,
+    record: BreakWavePinVerificationRecord
+  ) throws -> Bool {
+    guard isValidPin(pin) else {
+      return false
+    }
+    try validateRecord(record)
 
     let candidate = try derive(
       pin: pin,

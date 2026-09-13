@@ -107,6 +107,49 @@ void main() {
       expect(calls[2].arguments, <String, Object?>{'pin': '654321'});
     });
 
+    test('platform exceptions fail closed without escaping the bridge', () async {
+      messenger.setMockMethodCallHandler(channel, (MethodCall call) async {
+        throw PlatformException(
+          code: 'privacy_test_failure',
+          message: 'bounded native failure',
+        );
+      });
+
+      final PrivacyNativeBridge bridge = PrivacyNativeBridge(channel: channel);
+
+      expect(await bridge.isCredentialConfigured(), isFalse);
+      expect(
+        await bridge.verifyPin('123456'),
+        PrivacyAuthResult.error,
+      );
+      expect(
+        await bridge.biometricStatus(),
+        PrivacyBiometricStatus.unknown,
+      );
+      expect(
+        await bridge.authenticateBiometric(),
+        PrivacyAuthResult.error,
+      );
+    });
+
+    test('missing plugin failures are bounded', () async {
+      messenger.setMockMethodCallHandler(channel, (MethodCall call) async {
+        throw MissingPluginException('privacy bridge unavailable');
+      });
+
+      final PrivacyNativeBridge bridge = PrivacyNativeBridge(channel: channel);
+
+      expect(await bridge.isCredentialConfigured(), isFalse);
+      expect(
+        await bridge.verifyPin('123456'),
+        PrivacyAuthResult.error,
+      );
+      expect(
+        await bridge.biometricStatus(),
+        PrivacyBiometricStatus.unknown,
+      );
+    });
+
     test('unexpected native results fail closed to error/unknown', () async {
       messenger.setMockMethodCallHandler(channel, (MethodCall call) async {
         if (call.method == 'credentialStatus') {
@@ -117,9 +160,9 @@ void main() {
 
       final PrivacyNativeBridge bridge = PrivacyNativeBridge(channel: channel);
 
-      await expectLater(
-        bridge.isCredentialConfigured(),
-        throwsStateError,
+      expect(
+        await bridge.isCredentialConfigured(),
+        isFalse,
       );
       expect(
         await bridge.verifyPin('123456'),

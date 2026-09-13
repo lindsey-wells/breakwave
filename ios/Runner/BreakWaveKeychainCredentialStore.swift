@@ -13,15 +13,11 @@ final class BreakWaveKeychainCredentialStore {
   private let verifier = BreakWavePinVerifier()
 
   func isConfigured() throws -> Bool {
-    let status = SecItemCopyMatching(baseQuery() as CFDictionary, nil)
-    switch status {
-    case errSecSuccess:
-      return true
-    case errSecItemNotFound:
+    guard let data = try readData() else {
       return false
-    default:
-      throw StoreError.keychain(status)
     }
+    _ = try decodeRecord(data)
+    return true
   }
 
   func configure(pin: String) throws {
@@ -35,16 +31,7 @@ final class BreakWaveKeychainCredentialStore {
       return nil
     }
 
-    let record: BreakWavePinVerificationRecord
-    do {
-      record = try JSONDecoder().decode(
-        BreakWavePinVerificationRecord.self,
-        from: data
-      )
-    } catch {
-      throw StoreError.invalidRecord
-    }
-
+    let record = try decodeRecord(data)
     return try verifier.verify(pin: pin, record: record)
   }
 
@@ -53,6 +40,22 @@ final class BreakWaveKeychainCredentialStore {
     guard status == errSecSuccess || status == errSecItemNotFound else {
       throw StoreError.keychain(status)
     }
+  }
+
+  private func decodeRecord(
+    _ data: Data
+  ) throws -> BreakWavePinVerificationRecord {
+    let record: BreakWavePinVerificationRecord
+    do {
+      record = try JSONDecoder().decode(
+        BreakWavePinVerificationRecord.self,
+        from: data
+      )
+      try verifier.validateRecord(record)
+    } catch {
+      throw StoreError.invalidRecord
+    }
+    return record
   }
 
   private func readData() throws -> Data? {

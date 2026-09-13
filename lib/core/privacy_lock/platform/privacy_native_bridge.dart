@@ -42,7 +42,7 @@ class PrivacyNativeBridge implements PrivacyNativeBridgeApi {
       case 'notConfigured':
         return false;
       default:
-        throw StateError('Native credential status unavailable.');
+        return false;
     }
   }
 
@@ -102,11 +102,19 @@ class PrivacyNativeBridge implements PrivacyNativeBridgeApi {
     String method, [
     Map<String, Object?>? arguments,
   ]) async {
-    final String? value = await _channel.invokeMethod<String>(
-      method,
-      arguments,
-    );
-    return value ?? 'error';
+    try {
+      final String? value = await _channel.invokeMethod<String>(
+        method,
+        arguments,
+      );
+      return value ?? 'error';
+    } on MissingPluginException {
+      return 'error';
+    } on PlatformException {
+      return 'error';
+    } catch (_) {
+      return 'error';
+    }
   }
 
   PrivacyAuthResult _authResult(String value) {

@@ -82,6 +82,15 @@ for forbidden in ['MethodChannel', 'Keychain', 'LocalAuthentication']:
         print('FAIL legacy Android adapter contains future iOS/native detail: ' + forbidden)
         failed = True
 
+if 'ArgumentError.value(' in texts['legacy_adapter']:
+    print('FAIL legacy Android adapter can echo candidate PIN through ArgumentError.value')
+    failed = True
+
+require(
+    'gateway_test',
+    'expect(error.toString(), isNot(contains(invalidPin)))',
+)
+
 for needle in [
     'PrivacyCredentialPlatform.android',
     'PrivacyCredentialPlatform.ios',

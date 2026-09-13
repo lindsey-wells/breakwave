@@ -135,6 +135,9 @@ def verify() -> None:
         "composition_test": ROOT / "test/privacy_lock_composition_test.dart",
         "pbx": PBX,
         "runner": RUNNER,
+        "g2c_verifier": ROOT / "tools/verify_bw_ios_g2c.py",
+        "legacy_adapter": ROOT / "lib/core/privacy_lock/platform/legacy_android_privacy_credential_gateway.dart",
+        "gateway_test": ROOT / "test/privacy_credential_gateway_test.dart",
         "iap": ROOT / "docs/BW_IOS_G2_IAP_1_0_IMPLEMENTATION_ARCHITECTURE.md",
     }
 
@@ -218,6 +221,30 @@ def verify() -> None:
 
     require("ios_gateway", "implements PrivacyCredentialGateway")
     require("composition", "IosPrivacyCredentialGateway()")
+
+    for needle in [
+        "on MissingPluginException",
+        "on PlatformException",
+        "return PrivacyAuthResult.error;",
+        "return PrivacyBiometricStatus.unknown;",
+    ]:
+        require("dart_bridge", needle)
+
+    require("bridge_test", "platform exceptions fail closed without escaping the bridge")
+    require("bridge_test", "missing plugin failures are bounded")
+    require("native_bridge", "guard try credentialStore.isConfigured() else")
+    require("keychain", "private func decodeRecord(")
+    require("keychain", "try verifier.validateRecord(record)")
+    require("pin_verifier", "func validateRecord(")
+
+    if "ArgumentError.value(" in texts["legacy_adapter"]:
+        print("FAIL G2C legacy adapter can echo candidate PIN diagnostics")
+        failed = True
+    require(
+        "gateway_test",
+        "expect(error.toString(), isNot(contains(invalidPin)))",
+    )
+    require("g2c_verifier", "ArgumentError.value(")
     require("composition_test", "iOS defaults to the native-bound credential gateway")
     require("bridge_test", "uses only the approved channel methods and bounded values")
     require("bridge_test", "validates PIN shape before crossing the native boundary")
@@ -237,7 +264,8 @@ def verify() -> None:
         "PASS: IOS-G2D registers the bounded breakwave/privacy_auth channel, "
         "stores only a versioned PBKDF2 verifier in device-bound Keychain, "
         "uses biometric-only LocalAuthentication, composes iOS through the "
-        "native gateway, and pins the superseded G2C verifier historically."
+        "native gateway, hardens native transport and credential validation "
+        "fail-closed behavior, and pins the superseded G2C verifier historically."
     )
 
 

@@ -79,6 +79,15 @@ final class BreakWavePrivacyBridge {
       result(biometricAuthenticator.status())
 
     case "authenticateBiometric":
+      do {
+        guard try credentialStore.isConfigured() else {
+          result("unavailable")
+          return
+        }
+      } catch {
+        result("error")
+        return
+      }
       biometricAuthenticator.authenticate { authResult in
         result(authResult)
       }
