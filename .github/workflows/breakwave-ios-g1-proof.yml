@@ -203,13 +203,34 @@ jobs:
             cp ios/Podfile.lock "${IOS_G1_EVIDENCE_DIR}/generated_Podfile.lock"
           fi
 
+          git diff -- \
+            ios/Runner.xcodeproj/project.pbxproj \
+            ios/Runner.xcodeproj/xcshareddata/xcschemes/Runner.xcscheme \
+            ios/Runner.xcworkspace/contents.xcworkspacedata \
+            > "${IOS_G1_EVIDENCE_DIR}/generated_swiftpm_integration.diff" || true
+
+          if [ -f ios/Runner.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved ]; then
+            cp ios/Runner.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved \
+              "${IOS_G1_EVIDENCE_DIR}/project_Package.resolved"
+          fi
+
+          if [ -f ios/Runner.xcworkspace/xcshareddata/swiftpm/Package.resolved ]; then
+            cp ios/Runner.xcworkspace/xcshareddata/swiftpm/Package.resolved \
+              "${IOS_G1_EVIDENCE_DIR}/workspace_Package.resolved"
+          fi
+
           unexpected="$(
             git status --porcelain --untracked-files=all \
               | awk '
                   $0 == " M ios/Flutter/Debug.xcconfig" { next }
                   $0 == " M ios/Flutter/Release.xcconfig" { next }
+                  $0 == " M ios/Runner.xcodeproj/project.pbxproj" { next }
+                  $0 == " M ios/Runner.xcodeproj/xcshareddata/xcschemes/Runner.xcscheme" { next }
+                  $0 == " M ios/Runner.xcworkspace/contents.xcworkspacedata" { next }
                   $0 == "?? ios/Podfile" { next }
                   $0 == "?? ios/Podfile.lock" { next }
+                  $0 == "?? ios/Runner.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved" { next }
+                  $0 == "?? ios/Runner.xcworkspace/xcshareddata/swiftpm/Package.resolved" { next }
                   { print }
                 '
           )"
@@ -248,7 +269,7 @@ jobs:
 
           payload = {
               "gate": "IOS-G1",
-              "result": "BUILD_COMPLETED",
+              "result": "PASS",
               "source_sha": command("git", "rev-parse", "HEAD"),
               "expected_source_sha": os.environ["BREAKWAVE_IOS_G1_BASELINE_SHA"],
               "github_run_id": os.environ.get("GITHUB_RUN_ID"),
