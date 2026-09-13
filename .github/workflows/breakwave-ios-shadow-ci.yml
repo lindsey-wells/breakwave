@@ -1,0 +1,291 @@
+name: BreakWave iOS Shadow CI
+
+run-name: ${{ github.event_name == 'push' && github.event.head_commit.message || inputs.run_label || format('BreakWave iOS Shadow CI — {0}', github.ref_name) }}
+
+"on":
+  push:
+    branches:
+      - "validation/bw-ios-*"
+  workflow_dispatch:
+    inputs:
+      run_label:
+        description: "Optional IOS mission label shown in Actions"
+        required: false
+        type: string
+
+permissions:
+  contents: read
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+  BREAKWAVE_FLUTTER_VERSION: "3.44.9"
+
+concurrency:
+  group: breakwave-ios-shadow-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  ios-shadow:
+    name: iOS Shadow Verify, Analyze, Test, Build
+    runs-on: macos-26
+    timeout-minutes: 45
+
+    steps:
+      - name: Checkout exact candidate commit
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 1
+
+      - name: Verify exact candidate SHA
+        shell: bash
+        run: |
+          set -euo pipefail
+          actual="$(git rev-parse HEAD)"
+          echo "GITHUB_SHA=${GITHUB_SHA}"
+          echo "ACTUAL_SHA=${actual}"
+          test "${actual}" = "${GITHUB_SHA}"
+          test -z "$(git status --porcelain --untracked-files=all)"
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          flutter-version: ${{ env.BREAKWAVE_FLUTTER_VERSION }}
+          cache: true
+
+      - name: Initialize external evidence directory
+        shell: bash
+        run: |
+          set -euo pipefail
+          evidence="${RUNNER_TEMP}/breakwave_ios_shadow_evidence"
+          mkdir -p "${evidence}"
+          echo "IOS_SHADOW_EVIDENCE_DIR=${evidence}" >> "${GITHUB_ENV}"
+
+      - name: Capture macOS and Apple toolchain evidence
+        shell: bash
+        run: |
+          set -euo pipefail
+          {
+            echo "=== BREAKWAVE IOS SHADOW TOOLCHAIN ==="
+            echo "SOURCE_SHA=$(git rev-parse HEAD)"
+            echo "GITHUB_REF=${GITHUB_REF}"
+            echo "GITHUB_RUN_ID=${GITHUB_RUN_ID}"
+            echo "RUNNER_OS=${RUNNER_OS}"
+            echo "RUNNER_ARCH=${RUNNER_ARCH}"
+            echo "ImageOS=${ImageOS:-unknown}"
+            echo "ImageVersion=${ImageVersion:-unknown}"
+            echo
+            xcodebuild -version
+            echo "DEVELOPER_DIR=$(xcode-select -p)"
+            echo "IOS_SIMULATOR_SDK=$(xcrun --sdk iphonesimulator --show-sdk-version)"
+            swift --version
+            if command -v pod >/dev/null 2>&1; then pod --version; else echo "pod=NOT_PRESENT"; fi
+            flutter --version
+            dart --version 2>&1
+          } | tee "${IOS_SHADOW_EVIDENCE_DIR}/toolchain.txt"
+
+          flutter --version | tee "${RUNNER_TEMP}/breakwave_flutter_version.txt"
+          grep -F "Flutter ${BREAKWAVE_FLUTTER_VERSION}" "${RUNNER_TEMP}/breakwave_flutter_version.txt"
+
+      - name: Capture Flutter doctor
+        shell: bash
+        run: |
+          set -o pipefail
+          flutter doctor -v 2>&1 | tee "${IOS_SHADOW_EVIDENCE_DIR}/flutter_doctor.txt" || true
+
+      - name: Hash dependency inputs before resolution
+        shell: bash
+        run: |
+          set -euo pipefail
+          shasum -a 256 pubspec.yaml pubspec.lock \
+            | tee "${IOS_SHADOW_EVIDENCE_DIR}/dependency_hashes_before.txt"
+
+      - name: Resolve dependencies and classify bootstrap
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          flutter pub get 2>&1 \
+            | tee "${IOS_SHADOW_EVIDENCE_DIR}/flutter_pub_get.txt"
+
+          git diff --exit-code -- pubspec.lock
+
+          shasum -a 256 pubspec.yaml pubspec.lock \
+            | tee "${IOS_SHADOW_EVIDENCE_DIR}/dependency_hashes_after.txt"
+
+          git status --porcelain --untracked-files=all \
+            | tee "${IOS_SHADOW_EVIDENCE_DIR}/git_status_after_pub_get.txt"
+
+          unexpected="$(
+            git status --porcelain --untracked-files=all \
+              | awk '
+                  $0 == " M ios/Flutter/Debug.xcconfig" { next }
+                  $0 == " M ios/Flutter/Release.xcconfig" { next }
+                  $0 == "?? ios/Podfile" { next }
+                  { print }
+                '
+          )"
+
+          if [ -n "${unexpected}" ]; then
+            echo "::error::Unexpected source drift after flutter pub get:"
+            echo "${unexpected}"
+            exit 1
+          fi
+
+      - name: BreakWaveVerify engine self-test
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 tools/breakwave_verify.py selftest 2>&1 \
+            | tee "${IOS_SHADOW_EVIDENCE_DIR}/breakwave_verify_selftest.txt"
+
+      - name: Verify IOS-G2A architecture freeze
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 tools/verify_bw_ios_g2a.py 2>&1 \
+            | tee "${IOS_SHADOW_EVIDENCE_DIR}/verify_bw_ios_g2a.txt"
+
+      - name: Flutter analyze
+        shell: bash
+        run: |
+          set -euo pipefail
+          flutter analyze --no-fatal-infos 2>&1 \
+            | tee "${IOS_SHADOW_EVIDENCE_DIR}/flutter_analyze.txt"
+
+      - name: Flutter test
+        shell: bash
+        run: |
+          set -euo pipefail
+          flutter test 2>&1 \
+            | tee "${IOS_SHADOW_EVIDENCE_DIR}/flutter_test.txt"
+
+      - name: Build unsigned iOS Simulator app
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          flutter precache --ios
+
+          flutter build ios --simulator --debug 2>&1 \
+            | tee "${IOS_SHADOW_EVIDENCE_DIR}/flutter_build_ios_simulator.txt"
+
+          app_path="$(find build/ios -type d -name Runner.app -print -quit)"
+          test -n "${app_path}"
+          test -d "${app_path}"
+
+          echo "${app_path}" \
+            | tee "${IOS_SHADOW_EVIDENCE_DIR}/runner_app_path.txt"
+
+          ditto -c -k --sequesterRsrc --keepParent \
+            "${app_path}" \
+            "${IOS_SHADOW_EVIDENCE_DIR}/BreakWave_iOS_Shadow_Runner_app.zip"
+
+          shasum -a 256 \
+            "${IOS_SHADOW_EVIDENCE_DIR}/BreakWave_iOS_Shadow_Runner_app.zip" \
+            | tee "${IOS_SHADOW_EVIDENCE_DIR}/runner_app_sha256.txt"
+
+      - name: Classify final generated iOS drift
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          git status --porcelain --untracked-files=all \
+            | tee "${IOS_SHADOW_EVIDENCE_DIR}/git_status_final.txt"
+
+          if [ -f ios/Podfile ]; then
+            cp ios/Podfile "${IOS_SHADOW_EVIDENCE_DIR}/generated_Podfile"
+          fi
+          if [ -f ios/Podfile.lock ]; then
+            cp ios/Podfile.lock "${IOS_SHADOW_EVIDENCE_DIR}/generated_Podfile.lock"
+          fi
+
+          git diff -- \
+            ios/Flutter/Debug.xcconfig \
+            ios/Flutter/Release.xcconfig \
+            ios/Runner.xcodeproj/project.pbxproj \
+            ios/Runner.xcodeproj/xcshareddata/xcschemes/Runner.xcscheme \
+            ios/Runner.xcworkspace/contents.xcworkspacedata \
+            > "${IOS_SHADOW_EVIDENCE_DIR}/generated_ios_integration.diff" || true
+
+          unexpected="$(
+            git status --porcelain --untracked-files=all \
+              | awk '
+                  $0 == " M ios/Flutter/Debug.xcconfig" { next }
+                  $0 == " M ios/Flutter/Release.xcconfig" { next }
+                  $0 == " M ios/Runner.xcodeproj/project.pbxproj" { next }
+                  $0 == " M ios/Runner.xcodeproj/xcshareddata/xcschemes/Runner.xcscheme" { next }
+                  $0 == " M ios/Runner.xcworkspace/contents.xcworkspacedata" { next }
+                  $0 == "?? ios/Podfile" { next }
+                  $0 == "?? ios/Podfile.lock" { next }
+                  $0 == "?? ios/Runner.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved" { next }
+                  $0 == "?? ios/Runner.xcworkspace/xcshareddata/swiftpm/Package.resolved" { next }
+                  { print }
+                '
+          )"
+
+          if [ -n "${unexpected}" ]; then
+            echo "::error::Unexpected source drift after iOS build:"
+            echo "${unexpected}"
+            exit 1
+          fi
+
+      - name: Write machine-readable iOS Shadow evidence
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          python3 - <<'PY'
+          import hashlib
+          import json
+          import os
+          import pathlib
+          import subprocess
+
+          evidence = pathlib.Path(os.environ["IOS_SHADOW_EVIDENCE_DIR"])
+          artifact = evidence / "BreakWave_iOS_Shadow_Runner_app.zip"
+
+          def sha256(path):
+              h = hashlib.sha256()
+              with open(path, "rb") as f:
+                  for chunk in iter(lambda: f.read(1024 * 1024), b""):
+                      h.update(chunk)
+              return h.hexdigest()
+
+          def command(*args):
+              return subprocess.check_output(args, text=True).strip()
+
+          payload = {
+              "gate": "IOS-SHADOW",
+              "stage": "IOS-G2A",
+              "result": "PASS",
+              "source_sha": command("git", "rev-parse", "HEAD"),
+              "github_sha": os.environ.get("GITHUB_SHA"),
+              "github_ref": os.environ.get("GITHUB_REF"),
+              "github_run_id": os.environ.get("GITHUB_RUN_ID"),
+              "runner_os": os.environ.get("RUNNER_OS"),
+              "runner_arch": os.environ.get("RUNNER_ARCH"),
+              "flutter_pin": os.environ["BREAKWAVE_FLUTTER_VERSION"],
+              "xcode": command("xcodebuild", "-version"),
+              "ios_simulator_sdk": command(
+                  "xcrun", "--sdk", "iphonesimulator", "--show-sdk-version"
+              ),
+              "pubspec_lock_sha256": sha256(pathlib.Path("pubspec.lock")),
+              "runner_app_zip_sha256": sha256(artifact),
+              "signing_used": False,
+              "apple_credentials_used": False,
+          }
+
+          output = evidence / "ios_shadow_evidence.json"
+          output.write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
+          print(json.dumps(payload, indent=2))
+          PY
+
+      - name: Upload iOS Shadow evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: breakwave-ios-shadow-${{ github.run_id }}
+          path: ${{ runner.temp }}/breakwave_ios_shadow_evidence/
+          if-no-files-found: error
+          retention-days: 14
