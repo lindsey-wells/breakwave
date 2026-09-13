@@ -113,7 +113,7 @@ class _BreakWaveShellState extends State<BreakWaveShell>
       });
     }
 
-    if (_privacyPlatform == PrivacyCredentialPlatform.iOS) {
+    if (_privacyPlatform == PrivacyCredentialPlatform.ios) {
       // IOS-G2F must not leave the released Android-era raw PIN record in
       // ordinary iOS app preferences. The iOS credential authority is Keychain.
       await PrivacyLockStore.clear();
@@ -183,7 +183,8 @@ class _BreakWaveShellState extends State<BreakWaveShell>
       PrivacyDestination.rescuePersonalized => 1,
       PrivacyDestination.log => 2,
       PrivacyDestination.support => 3,
-      PrivacyDestination.internalQa => BreakWaveBillingQaConfig.enabled ? 4 : null,
+      PrivacyDestination.internalQa =>
+          _navigationDestinations().length > 4 ? 4 : null,
       _ => null,
     };
   }
