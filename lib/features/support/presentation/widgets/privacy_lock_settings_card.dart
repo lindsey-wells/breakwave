@@ -4,8 +4,10 @@
 // File: privacy_lock_settings_card.dart
 // Purpose: BW-41 privacy lock settings card.
 // Notes: Lets the user choose lock mode and save a 6-digit PIN.
+// Notes: IOS-G2F blocks legacy raw-PIN settings writes on iOS until native settings migration lands.
 // ------------------------------------------------------------
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -30,13 +32,20 @@ class _PrivacyLockSettingsCardState extends State<PrivacyLockSettingsCard> {
   PrivacyLockMode _mode = PrivacyLockMode.none;
   String _savedPasscode = '';
 
+  bool get _isIos => defaultTargetPlatform == TargetPlatform.iOS;
+
   @override
   void initState() {
     super.initState();
     _currentPasscodeController = TextEditingController();
     _passcodeController = TextEditingController();
     _confirmController = TextEditingController();
-    _load();
+
+    if (_isIos) {
+      _loading = false;
+    } else {
+      _load();
+    }
   }
 
   @override
@@ -48,6 +57,8 @@ class _PrivacyLockSettingsCardState extends State<PrivacyLockSettingsCard> {
   }
 
   Future<void> _load() async {
+    if (_isIos) return;
+
     final PrivacyLockSettings settings = await PrivacyLockStore.load();
     if (!mounted) return;
 
@@ -59,7 +70,7 @@ class _PrivacyLockSettingsCardState extends State<PrivacyLockSettingsCard> {
   }
 
   Future<void> _save() async {
-    if (_saving) return;
+    if (_isIos || _saving) return;
 
     final String currentPasscode = _currentPasscodeController.text.trim();
     final String passcode = _passcodeController.text.trim();
@@ -178,7 +189,7 @@ class _PrivacyLockSettingsCardState extends State<PrivacyLockSettingsCard> {
   }
 
   Future<void> _clearLock() async {
-    if (_saving) return;
+    if (_isIos || _saving) return;
 
     final String currentPasscode = _currentPasscodeController.text.trim();
     if (_savedPasscode.isNotEmpty && currentPasscode != _savedPasscode) {
@@ -227,10 +238,44 @@ class _PrivacyLockSettingsCardState extends State<PrivacyLockSettingsCard> {
     }
   }
 
+  Widget _buildIosNativeLockNotice(
+    ThemeData theme,
+    ColorScheme colorScheme,
+  ) {
+    return Container(
+      padding: const EdgeInsets.all(18),
+      decoration: BoxDecoration(
+        color: colorScheme.surfaceContainerHighest.withOpacity(0.45),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: colorScheme.outlineVariant),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          Text(
+            'Privacy lock',
+            style: theme.textTheme.titleMedium?.copyWith(
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+          const SizedBox(height: 10),
+          Text(
+            'iPhone privacy-lock setup is being finalized with Keychain protection. This build will not store a BreakWave PIN in ordinary app preferences on iPhone.',
+            style: theme.textTheme.bodyMedium,
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final ThemeData theme = Theme.of(context);
     final ColorScheme colorScheme = theme.colorScheme;
+
+    if (_isIos) {
+      return _buildIosNativeLockNotice(theme, colorScheme);
+    }
 
     return Container(
       padding: const EdgeInsets.all(18),
@@ -272,44 +317,44 @@ class _PrivacyLockSettingsCardState extends State<PrivacyLockSettingsCard> {
                   }).toList(),
                 ),
                 const SizedBox(height: 12),
-                  Text(
-                    _mode.description,
-                    style: theme.textTheme.bodyMedium,
-                  ),
-                  if (_savedPasscode.isNotEmpty) ...<Widget>[
-                    const SizedBox(height: 16),
-                    TextField(
-                      controller: _currentPasscodeController,
-                      keyboardType: TextInputType.number,
-                      obscureText: true,
-                      maxLength: 6,
-                      inputFormatters: <TextInputFormatter>[
-                        FilteringTextInputFormatter.digitsOnly,
-                      ],
-                      decoration: const InputDecoration(
-                        labelText: 'Current PIN',
-                        hintText: 'Required to change or clear',
-                      ),
-                    ),
-                  ],
+                Text(
+                  _mode.description,
+                  style: theme.textTheme.bodyMedium,
+                ),
+                if (_savedPasscode.isNotEmpty) ...<Widget>[
                   const SizedBox(height: 16),
                   TextField(
-                    controller: _passcodeController,
+                    controller: _currentPasscodeController,
                     keyboardType: TextInputType.number,
                     obscureText: true,
                     maxLength: 6,
                     inputFormatters: <TextInputFormatter>[
                       FilteringTextInputFormatter.digitsOnly,
                     ],
-                    decoration: InputDecoration(
-                      labelText: _savedPasscode.isEmpty
-                          ? 'Set 6-digit PIN'
-                          : 'New 6-digit PIN',
-                      hintText: _savedPasscode.isEmpty
-                          ? 'Example: 123456'
-                          : 'Leave blank to keep current PIN',
+                    decoration: const InputDecoration(
+                      labelText: 'Current PIN',
+                      hintText: 'Required to change or clear',
                     ),
                   ),
+                ],
+                const SizedBox(height: 16),
+                TextField(
+                  controller: _passcodeController,
+                  keyboardType: TextInputType.number,
+                  obscureText: true,
+                  maxLength: 6,
+                  inputFormatters: <TextInputFormatter>[
+                    FilteringTextInputFormatter.digitsOnly,
+                  ],
+                  decoration: InputDecoration(
+                    labelText: _savedPasscode.isEmpty
+                        ? 'Set 6-digit PIN'
+                        : 'New 6-digit PIN',
+                    hintText: _savedPasscode.isEmpty
+                        ? 'Example: 123456'
+                        : 'Leave blank to keep current PIN',
+                  ),
+                ),
                 const SizedBox(height: 12),
                 TextField(
                   controller: _confirmController,
