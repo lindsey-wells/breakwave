@@ -28,6 +28,7 @@ import '../../premium/presentation/breakwave_plus_access_button.dart';
 import '../../premium/presentation/breakwave_plus_screen.dart';
 import '../../privacy_lock/presentation/privacy_locked_screen.dart';
 import '../../privacy_lock/presentation/privacy_unlock_screen.dart';
+import '../../rescue/presentation/rescue_safe_screen.dart';
 import '../../rescue/presentation/rescue_screen.dart';
 import '../../support/presentation/support_screen.dart';
 
@@ -573,12 +574,10 @@ class _BreakWaveShellState extends State<BreakWaveShell>
       if (state == PrivacySessionState.rescueSafe) {
         return _privacyScaffold(
           showNavigation: false,
-          body: PrivacyLockedScreen(
-            rescueSafeActive: true,
+          body: RescueSafeScreen(
             onUnlock: () => _requestUnlockFromLockedLanding(
               fromRescueSafe: true,
             ),
-            onOpenRescue: _enterRescueSafe,
             onBackToLock: _privacySessionController.lockNow,
           ),
         );
