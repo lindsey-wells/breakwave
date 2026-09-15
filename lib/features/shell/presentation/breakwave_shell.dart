@@ -7,6 +7,8 @@
 // Notes: Full App lock renders no protected shell content before authentication.
 // ------------------------------------------------------------
 
+import 'dart:async';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
@@ -28,6 +30,7 @@ import '../../premium/presentation/breakwave_plus_access_button.dart';
 import '../../premium/presentation/breakwave_plus_screen.dart';
 import '../../privacy_lock/presentation/privacy_locked_screen.dart';
 import '../../privacy_lock/presentation/privacy_unlock_screen.dart';
+import '../../rescue/data/rescue_outcome_reconciler.dart';
 import '../../rescue/presentation/rescue_safe_screen.dart';
 import '../../rescue/presentation/rescue_screen.dart';
 import '../../support/presentation/support_screen.dart';
@@ -51,6 +54,9 @@ class _BreakWaveShellState extends State<BreakWaveShell>
   int _selectedIndex = 0;
   int _homeRefreshTick = 0;
   int _logRefreshTick = 0;
+
+  final RescueOutcomeReconciler _rescueOutcomeReconciler =
+      const RescueOutcomeReconciler();
 
   late final PrivacyCredentialPlatform _privacyPlatform;
   late final PrivacySessionController _privacySessionController;
@@ -369,7 +375,20 @@ class _BreakWaveShellState extends State<BreakWaveShell>
     }
   }
 
+  Future<void> _reconcilePendingRescueOutcomes() async {
+    try {
+      await _rescueOutcomeReconciler.reconcile();
+    } catch (_) {
+      return;
+    }
+    if (!mounted) return;
+    setState(() {
+      _logRefreshTick += 1;
+    });
+  }
+
   void _handleUnlockSuccess() {
+    unawaited(_reconcilePendingRescueOutcomes());
     final PrivacyDestination? destination =
         _privacySessionController.takeRequestedProtectedDestination();
 

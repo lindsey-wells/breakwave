@@ -15,6 +15,9 @@ source = RUNNER.read_text(encoding="utf-8")
 
 required = (
     "PRE_WP03W_REF",
+    "IOS_G2G_CLOSED_REF",
+    '"0c2a18df625cb1db7212cb3c570cb782effd0648"',
+    '"tools/verify_bw_ios_g2g.py": IOS_G2G_CLOSED_REF',
     '"b7ef61ed24a9aae1e683c2d8e790e70802f754c4"',
     "PHASE_VERIFIER_REFS",
     '"tools/verify_bw25.py": PRE_WP03W_REF',

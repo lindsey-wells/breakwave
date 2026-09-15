@@ -8,4 +8,5 @@
 
 class BreakWaveStorageKeys {
   static const String logEntries = 'bw_log_entries_v1';
+  static const String rescueSafePendingOutcomes = 'bw_rescue_safe_pending_v1';
 }

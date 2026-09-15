@@ -39,6 +39,10 @@ PRE_PERF02B_REF = "97e17cc2eb7ad6a2db99fddfdb638ce22df326b0"
 # BW-70B and split-instrumentation contracts at their closed state.
 PRE_PERF02C_REF = "3d2d8d8816cd972eba2b095c211ae96f83939946"
 
+# IOS-G2H intentionally adds isolated locked-Rescue pending persistence.
+# Preserve the superseded IOS-G2G no-persistence contract at its closed SHA.
+IOS_G2G_CLOSED_REF = "0c2a18df625cb1db7212cb3c570cb782effd0648"
+
 PHASE_VERIFIER_REFS = {
     "tools/verify_bw70b.py": PRE_PERF02C_REF,
     "tools/verify_bw_perf02c.py": PRE_PERF02C_REF,
@@ -85,6 +89,7 @@ PHASE_VERIFIER_REFS = {
     "tools/verify_bw49c.py": "ddb21693e3fa3b1d2ca67a6bb866e0884c37b330",
     "tools/verify_bw49c1.py": "ddb21693e3fa3b1d2ca67a6bb866e0884c37b330",
     "tools/verify_bw_ios_g2e.py": "ddb21693e3fa3b1d2ca67a6bb866e0884c37b330",
+    "tools/verify_bw_ios_g2g.py": IOS_G2G_CLOSED_REF,
 }
 
 
@@ -311,6 +316,7 @@ def phase_routing_selftest() -> None:
         "tools/verify_bw49c.py": "ddb21693e3fa3b1d2ca67a6bb866e0884c37b330",
         "tools/verify_bw49c1.py": "ddb21693e3fa3b1d2ca67a6bb866e0884c37b330",
         "tools/verify_bw_ios_g2e.py": "ddb21693e3fa3b1d2ca67a6bb866e0884c37b330",
+        "tools/verify_bw_ios_g2g.py": IOS_G2G_CLOSED_REF,
         "tools/verify_bw_wp03s.py": "HEAD",
         "tools/verify_bw_wp03w.py": "HEAD",
         "tools/verify_bw_ci_01d.py": "HEAD",
@@ -367,6 +373,7 @@ def phase_routing_selftest() -> None:
             "tools/verify_bw49c.py",
             "tools/verify_bw49c1.py",
             "tools/verify_bw_ios_g2e.py",
+            "tools/verify_bw_ios_g2g.py",
             "tools/verify_bw_wp03s.py",
             "tools/verify_bw_wp03w.py",
         ],

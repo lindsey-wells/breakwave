@@ -1,0 +1,13 @@
+import 'package:flutter_test/flutter_test.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:breakwave/features/log/data/log_repository.dart';
+import 'package:breakwave/features/log/domain/log_entry.dart';
+import 'package:breakwave/features/rescue/data/rescue_outcome_reconciler.dart';
+import 'package:breakwave/features/rescue/data/rescue_safe_outcome_store.dart';
+import 'package:breakwave/features/rescue/domain/pending_rescue_outcome.dart';
+class _FakeLogRepository extends LogRepository { _FakeLogRepository({List<LogEntry>? entries,this.failSave=false}):entries=entries??<LogEntry>[]; List<LogEntry> entries; bool failSave; @override Future<List<LogEntry>> loadEntries() async=>List<LogEntry>.from(entries); @override Future<void> saveEntry(LogEntry entry) async { if(failSave) throw StateError('fail'); entries=<LogEntry>[entry,...entries]; } }
+void main(){ const store=RescueSafeOutcomeStore(); setUp(()=>SharedPreferences.setMockInitialValues(<String,Object>{}));
+  test('post-auth reconciliation moves pending outcome into normal Log',() async { await store.save(const PendingRescueOutcome(id:'p1',entryType:'Victory',intensity:4,genericOutcomeTag:'lower_now',genericAction:'Move to a different room',createdAtIso:'2026-09-14T21:00:00.000')); final log=_FakeLogRepository(); final r=await RescueOutcomeReconciler(pendingStore:store,logRepository:log).reconcile(); expect(r.reconciled,1); expect(log.entries.single.triggers,<String>['Lower Now']); expect(await store.loadPending(),isEmpty); });
+  test('existing id clears pending without duplicate',() async { await store.save(const PendingRescueOutcome(id:'p1',entryType:'Urge',intensity:5,genericOutcomeTag:'still_strong',genericAction:'',createdAtIso:'2026-09-14T21:00:00.000')); final log=_FakeLogRepository(entries:<LogEntry>[const LogEntry(id:'p1',entryType:'Urge',intensity:5,triggers:<String>['Still Strong'],notes:'',createdAtIso:'2026-09-14T21:00:00.000')]); final r=await RescueOutcomeReconciler(pendingStore:store,logRepository:log).reconcile(); expect(r.alreadyPresent,1); expect(log.entries,hasLength(1)); expect(await store.loadPending(),isEmpty); });
+  test('failed log save leaves pending for retry',() async { await store.save(const PendingRescueOutcome(id:'p1',entryType:'Urge',intensity:5,genericOutcomeTag:'still_strong',genericAction:'',createdAtIso:'2026-09-14T21:00:00.000')); final log=_FakeLogRepository(failSave:true); final r=await RescueOutcomeReconciler(pendingStore:store,logRepository:log).reconcile(); expect(r.failed,1); expect(await store.loadPending(),hasLength(1)); });
+}
