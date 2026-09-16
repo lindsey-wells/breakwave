@@ -13,6 +13,7 @@ import 'package:flutter/foundation.dart';
 import 'privacy_attempt_state.dart';
 import 'privacy_attempt_store.dart';
 import 'privacy_auth_result.dart';
+import 'privacy_biometric_status.dart';
 import 'privacy_credential_gateway.dart';
 import 'privacy_destination.dart';
 import 'privacy_lock_configuration.dart';
@@ -190,6 +191,19 @@ class PrivacySessionController extends ChangeNotifier {
       case PrivacyAuthResult.error:
         _restoreAfterAuthentication();
         return result;
+    }
+  }
+
+  Future<PrivacyBiometricStatus> biometricStatus() async {
+    if (!_configuration.biometricEnabled ||
+        !_configuration.credentialConfigured) {
+      return PrivacyBiometricStatus.notAvailable;
+    }
+
+    try {
+      return await _credentialGateway.biometricStatus();
+    } catch (_) {
+      return PrivacyBiometricStatus.unknown;
     }
   }
 

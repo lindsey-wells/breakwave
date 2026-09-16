@@ -2,10 +2,11 @@
 // Cube23 Collaboration Header
 // Project: BreakWave
 // File: privacy_unlock_screen.dart
-// Purpose: IOS-G2F controller-driven 6-digit privacy unlock presentation.
+// Purpose: IOS-G2I privacy unlock presentation with optional biometric convenience.
 // Notes:
-// - Never reads or compares a stored PIN directly.
-// - Persistent failed-attempt/cooldown state is owned by PrivacySessionController.
+// - PIN remains available as the authoritative fallback.
+// - Biometrics are shown only when enabled and reported available.
+// - Never reads or compares stored credential material directly.
 // ------------------------------------------------------------
 
 import 'dart:async';
@@ -14,6 +15,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import '../../../core/privacy_lock/privacy_auth_result.dart';
+import '../../../core/privacy_lock/privacy_biometric_status.dart';
 import '../../../core/privacy_lock/privacy_lock_mode.dart';
 import '../../../core/privacy_lock/privacy_session_controller.dart';
 
@@ -38,12 +40,20 @@ class _PrivacyUnlockScreenState extends State<PrivacyUnlockScreen> {
   Timer? _cooldownTicker;
   String? _error;
   bool _unlocking = false;
+  PrivacyBiometricStatus _biometricStatus = PrivacyBiometricStatus.unknown;
+  bool _biometricStatusLoaded = false;
+
+  bool get _showBiometricUnlock =>
+      widget.controller.configuration.biometricEnabled &&
+      widget.controller.configuration.credentialConfigured &&
+      _biometricStatus == PrivacyBiometricStatus.available;
 
   @override
   void initState() {
     super.initState();
     _pinController = TextEditingController();
     _syncCooldownTicker();
+    unawaited(_loadBiometricStatus());
   }
 
   @override
@@ -51,6 +61,16 @@ class _PrivacyUnlockScreenState extends State<PrivacyUnlockScreen> {
     _cooldownTicker?.cancel();
     _pinController.dispose();
     super.dispose();
+  }
+
+  Future<void> _loadBiometricStatus() async {
+    final PrivacyBiometricStatus status =
+        await widget.controller.biometricStatus();
+    if (!mounted) return;
+    setState(() {
+      _biometricStatus = status;
+      _biometricStatusLoaded = true;
+    });
   }
 
   String _modeCopy() {
@@ -109,7 +129,7 @@ class _PrivacyUnlockScreenState extends State<PrivacyUnlockScreen> {
     }
 
     final String pin = _pinController.text.trim();
-    if (!RegExp(r'^\d{6}$').hasMatch(pin)) {
+    if (!RegExp(r'^\\d{6}$').hasMatch(pin)) {
       setState(() {
         _error = 'Enter your 6-digit PIN.';
       });
@@ -133,7 +153,6 @@ class _PrivacyUnlockScreenState extends State<PrivacyUnlockScreen> {
         });
         widget.onUnlocked();
         return;
-
       case PrivacyAuthResult.failed:
         final int attemptsRemaining =
             widget.controller.failedAttemptCooldownThreshold -
@@ -144,7 +163,6 @@ class _PrivacyUnlockScreenState extends State<PrivacyUnlockScreen> {
           _error = 'Wrong PIN. $attemptsRemaining tries left before cooldown.';
         });
         return;
-
       case PrivacyAuthResult.cooldown:
         _pinController.clear();
         setState(() {
@@ -153,25 +171,71 @@ class _PrivacyUnlockScreenState extends State<PrivacyUnlockScreen> {
         });
         _syncCooldownTicker();
         return;
-
       case PrivacyAuthResult.cancelled:
         setState(() {
           _unlocking = false;
           _error = 'Unlock cancelled.';
         });
         return;
-
       case PrivacyAuthResult.unavailable:
         setState(() {
           _unlocking = false;
           _error = 'Privacy unlock is unavailable right now.';
         });
         return;
-
       case PrivacyAuthResult.error:
         setState(() {
           _unlocking = false;
           _error = 'Unable to unlock BreakWave right now.';
+        });
+        return;
+    }
+  }
+
+  Future<void> _unlockWithBiometrics() async {
+    if (_unlocking || !_showBiometricUnlock) return;
+
+    setState(() {
+      _unlocking = true;
+      _error = null;
+    });
+
+    final PrivacyAuthResult result =
+        await widget.controller.unlockWithBiometrics();
+    if (!mounted) return;
+
+    switch (result) {
+      case PrivacyAuthResult.success:
+        setState(() {
+          _unlocking = false;
+          _error = null;
+        });
+        widget.onUnlocked();
+        return;
+      case PrivacyAuthResult.cancelled:
+        setState(() {
+          _unlocking = false;
+          _error = 'Biometric unlock cancelled. You can still use your PIN.';
+        });
+        return;
+      case PrivacyAuthResult.failed:
+        setState(() {
+          _unlocking = false;
+          _error = 'Biometric unlock did not match. Try again or use your PIN.';
+        });
+        return;
+      case PrivacyAuthResult.unavailable:
+        setState(() {
+          _unlocking = false;
+          _biometricStatus = PrivacyBiometricStatus.notAvailable;
+          _error = 'Biometric unlock is unavailable. Use your PIN.';
+        });
+        return;
+      case PrivacyAuthResult.cooldown:
+      case PrivacyAuthResult.error:
+        setState(() {
+          _unlocking = false;
+          _error = 'Unable to use biometric unlock. Use your PIN.';
         });
         return;
     }
@@ -214,6 +278,29 @@ class _PrivacyUnlockScreenState extends State<PrivacyUnlockScreen> {
                   ),
                   const SizedBox(height: 10),
                   Text(_modeCopy(), style: theme.textTheme.bodyMedium),
+                  if (_showBiometricUnlock) ...<Widget>[
+                    const SizedBox(height: 16),
+                    FilledButton.tonalIcon(
+                      onPressed: _unlocking ? null : _unlockWithBiometrics,
+                      icon: const Icon(Icons.fingerprint),
+                      label: Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 14),
+                        child: Text(
+                          _unlocking ? 'Checking...' : 'Use Face ID / Touch ID',
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    Text(
+                      'Or use your BreakWave PIN.',
+                      textAlign: TextAlign.center,
+                      style: theme.textTheme.bodySmall,
+                    ),
+                  ] else if (!_biometricStatusLoaded &&
+                      widget.controller.configuration.biometricEnabled) ...<Widget>[
+                    const SizedBox(height: 12),
+                    const LinearProgressIndicator(),
+                  ],
                   const SizedBox(height: 16),
                   TextField(
                     controller: _pinController,
@@ -224,9 +311,7 @@ class _PrivacyUnlockScreenState extends State<PrivacyUnlockScreen> {
                     inputFormatters: <TextInputFormatter>[
                       FilteringTextInputFormatter.digitsOnly,
                     ],
-                    decoration: const InputDecoration(
-                      labelText: '6-digit PIN',
-                    ),
+                    decoration: const InputDecoration(labelText: '6-digit PIN'),
                     onSubmitted: (_) => _unlock(),
                   ),
                   if (coolingDown) ...<Widget>[
