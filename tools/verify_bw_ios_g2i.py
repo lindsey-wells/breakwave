@@ -32,6 +32,9 @@ for n in ('Use Face ID / Touch ID','widget.controller.biometricStatus()','widget
     require(unlock,n,'biometric unlock UI')
 for n in ('available enabled biometrics unlock without removing PIN fallback','unavailable biometrics remain hidden and PIN stays available','biometric failure does not increment PIN failure counter'):
     require(test,n,'biometric widget tests')
+require(unlock, r"RegExp(r'^\d{6}$')", 'six-digit PIN regex')
+if r"RegExp(r'^\\d{6}$')" in unlock:
+    print('FAIL PIN regex contains doubled raw-string backslash'); failed=True
 require(biometric,'.deviceOwnerAuthenticationWithBiometrics','native biometrics-only policy')
 if '.deviceOwnerAuthentication,' in biometric:
     print('FAIL generic device owner auth would permit passcode fallback'); failed=True

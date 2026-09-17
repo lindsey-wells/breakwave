@@ -129,7 +129,7 @@ class _PrivacyUnlockScreenState extends State<PrivacyUnlockScreen> {
     }
 
     final String pin = _pinController.text.trim();
-    if (!RegExp(r'^\\d{6}$').hasMatch(pin)) {
+    if (!RegExp(r'^\d{6}$').hasMatch(pin)) {
       setState(() {
         _error = 'Enter your 6-digit PIN.';
       });
